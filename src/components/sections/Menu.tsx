@@ -63,18 +63,29 @@ export function Menu({ onAddToCart }: MenuProps) {
 
   // Helper to format price
   const formatPrice = (price: number | string | Record<string, number>, variant?: string) => {
+    // Handle undefined/null prices
+    if (price === undefined || price === null) {
+      return "€0.00";
+    }
+    
     if (typeof price === "object") {
-      if (variant && price[variant]) {
+      if (variant && price[variant] !== undefined) {
         return `€${price[variant].toFixed(2)}`;
       }
       // Return first available price as default
       const firstKey = Object.keys(price)[0];
-      return `€${price[firstKey].toFixed(2)}`;
+      if (firstKey && price[firstKey] !== undefined) {
+        return `€${price[firstKey].toFixed(2)}`;
+      }
+      return "€0.00";
     }
     if (typeof price === "string") {
       return price.includes("€") ? price : `€${price}`;
     }
-    return `€${price.toFixed(2)}`;
+    if (typeof price === "number") {
+      return `€${price.toFixed(2)}`;
+    }
+    return "€0.00";
   };
 
   // Helper to get item variants (for items with multiple sizes/volumes)
