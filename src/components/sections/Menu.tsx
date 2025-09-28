@@ -13,7 +13,7 @@ interface MenuItem {
   name_en: string;
   description_de?: string;
   description_en?: string;
-  price: number | string | Record<string, number>;
+  price: number | string | Record<string, number | string>;
 }
 
 interface MenuProps {
@@ -62,38 +62,35 @@ export function Menu({ onAddToCart }: MenuProps) {
   };
 
   // Helper to format price
-  const formatPrice = (price: number | string | Record<string, number>, variant?: string) => {
-    // Handle undefined/null prices
-    if (price === undefined || price === null) {
-      return "€0.00";
-    }
-    
-    if (typeof price === "object") {
-      if (variant && price[variant] !== undefined) {
-        return `€${price[variant].toFixed(2)}`;
-      }
-      // Return first available price as default
-      const firstKey = Object.keys(price)[0];
-      if (firstKey && price[firstKey] !== undefined) {
-        return `€${price[firstKey].toFixed(2)}`;
-      }
-      return "€0.00";
-    }
-    if (typeof price === "string") {
-      return price.includes("€") ? price : `€${price}`;
-    }
-    if (typeof price === "number") {
-      return `€${price.toFixed(2)}`;
-    }
-    return "€0.00";
-  };
+  const formatPrice = (price: number | string | Record<string, number | string>, variant?: string) => {
+    if (price === undefined || price === null) return "€0.00";
 
-  // Helper to get item variants (for items with multiple sizes/volumes)
-  const getItemVariants = (price: number | string | Record<string, number>) => {
+    const toEuro = (val: number | string) => {
+      if (typeof val === "number" && isFinite(val)) return `€${val.toFixed(2)}`;
+      if (typeof val === "string") return val.includes("€") ? val : `€${val}`;
+      return "€0.00";
+    };
+
     if (typeof price === "object") {
-      return Object.keys(price);
+      const record = price as Record<string, number | string>;
+      const pick = (key?: string) => (key ? record[key] : undefined);
+
+      const chosen = variant ? pick(variant) : undefined;
+      if (chosen !== undefined && chosen !== null) return toEuro(chosen);
+
+      // Fallback to first defined value
+      for (const key of Object.keys(record)) {
+        const v = record[key];
+        if (v !== undefined && v !== null) return toEuro(v);
+      }
+      return "€0.00";
     }
-    return [];
+
+    return toEuro(price as number | string);
+  };
+  // Helper to get item variants (for items with multiple sizes/volumes)
+  const getItemVariants = (price: number | string | Record<string, number | string>) => {
+    return typeof price === "object" ? Object.keys(price) : [];
   };
 
   // Helper to get unique item ID
