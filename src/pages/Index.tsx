@@ -3,6 +3,8 @@ import { Header } from "@/components/navigation/Header";
 import { Hero } from "@/components/sections/Hero";
 import { Menu } from "@/components/sections/Menu";
 import { WhyChooseUs } from "@/components/sections/WhyChooseUs";
+import { Reviews } from "@/components/sections/Reviews";
+import { Contact } from "@/components/sections/Contact";
 import { Footer } from "@/components/sections/Footer";
 
 const Index = () => {
@@ -54,34 +56,9 @@ const Index = () => {
       
       <WhyChooseUs />
       
-      {/* Placeholder sections for Reserve, Order, Reviews, Contact */}
-      <section id="reserve" className="min-h-screen bg-surface flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-4xl font-bold text-foreground mb-4">RESERVIERUNG</h2>
-          <p className="text-body">Reservation system coming soon...</p>
-        </div>
-      </section>
+      <Reviews />
       
-      <section id="order" className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-4xl font-bold text-foreground mb-4">BESTELLUNG</h2>
-          <p className="text-body">Online ordering system coming soon...</p>
-        </div>
-      </section>
-      
-      <section id="reviews" className="min-h-screen bg-surface flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-4xl font-bold text-foreground mb-4">BEWERTUNGEN</h2>
-          <p className="text-body">Customer reviews coming soon...</p>
-        </div>
-      </section>
-      
-      <section id="contact" className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-4xl font-bold text-foreground mb-4">KONTAKT</h2>
-          <p className="text-body">Contact information and map coming soon...</p>
-        </div>
-      </section>
+      <Contact />
       
       <Footer />
     </div>
