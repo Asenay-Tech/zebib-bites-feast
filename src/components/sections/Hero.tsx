@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 import { useLanguage } from "@/components/ui/language-switcher";
@@ -9,8 +10,9 @@ interface HeroProps {
   onOrderClick: () => void;
 }
 
-export function Hero({ onScrollToMenu, onReserveClick, onOrderClick }: HeroProps) {
+export function Hero({ onScrollToMenu }: HeroProps) {
   const { t } = useLanguage();
+  const navigate = useNavigate();
 
   return (
     <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
@@ -40,7 +42,7 @@ export function Hero({ onScrollToMenu, onReserveClick, onOrderClick }: HeroProps
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
             <Button
-              onClick={onReserveClick}
+              onClick={() => navigate("/reserve")}
               size="lg"
               className="bg-accent hover:bg-accent-hover text-accent-foreground font-semibold px-8 py-4 text-lg transition-all duration-300 hover:shadow-glow min-w-[200px]"
             >
@@ -48,7 +50,7 @@ export function Hero({ onScrollToMenu, onReserveClick, onOrderClick }: HeroProps
             </Button>
             
             <Button
-              onClick={onOrderClick}
+              onClick={() => navigate("/order")}
               variant="outline"
               size="lg"
               className="border-accent text-accent hover:bg-accent hover:text-accent-foreground font-semibold px-8 py-4 text-lg transition-all duration-300 min-w-[200px]"

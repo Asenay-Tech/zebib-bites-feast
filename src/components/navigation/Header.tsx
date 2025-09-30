@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher, useLanguage } from "@/components/ui/language-switcher";
-import { Menu, X, Phone, MapPin, Clock } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Menu, X, Phone, MapPin, Clock, User, LogOut, ShoppingBag, Calendar } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface HeaderProps {
   currentSection?: string;
@@ -11,7 +15,22 @@ interface HeaderProps {
 export function Header({ currentSection, onSectionChange }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const { language, setLanguage, t } = useLanguage();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   // Handle scroll effect for header
   useEffect(() => {
@@ -38,6 +57,16 @@ export function Header({ currentSection, onSectionChange }: HeaderProps) {
       element.scrollIntoView({ behavior: "smooth" });
       onSectionChange?.(href.replace("#", ""));
       setIsMobileMenuOpen(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: t("auth.logoutSuccess") });
+      navigate("/");
     }
   };
 
@@ -77,6 +106,36 @@ export function Header({ currentSection, onSectionChange }: HeaderProps) {
               currentLanguage={language}
               onLanguageChange={setLanguage}
             />
+            {user && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    <span className="hidden md:inline">{user.email?.split('@')[0]}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 bg-surface border-border">
+                  <DropdownMenuItem onClick={() => navigate("/reserve")} className="cursor-pointer">
+                    <Calendar className="mr-2 h-4 w-4" />
+                    {t("nav.reserve")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/order")} className="cursor-pointer">
+                    <ShoppingBag className="mr-2 h-4 w-4" />
+                    {t("nav.order")}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    {t("auth.logout")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+            {!user && (
+              <Button variant="ghost" size="sm" onClick={() => navigate("/login")}>
+                {t("auth.login")}
+              </Button>
+            )}
           </div>
         </div>
       </div>
