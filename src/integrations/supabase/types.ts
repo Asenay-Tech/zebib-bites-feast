@@ -14,13 +14,219 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      contact_messages: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          message: string
+          name: string
+          phone: string | null
+          subject: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          message: string
+          name: string
+          phone?: string | null
+          subject: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          phone?: string | null
+          subject?: string
+        }
+        Relationships: []
+      }
+      orders: {
+        Row: {
+          created_at: string | null
+          date: string
+          dining_type: string
+          id: string
+          items: Json
+          name: string
+          payment_status: string | null
+          phone: string
+          table_number: number | null
+          time: string
+          total_amount_cents: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          dining_type: string
+          id?: string
+          items: Json
+          name: string
+          payment_status?: string | null
+          phone: string
+          table_number?: number | null
+          time: string
+          total_amount_cents: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          dining_type?: string
+          id?: string
+          items?: Json
+          name?: string
+          payment_status?: string | null
+          phone?: string
+          table_number?: number | null
+          time?: string
+          total_amount_cents?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          id: string
+          name: string | null
+          phone: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          id: string
+          name?: string | null
+          phone?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name?: string | null
+          phone?: string | null
+        }
+        Relationships: []
+      }
+      reservations: {
+        Row: {
+          created_at: string | null
+          date: string
+          email: string
+          event_type: string | null
+          id: string
+          name: string
+          notes: string | null
+          people: number
+          phone: string
+          services: string[] | null
+          table_number: number | null
+          time: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          email: string
+          event_type?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          people: number
+          phone: string
+          services?: string[] | null
+          table_number?: number | null
+          time: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          email?: string
+          event_type?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          people?: number
+          phone?: string
+          services?: string[] | null
+          table_number?: number | null
+          time?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      reviews_local: {
+        Row: {
+          created_at: string | null
+          id: string
+          language: string
+          name: string
+          rating: number
+          text: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          language: string
+          name: string
+          rating: number
+          text: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          language?: string
+          name?: string
+          rating?: number
+          text?: string
+        }
+        Relationships: []
+      }
+      tickets: {
+        Row: {
+          created_at: string | null
+          id: string
+          ref_id: string
+          status: string | null
+          ticket_code: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          ref_id: string
+          status?: string | null
+          ticket_code: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          ref_id?: string
+          status?: string | null
+          ticket_code?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_ticket_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
