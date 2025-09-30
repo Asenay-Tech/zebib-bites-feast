@@ -6,8 +6,6 @@ import heroImage from "@/assets/hero-restaurant.jpg";
 
 interface HeroProps {
   onScrollToMenu: () => void;
-  onReserveClick: () => void;
-  onOrderClick: () => void;
 }
 
 export function Hero({ onScrollToMenu }: HeroProps) {

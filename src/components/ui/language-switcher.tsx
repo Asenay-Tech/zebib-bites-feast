@@ -239,6 +239,65 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "menu.subtitle": "Discover the Flavors of Eritrea",
         "menu.category.all": "All",
         
+        // Reserve
+        "reserve.title": "Make a Reservation",
+        "reserve.date": "Date",
+        "reserve.selectDate": "Select date",
+        "reserve.time": "Time",
+        "reserve.people": "Number of People",
+        "reserve.table": "Table Selection",
+        "reserve.submit": "Reserve Table",
+        "reserve.success": "Reservation successful!",
+        
+        // Order
+        "order.title": "Order Online",
+        "order.pickup": "Pickup",
+        "order.dineIn": "Dine-In",
+        "order.cart": "Your Cart",
+        "order.emptyCart": "Your cart is empty",
+        "order.checkout": "Proceed to Checkout",
+        
+        // Auth
+        "auth.login": "Login",
+        "auth.logout": "Logout",
+        "auth.logoutSuccess": "Logged out successfully",
+        "auth.backToHome": "Back to Home",
+        
+        // Contact
+        "contact.title": "CONTACT",
+        "contact.subtitle": "We'd love to hear from you",
+        "contact.info": "Contact Information",
+        "contact.address": "Address",
+        "contact.phone": "Phone",
+        "contact.email": "Email",
+        "contact.hours": "Opening Hours",
+        "contact.getDirections": "Get Directions",
+        "contact.viewMenu": "View Menu",
+        "contact.form": "Contact Form",
+        "contact.name": "Name",
+        "contact.emailLabel": "Email",
+        "contact.phoneLabel": "Phone",
+        "contact.subject": "Subject",
+        "contact.message": "Message",
+        "contact.optional": "optional",
+        "contact.namePlaceholder": "Your Name",
+        "contact.emailPlaceholder": "your@email.com",
+        "contact.phonePlaceholder": "+49 ...",
+        "contact.subjectPlaceholder": "What's this about?",
+        "contact.messagePlaceholder": "Your message to us...",
+        "contact.send": "Send Message",
+        "contact.success": "Message sent successfully!",
+        
+        // Reviews
+        "reviews.title": "CUSTOMER REVIEWS",
+        "reviews.subtitle": "What our guests say about us",
+        "reviews.readMoreGoogle": "Read more on Google",
+        "reviews.noReviews": "No reviews yet",
+        "reviews.starsLabel": "stars",
+        "reviews.of": "of",
+        "reviews.sectionLabel": "Customer Reviews Carousel",
+        "reviews.viewOnGoogle": "View on Google",
+        
         // Common
         "common.loading": "Loading...",
         "common.error": "Error occurred",

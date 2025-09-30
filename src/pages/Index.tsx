@@ -48,8 +48,6 @@ const Index = () => {
       
       <Hero
         onScrollToMenu={() => scrollToSection("menu")}
-        onReserveClick={() => scrollToSection("reserve")}
-        onOrderClick={() => scrollToSection("order")}
       />
       
       <Menu />
