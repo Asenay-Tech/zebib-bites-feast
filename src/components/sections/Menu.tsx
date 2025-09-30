@@ -7,6 +7,7 @@ import { useLanguage } from "@/components/ui/language-switcher";
 import { Plus, Minus } from "lucide-react";
 import menuData from "@/data/menu.json";
 import traditionalPlatterImage from "@/assets/traditional-platter.jpg";
+import menuPlaceholder from "@/assets/menu-placeholder.jpg";
 
 interface MenuItem {
   name_de: string;
@@ -190,17 +191,25 @@ export function Menu({ onAddToCart }: MenuProps) {
             const currentQuantity = quantities[itemId] || 0;
 
             return (
-              <Card key={itemId} className="bg-surface border-border hover:shadow-card-hover transition-all duration-300">
-                <CardContent className="p-6">
-                  {/* Item Category Badge */}
-                  <Badge variant="secondary" className="mb-3 bg-accent/10 text-accent border-accent/20">
-                    {item.category}
-                  </Badge>
+              <Card key={itemId} className="bg-surface border-border hover:shadow-card-hover transition-all duration-300 overflow-hidden">
+                <CardContent className="p-0">
+                  {/* Thumbnail Image */}
+                  <img 
+                    src={menuPlaceholder} 
+                    alt={getItemName(item)}
+                    className="w-full h-48 object-cover"
+                  />
+                  
+                  <div className="p-6">
+                    {/* Item Category Badge */}
+                    <Badge variant="secondary" className="mb-3 bg-accent/10 text-accent border-accent/20">
+                      {item.category}
+                    </Badge>
 
-                  {/* Item Name */}
-                  <h3 className="text-lg font-semibold text-foreground mb-2">
-                    {getItemName(item)}
-                  </h3>
+                    {/* Item Name */}
+                    <h3 className="text-lg font-semibold text-foreground mb-2">
+                      {getItemName(item)}
+                    </h3>
 
                   {/* Item Description */}
                   {getItemDescription(item) && (
@@ -269,6 +278,7 @@ export function Menu({ onAddToCart }: MenuProps) {
                     >
                       {t("common.add")}
                     </Button>
+                  </div>
                   </div>
                 </CardContent>
               </Card>

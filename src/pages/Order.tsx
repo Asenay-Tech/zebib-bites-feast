@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import { de, enUS } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import menuDataRaw from "@/data/menu.json";
+import menuPlaceholder from "@/assets/menu-placeholder.jpg";
 
 interface MenuItem {
   name_de: string;
@@ -275,21 +276,30 @@ const Order = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {filteredMenu.map((item, idx) => (
-                  <Card key={idx} className="p-4">
-                    <h3 className="font-semibold">{language === "de" ? item.name_de : item.name_en}</h3>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      {language === "de" ? item.description_de : item.description_en}
-                    </p>
-                    <div className="flex justify-between items-center">
-                      <span className="font-bold text-accent">
-                        {typeof item.price === "object" 
-                          ? `€${Object.values(item.price)[0]}`
-                          : `€${item.price}`
-                        }
-                      </span>
-                      <Button size="sm" onClick={() => addToCart(item)}>
-                        <Plus className="h-4 w-4" />
-                      </Button>
+                  <Card key={idx} className="p-4 overflow-hidden">
+                    <div className="flex gap-4">
+                      <img 
+                        src={menuPlaceholder} 
+                        alt={language === "de" ? item.name_de : item.name_en}
+                        className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold truncate">{language === "de" ? item.name_de : item.name_en}</h3>
+                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                          {language === "de" ? item.description_de : item.description_en}
+                        </p>
+                        <div className="flex justify-between items-center">
+                          <span className="font-bold text-accent">
+                            {typeof item.price === "object" 
+                              ? `€${Object.values(item.price)[0]}`
+                              : `€${item.price}`
+                            }
+                          </span>
+                          <Button size="sm" onClick={() => addToCart(item)}>
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   </Card>
                 ))}
