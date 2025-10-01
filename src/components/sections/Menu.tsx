@@ -1,10 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/components/ui/language-switcher";
-import { Plus, Minus } from "lucide-react";
 import menuData from "@/data/menu.json";
 import traditionalPlatterImage from "@/assets/traditional-platter.jpg";
 import menuPlaceholder from "@/assets/menu-placeholder.jpg";
@@ -17,15 +15,9 @@ interface MenuItem {
   price: number | string | Record<string, number | string>;
 }
 
-interface MenuProps {
-  onAddToCart?: (item: any) => void;
-}
-
-export function Menu({ onAddToCart }: MenuProps) {
+export function Menu() {
   const { language, t } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [quantities, setQuantities] = useState<Record<string, number>>({});
-  const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
 
   // Get all categories from menu data
   const categories = Object.keys(menuData);
@@ -99,41 +91,6 @@ export function Menu({ onAddToCart }: MenuProps) {
     return `${item.category}-${index}`;
   };
 
-  // Update quantity
-  const updateQuantity = (itemId: string, change: number) => {
-    setQuantities(prev => ({
-      ...prev,
-      [itemId]: Math.max(0, (prev[itemId] || 0) + change)
-    }));
-  };
-
-  // Update variant selection
-  const updateVariant = (itemId: string, variant: string) => {
-    setSelectedVariants(prev => ({
-      ...prev,
-      [itemId]: variant
-    }));
-  };
-
-  // Add to cart handler
-  const handleAddToCart = (item: MenuItem & { category: string }, index: number) => {
-    const itemId = getItemId(item, index);
-    const quantity = quantities[itemId] || 1;
-    const variant = selectedVariants[itemId];
-    
-    if (onAddToCart) {
-      onAddToCart({
-        id: itemId,
-        name: getItemName(item),
-        description: getItemDescription(item),
-        category: item.category,
-        price: item.price,
-        variant,
-        quantity
-      });
-    }
-  };
-
   return (
     <section id="menu" className="py-20 bg-background">
       <div className="container mx-auto px-4">
@@ -187,8 +144,7 @@ export function Menu({ onAddToCart }: MenuProps) {
           {filteredItems.map((item, index) => {
             const itemId = getItemId(item, index);
             const variants = getItemVariants(item.price);
-            const currentVariant = selectedVariants[itemId] || variants[0];
-            const currentQuantity = quantities[itemId] || 0;
+            const displayPrice = variants.length > 0 ? variants[0] : undefined;
 
             return (
               <Card key={itemId} className="bg-surface border-border hover:shadow-card-hover transition-all duration-300 overflow-hidden">
@@ -201,84 +157,15 @@ export function Menu({ onAddToCart }: MenuProps) {
                   />
                   
                   <div className="p-6">
-                    {/* Item Category Badge */}
-                    <Badge variant="secondary" className="mb-3 bg-accent/10 text-accent border-accent/20">
-                      {item.category}
-                    </Badge>
-
                     {/* Item Name */}
-                    <h3 className="text-lg font-semibold text-foreground mb-2">
+                    <h3 className="text-lg font-semibold text-foreground mb-4">
                       {getItemName(item)}
                     </h3>
 
-                  {/* Item Description */}
-                  {getItemDescription(item) && (
-                    <p className="text-body text-sm mb-4 leading-relaxed">
-                      {getItemDescription(item)}
-                    </p>
-                  )}
-
-                  {/* Variants Selector */}
-                  {variants.length > 0 && (
-                    <div className="mb-4">
-                      <Select 
-                        value={currentVariant} 
-                        onValueChange={(value) => updateVariant(itemId, value)}
-                      >
-                        <SelectTrigger className="w-full bg-surface-elevated border-border text-foreground">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-surface border-border">
-                          {variants.map(variant => (
-                            <SelectItem key={variant} value={variant}>
-                              {variant} - {formatPrice(item.price, variant)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                    {/* Price Display */}
+                    <div className="text-xl font-bold text-accent">
+                      {formatPrice(item.price, displayPrice)}
                     </div>
-                  )}
-
-                  {/* Price Display */}
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-xl font-bold text-accent">
-                      {formatPrice(item.price, currentVariant)}
-                    </span>
-                  </div>
-
-                  {/* Quantity Controls */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => updateQuantity(itemId, -1)}
-                        disabled={currentQuantity === 0}
-                        className="h-8 w-8 p-0 border-border hover:border-accent"
-                      >
-                        <Minus className="h-4 w-4" />
-                      </Button>
-                      <span className="w-8 text-center text-foreground font-medium">
-                        {currentQuantity}
-                      </span>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => updateQuantity(itemId, 1)}
-                        className="h-8 w-8 p-0 border-border hover:border-accent"
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </div>
-
-                    <Button
-                      onClick={() => handleAddToCart(item, index)}
-                      disabled={currentQuantity === 0}
-                      className="bg-accent hover:bg-accent-hover text-accent-foreground disabled:opacity-50"
-                    >
-                      {t("common.add")}
-                    </Button>
-                  </div>
                   </div>
                 </CardContent>
               </Card>
@@ -296,20 +183,17 @@ export function Menu({ onAddToCart }: MenuProps) {
               {filteredItems.slice(0, 6).map((item, index) => {
                 const itemId = getItemId(item, index);
                 const variants = getItemVariants(item.price);
-                const currentVariant = selectedVariants[itemId] || variants[0];
+                const displayPrice = variants.length > 0 ? variants[0] : undefined;
                 
                 return (
                   <div key={itemId} className="flex items-center justify-between py-3 border-b border-border/50">
                     <div className="flex-1">
                       <h4 className="text-foreground font-medium">{getItemName(item)}</h4>
-                      {getItemDescription(item) && (
-                        <p className="text-body text-sm mt-1">{getItemDescription(item)}</p>
-                      )}
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="w-16 h-px bg-accent"></div>
                       <span className="text-accent font-bold">
-                        {formatPrice(item.price, currentVariant)}
+                        {formatPrice(item.price, displayPrice)}
                       </span>
                     </div>
                   </div>
