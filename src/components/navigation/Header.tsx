@@ -43,20 +43,38 @@ export function Header({ currentSection, onSectionChange }: HeaderProps) {
   }, []);
 
   const navigation = [
-    { key: "home", href: "#home" },
-    { key: "menu", href: "#menu" },
-    { key: "reserve", href: "#reserve" },
-    { key: "order", href: "#order" },
-    { key: "reviews", href: "#reviews" },
-    { key: "contact", href: "#contact" },
+    { key: "home", href: "#home", type: "scroll" },
+    { key: "menu", href: "#menu", type: "scroll" },
+    { key: "reserve", href: "/reserve", type: "route" },
+    { key: "order", href: "/order", type: "route" },
+    { key: "reviews", href: "#reviews", type: "scroll" },
+    { key: "contact", href: "#contact", type: "scroll" },
   ];
 
-  const scrollToSection = (href: string) => {
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-      onSectionChange?.(href.replace("#", ""));
-      setIsMobileMenuOpen(false);
+  const handleNavClick = (item: typeof navigation[0]) => {
+    setIsMobileMenuOpen(false);
+    
+    if (item.type === "route") {
+      navigate(item.href);
+    } else {
+      // First navigate to home if not already there
+      if (window.location.pathname !== "/") {
+        navigate("/");
+        // Wait for navigation then scroll
+        setTimeout(() => {
+          const element = document.querySelector(item.href);
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth" });
+            onSectionChange?.(item.href.replace("#", ""));
+          }
+        }, 100);
+      } else {
+        const element = document.querySelector(item.href);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+          onSectionChange?.(item.href.replace("#", ""));
+        }
+      }
     }
   };
 
@@ -153,7 +171,7 @@ export function Header({ currentSection, onSectionChange }: HeaderProps) {
             {/* Logo */}
             <div className="flex-shrink-0">
               <button
-                onClick={() => scrollToSection("#home")}
+                onClick={() => navigate("/")}
                 className="text-2xl font-bold text-foreground hover:text-accent transition-colors"
               >
                 ZEBIB
@@ -165,7 +183,7 @@ export function Header({ currentSection, onSectionChange }: HeaderProps) {
               {navigation.map((item) => (
                 <button
                   key={item.key}
-                  onClick={() => scrollToSection(item.href)}
+                  onClick={() => handleNavClick(item)}
                   className={`text-sm font-medium transition-colors duration-200 relative ${
                     currentSection === item.key
                       ? "text-accent"
@@ -204,7 +222,7 @@ export function Header({ currentSection, onSectionChange }: HeaderProps) {
                 {navigation.map((item) => (
                   <button
                     key={item.key}
-                    onClick={() => scrollToSection(item.href)}
+                    onClick={() => handleNavClick(item)}
                     className={`block w-full text-left px-3 py-2 text-sm font-medium transition-colors ${
                       currentSection === item.key
                         ? "text-accent bg-surface-elevated"

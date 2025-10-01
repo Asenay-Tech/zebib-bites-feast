@@ -17,9 +17,8 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
       <TooltipProvider>
-        {/* Toasters temporarily disabled to fix runtime hook error; will re-enable after theme provider setup */}
-        {/* <Toaster /> */}
-        {/* <Sonner /> */}
+        <Toaster />
+        <Sonner />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
