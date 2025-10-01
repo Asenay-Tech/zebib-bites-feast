@@ -146,6 +146,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "reserve.notesPlaceholder": "Besondere Wünsche oder Allergien...",
         "reserve.submit": "Reservierung absenden",
         "reserve.success": "Reservierung erfolgreich! Sie werden weitergeleitet...",
+        "reserve.tableAlreadyReserved": "Dieser Tisch ist zu dieser Zeit bereits reserviert. Bitte wählen Sie einen anderen Tisch oder eine andere Zeit.",
         "reserve.eventTypes.birthday": "Geburtstag",
         "reserve.eventTypes.wedding": "Hochzeit",
         "reserve.eventTypes.christening": "Taufe",
@@ -248,6 +249,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "reserve.table": "Table Selection",
         "reserve.submit": "Reserve Table",
         "reserve.success": "Reservation successful!",
+        "reserve.tableAlreadyReserved": "This table is already reserved at this time. Please choose another table or time.",
         
         // Order
         "order.title": "Order Online",

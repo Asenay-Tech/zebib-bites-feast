@@ -38,6 +38,7 @@ const Reserve = () => {
   const [eventType, setEventType] = useState("");
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [notes, setNotes] = useState("");
+  const [reservedTables, setReservedTables] = useState<number[]>([]);
 
   useEffect(() => {
     // Check auth
@@ -66,6 +67,29 @@ const Reserve = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
+  // Check for reserved tables when date/time changes
+  useEffect(() => {
+    const checkReservedTables = async () => {
+      if (!date) return;
+      
+      const timeString = `${hour}:${minute}`;
+      const dateString = format(date, "yyyy-MM-dd");
+      
+      const { data, error } = await supabase
+        .from("reservations")
+        .select("table_number")
+        .eq("date", dateString)
+        .eq("time", timeString);
+      
+      if (!error && data) {
+        const reserved = data.map(r => r.table_number).filter(Boolean) as number[];
+        setReservedTables(reserved);
+      }
+    };
+    
+    checkReservedTables();
+  }, [date, hour, minute]);
+
   const toggleService = (service: string) => {
     setSelectedServices(prev =>
       prev.includes(service)
@@ -83,6 +107,15 @@ const Reserve = () => {
 
     try {
       const timeString = `${hour}:${minute}`;
+      const dateString = format(date, "yyyy-MM-dd");
+      const selectedTableNum = parseInt(tableNumber);
+      
+      // Check if table is already reserved
+      if (reservedTables.includes(selectedTableNum)) {
+        setError(t("reserve.tableAlreadyReserved"));
+        setLoading(false);
+        return;
+      }
       
       const { error: reservationError } = await supabase
         .from("reservations")
@@ -91,10 +124,10 @@ const Reserve = () => {
           name,
           email,
           phone,
-          date: format(date, "yyyy-MM-dd"),
+          date: dateString,
           time: timeString,
           people,
-          table_number: parseInt(tableNumber),
+          table_number: selectedTableNum,
           event_type: eventType || null,
           services: selectedServices.length > 0 ? selectedServices : null,
           notes: notes || null,
@@ -280,11 +313,19 @@ const Reserve = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {Array.from({ length: 15 }, (_, i) => i + 1).map(t => (
-                        <SelectItem key={t} value={t.toString()}>
-                          {language === "de" ? `Tisch ${t}` : `Table ${t}`}
-                        </SelectItem>
-                      ))}
+                      {Array.from({ length: 15 }, (_, i) => i + 1).map(t => {
+                        const isReserved = reservedTables.includes(t);
+                        return (
+                          <SelectItem 
+                            key={t} 
+                            value={t.toString()}
+                            disabled={isReserved}
+                          >
+                            {language === "de" ? `Tisch ${t}` : `Table ${t}`}
+                            {isReserved && " (reserviert / reserved)"}
+                          </SelectItem>
+                        );
+                      })}
                     </SelectContent>
                   </Select>
                 </div>
@@ -339,7 +380,14 @@ const Reserve = () => {
               </div>
 
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? t("common.loading") : t("reserve.submit")}
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    {t("common.loading")}
+                  </span>
+                ) : (
+                  t("reserve.submit")
+                )}
               </Button>
             </form>
           </CardContent>

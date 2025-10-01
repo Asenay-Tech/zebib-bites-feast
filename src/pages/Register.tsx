@@ -158,7 +158,14 @@ const Register = () => {
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? t("common.loading") : t("auth.register")}
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                  {t("common.loading")}
+                </span>
+              ) : (
+                t("auth.register")
+              )}
             </Button>
           </form>
         </CardContent>

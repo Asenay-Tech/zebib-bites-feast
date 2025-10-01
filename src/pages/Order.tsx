@@ -57,6 +57,7 @@ const Order = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
+  const [addingToCart, setAddingToCart] = useState<string | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -89,31 +90,47 @@ const Order = () => {
     : menuData.filter(item => item.category_de === selectedCategory);
 
   const addToCart = (item: any, variant?: string) => {
-    const price = typeof item.price === "object" && variant 
-      ? item.price[variant] 
-      : typeof item.price === "number" 
-      ? item.price 
-      : 0;
+    setAddingToCart(item.name_de);
+    
+    // Handle price logic: if object and variant exists, use it; if object and no variant, use first price; if number, use it
+    let price: number;
+    if (typeof item.price === "object") {
+      if (variant && item.price[variant]) {
+        price = item.price[variant];
+      } else {
+        // Get first available price from object
+        price = Object.values(item.price)[0] as number;
+        // Also set the variant to the first key for display
+        if (!variant) {
+          variant = Object.keys(item.price)[0];
+        }
+      }
+    } else {
+      price = item.price;
+    }
 
     const cartItemId = `${item.name_de}-${variant || 'default'}`;
     const existing = cart.find(c => c.id === cartItemId);
 
-    if (existing) {
-      setCart(cart.map(c => 
-        c.id === cartItemId 
-          ? { ...c, quantity: c.quantity + 1 }
-          : c
-      ));
-    } else {
-      setCart([...cart, {
-        id: cartItemId,
-        name_de: item.name_de,
-        name_en: item.name_en,
-        variant,
-        price,
-        quantity: 1,
-      }]);
-    }
+    setTimeout(() => {
+      if (existing) {
+        setCart(cart.map(c => 
+          c.id === cartItemId 
+            ? { ...c, quantity: c.quantity + 1 }
+            : c
+        ));
+      } else {
+        setCart([...cart, {
+          id: cartItemId,
+          name_de: item.name_de,
+          name_en: item.name_en,
+          variant,
+          price,
+          quantity: 1,
+        }]);
+      }
+      setAddingToCart(null);
+    }, 300);
   };
 
   const updateQuantity = (id: string, delta: number) => {
@@ -295,8 +312,16 @@ const Order = () => {
                               : `€${item.price}`
                             }
                           </span>
-                          <Button size="sm" onClick={() => addToCart(item)}>
-                            <Plus className="h-4 w-4" />
+                          <Button 
+                            size="sm" 
+                            onClick={() => addToCart(item)}
+                            disabled={addingToCart === item.name_de}
+                          >
+                            {addingToCart === item.name_de ? (
+                              <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                              <Plus className="h-4 w-4" />
+                            )}
                           </Button>
                         </div>
                       </div>
