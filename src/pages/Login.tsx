@@ -308,10 +308,9 @@ const Login = () => {
                           value={resetEmail}
                           onChange={(e) => setResetEmail(e.target.value)}
                           className="flex-1"
-                          
-                        
-                        <Button>                          
-                        type="button"
+                        />
+                        <Button
+                          type="button"
                           onClick={handleSendResetEmail}
                           disabled={resetLoading || !resetEmail}
                         >
