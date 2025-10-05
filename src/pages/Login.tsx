@@ -20,20 +20,20 @@ const Login = () => {
   const [searchParams] = useSearchParams();
   const { t } = useLanguage();
 
-  // base login
+  // base login state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // forgot/reset
+  // forgot/reset state
   const [showForgot, setShowForgot] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetLoading, setResetLoading] = useState(false);
   const [resetSent, setResetSent] = useState(false);
 
-  // recovery mode (after clicking email link)
+  // recovery mode (after clicking the email link)
   const [isRecoveryMode, setIsRecoveryMode] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
@@ -81,7 +81,7 @@ const Login = () => {
   const handleGoogleLogin = async () => {
     setError("");
     try {
-      const redirectTo = `${window.location.origin}/login`; // this page handles recovery & redirect
+      const redirectTo = `${window.location.origin}/login`;
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: { redirectTo },
@@ -98,7 +98,7 @@ const Login = () => {
     setResetLoading(true);
     setResetSent(false);
     try {
-      const redirectTo = `${window.location.origin}/login`; // same page performs password update
+      const redirectTo = `${window.location.origin}/login`;
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(
         resetEmail,
         { redirectTo }
@@ -126,7 +126,6 @@ const Login = () => {
       });
       if (updateError) throw updateError;
 
-      // leave recovery mode and go home (or redirect)
       window.location.hash = "";
       setIsRecoveryMode(false);
       const redirectTo = searchParams.get("redirect") || "/";
@@ -213,7 +212,7 @@ const Login = () => {
             </form>
           ) : (
             <>
-              {/* Email/password login (unchanged UI) */}
+              {/* Email/password login */}
               <form onSubmit={handleLogin} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">{t("auth.email")}</Label>
@@ -234,7 +233,6 @@ const Login = () => {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="password">{t("auth.password")}</Label>
-                    {/* small toggle link; keeps layout the same */}
                     <button
                       type="button"
                       onClick={() => setShowForgot((s) => !s)}
@@ -258,7 +256,7 @@ const Login = () => {
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                      aria-label={showPassword ? t("common.hide") : t("common.show")}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -270,7 +268,7 @@ const Login = () => {
                 </Button>
               </form>
 
-              {/* minimal divider + Google button; style matches your UI */}
+              {/* Divider + Google */}
               <div className="my-6 flex items-center gap-4">
                 <div className="h-px bg-border flex-1" />
                 <span className="text-xs text-muted-foreground">{t("auth.or")}</span>
@@ -292,7 +290,7 @@ const Login = () => {
                 {t("auth.continueWithGoogle")}
               </Button>
 
-              {/* inline forgot-password block; hidden until toggled */}
+              {/* Forgot-password block */}
               {showForgot && (
                 <div className="mt-6 border-t pt-6 space-y-3">
                   {resetSent ? (
@@ -310,8 +308,10 @@ const Login = () => {
                           value={resetEmail}
                           onChange={(e) => setResetEmail(e.target.value)}
                           className="flex-1"
-                        />
-                        <Button
+                          
+                        
+                        <Button>                          
+                        type="button"
                           onClick={handleSendResetEmail}
                           disabled={resetLoading || !resetEmail}
                         >
@@ -334,11 +334,7 @@ const Login = () => {
                 {t("auth.register")}
               </Link>
             </div>
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => navigate("/")}
-            >
+            <Button variant="outline" className="w-full" onClick={() => navigate("/")}>
               {t("auth.backToHome")}
             </Button>
           </CardFooter>
