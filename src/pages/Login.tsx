@@ -231,16 +231,7 @@ const Login = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password">{t("auth.password")}</Label>
-                    <button
-                      type="button"
-                      onClick={() => setShowForgot((s) => !s)}
-                      className="text-sm text-accent hover:underline"
-                    >
-                      {t("auth.forgotPassword")}
-                    </button>
-                  </div>
+                  <Label htmlFor="password">{t("auth.password")}</Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -259,6 +250,15 @@ const Login = () => {
                       aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                  <div className="text-right">
+                    <button
+                      type="button"
+                      onClick={() => setShowForgot((s) => !s)}
+                      className="text-sm text-accent hover:underline"
+                    >
+                      {t("auth.forgotPassword")}
                     </button>
                   </div>
                 </div>
