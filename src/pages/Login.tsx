@@ -231,16 +231,7 @@ const Login = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password">{t("auth.password")}</Label>
-                    <button
-                      type="button"
-                      onClick={() => setShowForgot((s) => !s)}
-                      className="text-sm text-accent hover:underline"
-                    >
-                      {t("auth.forgotPassword")}
-                    </button>
-                  </div>
+                  <Label htmlFor="password">{t("auth.password")}</Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -259,6 +250,15 @@ const Login = () => {
                       aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                  <div className="text-right">
+                    <button
+                      type="button"
+                      onClick={() => setShowForgot((s) => !s)}
+                      className="text-sm text-accent hover:underline"
+                    >
+                      {t("auth.forgotPassword")}
                     </button>
                   </div>
                 </div>
@@ -291,6 +291,7 @@ const Login = () => {
               </Button>
 
               {/* Forgot-password block */}
+<<<<<<< HEAD
  {/* Forgot-password block */}
 {showForgot && (
   <div className="mt-6 border-t pt-6 space-y-3">
@@ -326,6 +327,38 @@ const Login = () => {
 )}
 
 
+=======
+              {showForgot && (
+                <div className="mt-6 border-t pt-6 space-y-3">
+                  {resetSent ? (
+                    <div className="text-sm rounded-md p-3 bg-green-500/10 text-green-600">
+                      {t("auth.resetLinkSent")}
+                    </div>
+                  ) : (
+                    <>
+                      <Label htmlFor="resetEmail">{t("auth.resetPasswordHelp")}</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          id="resetEmail"
+                          type="email"
+                          placeholder={t("auth.emailPlaceholder")}
+                          value={resetEmail}
+                          onChange={(e) => setResetEmail(e.target.value)}
+                          className="flex-1"
+                        />
+                        <Button
+                          type="button"
+                          onClick={handleSendResetEmail}
+                          disabled={resetLoading || !resetEmail}
+                        >
+                          {resetLoading ? t("common.loading") : t("auth.sendResetLink")}
+                        </Button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+>>>>>>> aa23e2bb827ed6007261b9ea703ae2e687809f35
             </>
           )}
         </CardContent>
