@@ -82,16 +82,24 @@ const Login = () => {
     setError("");
     try {
       const redirectTo = `${window.location.origin}/login`;
-      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+      const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: "google",
-        options: { redirectTo },
+        options: { redirectTo, skipBrowserRedirect: true },
       });
       if (oauthError) throw oauthError;
+      if (data?.url) {
+        // In preview, the app runs inside an iframe. Force a top-level navigation
+        // so Google can render outside of the iframe sandbox.
+        if (window.top) {
+          (window.top as Window).location.href = data.url;
+        } else {
+          window.location.href = data.url;
+        }
+      }
     } catch (err: any) {
       setError(err.message || t("common.error"));
     }
   };
-
   const handleSendResetEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
