@@ -82,24 +82,16 @@ const Login = () => {
     setError("");
     try {
       const redirectTo = `${window.location.origin}/login`;
-      const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: "google",
-        options: { redirectTo, skipBrowserRedirect: true },
+        options: { redirectTo },
       });
       if (oauthError) throw oauthError;
-      if (data?.url) {
-        // In preview, the app runs inside an iframe. Force a top-level navigation
-        // so Google can render outside of the iframe sandbox.
-        if (window.top) {
-          (window.top as Window).location.href = data.url;
-        } else {
-          window.location.href = data.url;
-        }
-      }
     } catch (err: any) {
       setError(err.message || t("common.error"));
     }
   };
+
   const handleSendResetEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -239,7 +231,16 @@ const Login = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password">{t("auth.password")}</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password">{t("auth.password")}</Label>
+                    <button
+                      type="button"
+                      onClick={() => setShowForgot((s) => !s)}
+                      className="text-sm text-accent hover:underline"
+                    >
+                      {t("auth.forgotPassword")}
+                    </button>
+                  </div>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -258,15 +259,6 @@ const Login = () => {
                       aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                  <div className="text-right">
-                    <button
-                      type="button"
-                      onClick={() => setShowForgot((s) => !s)}
-                      className="text-sm text-accent hover:underline"
-                    >
-                      {t("auth.forgotPassword")}
                     </button>
                   </div>
                 </div>
