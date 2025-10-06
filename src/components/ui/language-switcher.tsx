@@ -10,14 +10,10 @@ interface LanguageSwitcherProps {
   className?: string;
 }
 
-export function LanguageSwitcher({
-  currentLanguage,
-  onLanguageChange,
-  className,
-}: LanguageSwitcherProps) {
+export function LanguageSwitcher({ currentLanguage, onLanguageChange, className }: LanguageSwitcherProps) {
   const languages = [
     { code: "de" as Language, label: "DE", flag: "🇩🇪" },
-    { code: "en" as Language, label: "EN", flag: "🇬🇧" },
+    { code: "en" as Language, label: "EN", flag: "🇬🇧" }
   ];
 
   return (
@@ -30,8 +26,8 @@ export function LanguageSwitcher({
           size="sm"
           onClick={() => onLanguageChange(lang.code)}
           className={`h-8 px-2 text-xs font-medium transition-colors ${
-            currentLanguage === lang.code
-              ? "bg-accent text-accent-foreground"
+            currentLanguage === lang.code 
+              ? "bg-accent text-accent-foreground" 
               : "text-body hover:text-foreground hover:bg-surface-elevated"
           }`}
         >
@@ -52,9 +48,7 @@ interface LanguageContextType {
   t: (key: string) => string;
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(
-  undefined
-);
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 interface LanguageProviderProps {
   children: ReactNode;
@@ -89,25 +83,25 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "nav.order": "Bestellen",
         "nav.reviews": "Bewertungen",
         "nav.contact": "Kontakt",
-
+        
         // Hero Section
         "hero.title": "ZEBIB RESTAURANT",
         "hero.subtitle": "Authentische eritreische Küche im Herzen von Hanau",
         "hero.cta.reserve": "Tisch Reservieren",
         "hero.cta.order": "Online Bestellen",
         "hero.scroll": "Zur Speisekarte",
-
+        
         // Info Bar
         "info.address": "Salzstraße 14, 63450 Hanau",
         "info.directions": "Route Anzeigen",
         "info.hours": "Täglich 11:00 - 23:00",
         "info.phone": "+49 177 4629585",
-
+        
         // Menu Section
         "menu.title": "UNSERE SPEISEKARTE",
         "menu.subtitle": "Entdecken Sie die Aromen Eritreas",
         "menu.category.all": "Alle",
-
+        
         // Auth
         "auth.login": "Anmelden",
         "auth.register": "Registrieren",
@@ -116,10 +110,8 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "auth.password": "Passwort",
         "auth.confirmPassword": "Passwort bestätigen",
         "auth.name": "Name",
-        "auth.loginDescription":
-          "Melden Sie sich an, um Reservierungen vorzunehmen und Bestellungen aufzugeben",
-        "auth.registerDescription":
-          "Erstellen Sie ein Konto, um unsere Services zu nutzen",
+        "auth.loginDescription": "Melden Sie sich an, um Reservierungen vorzunehmen und Bestellungen aufzugeben",
+        "auth.registerDescription": "Erstellen Sie ein Konto, um unsere Services zu nutzen",
         "auth.emailPlaceholder": "ihre@email.de",
         "auth.passwordPlaceholder": "Ihr Passwort",
         "auth.confirmPasswordPlaceholder": "Passwort wiederholen",
@@ -132,11 +124,10 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "auth.profile": "Profil",
         "auth.orders": "Bestellungen",
         "auth.reservations": "Reservierungen",
-
+        
         // Reserve
         "reserve.title": "Tisch reservieren",
-        "reserve.description":
-          "Reservieren Sie Ihren Tisch im Zebib Restaurant",
+        "reserve.description": "Reservieren Sie Ihren Tisch im Zebib Restaurant",
         "reserve.name": "Name",
         "reserve.email": "E-Mail",
         "reserve.phone": "Telefon",
@@ -154,10 +145,8 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "reserve.selectEventType": "Wählen Sie einen Veranstaltungstyp",
         "reserve.notesPlaceholder": "Besondere Wünsche oder Allergien...",
         "reserve.submit": "Reservierung absenden",
-        "reserve.success":
-          "Reservierung erfolgreich! Sie werden weitergeleitet...",
-        "reserve.tableAlreadyReserved":
-          "Dieser Tisch ist zu dieser Zeit bereits reserviert. Bitte wählen Sie einen anderen Tisch oder eine andere Zeit.",
+        "reserve.success": "Reservierung erfolgreich! Sie werden weitergeleitet...",
+        "reserve.tableAlreadyReserved": "Dieser Tisch ist zu dieser Zeit bereits reserviert. Bitte wählen Sie einen anderen Tisch oder eine andere Zeit.",
         "reserve.eventTypes.birthday": "Geburtstag",
         "reserve.eventTypes.wedding": "Hochzeit",
         "reserve.eventTypes.christening": "Taufe",
@@ -168,7 +157,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "reserve.servicesList.drinks": "Getränke",
         "reserve.servicesList.venue": "Location",
         "reserve.servicesList.delivery": "Lieferung",
-
+        
         // Order
         "order.title": "Online bestellen",
         "order.pickup": "Abholung",
@@ -176,7 +165,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "order.cart": "Warenkorb",
         "order.emptyCart": "Ihr Warenkorb ist leer",
         "order.checkout": "Zur Kasse",
-
+        
         // Contact
         "contact.title": "KONTAKT",
         "contact.subtitle": "Wir freuen uns von Ihnen zu hören",
@@ -201,7 +190,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "contact.messagePlaceholder": "Ihre Nachricht an uns...",
         "contact.send": "Nachricht senden",
         "contact.success": "Nachricht erfolgreich gesendet!",
-
+        
         // Reviews
         "reviews.title": "KUNDENBEWERTUNGEN",
         "reviews.subtitle": "Was unsere Gäste über uns sagen",
@@ -211,7 +200,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "reviews.of": "von",
         "reviews.sectionLabel": "Kundenbewertungen Karussell",
         "reviews.viewOnGoogle": "Auf Google ansehen",
-
+        
         // Common
         "common.loading": "Lädt...",
         "common.error": "Fehler aufgetreten",
@@ -220,7 +209,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "common.remove": "Entfernen",
         "common.price": "Preis",
         "common.total": "Gesamt",
-
+        
         // Footer
         "footer.developed": "Entwickelt von Asenay Tech",
       },
@@ -232,25 +221,25 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "nav.order": "Order",
         "nav.reviews": "Reviews",
         "nav.contact": "Contact",
-
+        
         // Hero Section
-        "hero.title": "ZEBIB",
-        "hero.subtitle": "Door of Africa",
+        "hero.title": "ZEBIB RESTAURANT",
+        "hero.subtitle": "Authentic Eritrean Cuisine in the Heart of Hanau",
         "hero.cta.reserve": "Make Reservation",
         "hero.cta.order": "Order Online",
         "hero.scroll": "View Menu",
-
+        
         // Info Bar
         "info.address": "Salzstraße 14, 63450 Hanau",
         "info.directions": "Get Directions",
         "info.hours": "Daily 11:00 AM - 11:00 PM",
         "info.phone": "+49 177 4629585",
-
+        
         // Menu Section
         "menu.title": "OUR MENU",
         "menu.subtitle": "Discover the Flavors of Eritrea",
         "menu.category.all": "All",
-
+        
         // Reserve
         "reserve.title": "Make a Reservation",
         "reserve.date": "Date",
@@ -260,9 +249,8 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "reserve.table": "Table Selection",
         "reserve.submit": "Reserve Table",
         "reserve.success": "Reservation successful!",
-        "reserve.tableAlreadyReserved":
-          "This table is already reserved at this time. Please choose another table or time.",
-
+        "reserve.tableAlreadyReserved": "This table is already reserved at this time. Please choose another table or time.",
+        
         // Order
         "order.title": "Order Online",
         "order.pickup": "Pickup",
@@ -270,13 +258,13 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "order.cart": "Your Cart",
         "order.emptyCart": "Your cart is empty",
         "order.checkout": "Proceed to Checkout",
-
+        
         // Auth
         "auth.login": "Login",
         "auth.logout": "Logout",
         "auth.logoutSuccess": "Logged out successfully",
         "auth.backToHome": "Back to Home",
-
+        
         // Contact
         "contact.title": "CONTACT",
         "contact.subtitle": "We'd love to hear from you",
@@ -301,7 +289,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "contact.messagePlaceholder": "Your message to us...",
         "contact.send": "Send Message",
         "contact.success": "Message sent successfully!",
-
+        
         // Reviews
         "reviews.title": "CUSTOMER REVIEWS",
         "reviews.subtitle": "What our guests say about us",
@@ -311,7 +299,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "reviews.of": "of",
         "reviews.sectionLabel": "Customer Reviews Carousel",
         "reviews.viewOnGoogle": "View on Google",
-
+        
         // Common
         "common.loading": "Loading...",
         "common.error": "Error occurred",
@@ -320,10 +308,10 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "common.remove": "Remove",
         "common.price": "Price",
         "common.total": "Total",
-
+        
         // Footer
         "footer.developed": "Developed by Asenay Tech",
-      },
+      }
     };
 
     return translations[language][key] || key;
