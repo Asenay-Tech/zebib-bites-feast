@@ -291,6 +291,43 @@ const Login = () => {
               </Button>
 
               {/* Forgot-password block */}
+<<<<<<< HEAD
+ {/* Forgot-password block */}
+{showForgot && (
+  <div className="mt-6 border-t pt-6 space-y-3">
+    {resetSent ? (
+      <div className="text-sm rounded-md p-3 bg-green-500/10 text-green-600">
+        {t("auth.resetLinkSent")}
+      </div>
+   ) : (
+  <div>
+    <Label htmlFor="resetEmail">{t("auth.resetPasswordHelp")}</Label>
+    <div className="flex gap-2">
+      <Input
+        id="resetEmail"
+        type="email"
+        placeholder={t("auth.emailPlaceholder")}
+        value={resetEmail}
+        onChange={(e) => setResetEmail(e.target.value)}
+        className="flex-1"
+      />
+      <Button
+        type="button"
+        onClick={handleSendResetEmail}
+        disabled={resetLoading || !resetEmail}
+      >
+        {resetLoading ? t("common.loading") : t("auth.sendResetLink")}
+      </Button>
+    </div>
+  </div>
+)
+
+    )}
+  </div>
+)}
+
+
+=======
               {showForgot && (
                 <div className="mt-6 border-t pt-6 space-y-3">
                   {resetSent ? (
@@ -321,6 +358,7 @@ const Login = () => {
                   )}
                 </div>
               )}
+>>>>>>> aa23e2bb827ed6007261b9ea703ae2e687809f35
             </>
           )}
         </CardContent>
