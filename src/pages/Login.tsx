@@ -48,10 +48,15 @@ const Login = () => {
 
   // keep recovery flag in sync if URL changes
   useEffect(() => {
-    const hash = window.location.hash || "";
-    const recovery =
-      /type=recovery/.test(hash) || searchParams.get("type") === "recovery";
-    if (recovery !== isRecoveryMode) setIsRecoveryMode(recovery);
+    const sync = () => {
+      const hash = window.location.hash || "";
+      const recovery =
+        /type=recovery/.test(hash) || searchParams.get("type") === "recovery";
+      if (recovery !== isRecoveryMode) setIsRecoveryMode(recovery);
+    };
+    window.addEventListener("hashchange", sync);
+    sync();
+    return () => window.removeEventListener("hashchange", sync);
   }, [searchParams, isRecoveryMode]);
 
   // 2) Only redirect if NOT in recovery (double-check the hash right now)
@@ -107,7 +112,10 @@ const Login = () => {
       const redirectTo = `${window.location.origin}/login`;
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: "google",
-        options: { redirectTo },
+        options: { 
+          redirectTo,
+          queryParams: { prompt: "select_account" }
+        },
       });
       if (oauthError) throw oauthError;
     } catch (err: any) {
@@ -121,7 +129,7 @@ const Login = () => {
     setResetLoading(true);
     setResetSent(false);
     try {
-      const redirectTo = `${window.location.origin}/login`;
+      const redirectTo = `${window.location.origin}/login?type=recovery`;
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(
         resetEmail,
         { redirectTo }
