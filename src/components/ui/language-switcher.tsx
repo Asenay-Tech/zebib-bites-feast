@@ -112,6 +112,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "auth.login": "Anmelden",
         "auth.register": "Registrieren",
         "auth.logout": "Abmelden",
+        "auth.logoutSuccess": "Erfolgreich abgemeldet",
         "auth.email": "E-Mail",
         "auth.password": "Passwort",
         "auth.confirmPassword": "Passwort bestätigen",
@@ -132,6 +133,18 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "auth.profile": "Profil",
         "auth.orders": "Bestellungen",
         "auth.reservations": "Reservierungen",
+        "auth.forgotPassword": "Passwort vergessen?",
+        "auth.sendResetLink": "Link zum Zurücksetzen senden",
+        "auth.resetLinkSent":
+          "Passwort-Zurücksetzungslink gesendet. Bitte prüfen Sie Ihre E-Mails.",
+        "auth.resetPassword": "Passwort zurücksetzen",
+        "auth.resetPasswordDescription":
+          "Legen Sie ein neues Passwort für Ihr Konto fest.",
+        "auth.resetPasswordHelp":
+          "Geben Sie Ihre Konto-E-Mail ein; wir senden Ihnen einen Link zum Zurücksetzen.",
+        "auth.newPassword": "Neues Passwort",
+        "auth.updatePassword": "Passwort aktualisieren",
+        "auth.backToLogin": "Zurück zur Anmeldung",
 
         // Reserve
         "reserve.title": "Tisch reservieren",
@@ -223,7 +236,15 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
 
         // Footer
         "footer.developed": "Entwickelt von Asenay Tech",
+        "footer.followUs": "Folgen Sie uns",
+        "footer.rights": "Alle Rechte vorbehalten.",
+        "footer.privacy": "Datenschutz",
+        "footer.imprint": "Impressum",
+        "footer.hours.monThu": "Montag – Donnerstag:",
+        "footer.hours.friSat": "Freitag – Samstag:",
+        "footer.hours.sun": "Sonntag:",
       },
+
       en: {
         // Navigation
         "nav.home": "Home",
@@ -234,8 +255,8 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "nav.contact": "Contact",
 
         // Hero Section
-        "hero.title": "ZEBIB",
-        "hero.subtitle": "Door of Africa",
+        "hero.title": "ZEBIB RESTAURANT",
+        "hero.subtitle": "Authentic Eritrean cuisine in the heart of Hanau",
         "hero.cta.reserve": "Make Reservation",
         "hero.cta.order": "Order Online",
         "hero.scroll": "View Menu",
@@ -251,17 +272,75 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "menu.subtitle": "Discover the Flavors of Eritrea",
         "menu.category.all": "All",
 
+        // Auth
+        "auth.login": "Login",
+        "auth.register": "Sign up",
+        "auth.logout": "Logout",
+        "auth.logoutSuccess": "Logged out successfully",
+        "auth.email": "Email",
+        "auth.password": "Password",
+        "auth.confirmPassword": "Confirm password",
+        "auth.name": "Name",
+        "auth.loginDescription":
+          "Sign in to make reservations and place orders",
+        "auth.registerDescription": "Create an account to use our services",
+        "auth.emailPlaceholder": "your@email.com",
+        "auth.passwordPlaceholder": "Your password",
+        "auth.confirmPasswordPlaceholder": "Confirm your password",
+        "auth.namePlaceholder": "Your full name",
+        "auth.noAccount": "Don't have an account yet?",
+        "auth.hasAccount": "Already have an account?",
+        "auth.backToHome": "Back to Home",
+        "auth.passwordMismatch": "Passwords do not match",
+        "auth.passwordTooShort": "Password must be at least 6 characters long",
+        "auth.profile": "Profile",
+        "auth.orders": "Orders",
+        "auth.reservations": "Reservations",
+        "auth.forgotPassword": "Forgot password?",
+        "auth.sendResetLink": "Send reset link",
+        "auth.resetLinkSent":
+          "Password reset link sent. Please check your email.",
+        "auth.resetPassword": "Reset password",
+        "auth.resetPasswordDescription": "Set a new password for your account.",
+        "auth.resetPasswordHelp":
+          "Enter your account email and we’ll email you a reset link.",
+        "auth.newPassword": "New password",
+        "auth.updatePassword": "Update password",
+        "auth.backToLogin": "Back to login",
+
         // Reserve
         "reserve.title": "Make a Reservation",
+        "reserve.description": "Reserve your table at Zebib Restaurant",
+        "reserve.name": "Name",
+        "reserve.email": "Email",
+        "reserve.phone": "Phone",
         "reserve.date": "Date",
-        "reserve.selectDate": "Select date",
         "reserve.time": "Time",
         "reserve.people": "Number of People",
         "reserve.table": "Table Selection",
+        "reserve.eventType": "Event Type",
+        "reserve.services": "Additional Services",
+        "reserve.notes": "Notes",
+        "reserve.namePlaceholder": "Your full name",
+        "reserve.emailPlaceholder": "your@email.com",
+        "reserve.phonePlaceholder": "+49 ...",
+        "reserve.selectDate": "Select date",
+        "reserve.selectEventType": "Choose an event type",
+        "reserve.notesPlaceholder": "Special requests or allergies...",
         "reserve.submit": "Reserve Table",
         "reserve.success": "Reservation successful!",
         "reserve.tableAlreadyReserved":
           "This table is already reserved at this time. Please choose another table or time.",
+        "reserve.eventTypes.birthday": "Birthday",
+        "reserve.eventTypes.wedding": "Wedding",
+        "reserve.eventTypes.christening": "Christening",
+        "reserve.eventTypes.other": "Other",
+        "reserve.servicesList.catering": "Catering",
+        "reserve.servicesList.decorations": "Decorations",
+        "reserve.servicesList.dj": "DJ",
+        "reserve.servicesList.drinks": "Drinks",
+        "reserve.servicesList.venue": "Venue",
+        "reserve.servicesList.delivery": "Delivery",
 
         // Order
         "order.title": "Order Online",
@@ -270,12 +349,6 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "order.cart": "Your Cart",
         "order.emptyCart": "Your cart is empty",
         "order.checkout": "Proceed to Checkout",
-
-        // Auth
-        "auth.login": "Login",
-        "auth.logout": "Logout",
-        "auth.logoutSuccess": "Logged out successfully",
-        "auth.backToHome": "Back to Home",
 
         // Contact
         "contact.title": "CONTACT",
@@ -323,6 +396,13 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
 
         // Footer
         "footer.developed": "Developed by Asenay Tech",
+        "footer.followUs": "Follow us",
+        "footer.rights": "All rights reserved.",
+        "footer.privacy": "Privacy Policy",
+        "footer.imprint": "Imprint",
+        "footer.hours.monThu": "Monday – Thursday:",
+        "footer.hours.friSat": "Friday – Saturday:",
+        "footer.hours.sun": "Sunday:",
       },
     };
 
