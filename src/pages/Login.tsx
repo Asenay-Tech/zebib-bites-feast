@@ -45,6 +45,7 @@ const Login = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [updateLoading, setUpdateLoading] = useState(false);
+  const [sessionReady, setSessionReady] = useState(false);
 
   // keep recovery flag in sync if URL changes
   useEffect(() => {
@@ -79,11 +80,26 @@ const Login = () => {
 
   // 3) Optional: react to Supabase's recovery event
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") setIsRecoveryMode(true);
+    const { data: sub } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === "PASSWORD_RECOVERY") {
+        setIsRecoveryMode(true);
+        setSessionReady(true);
+      }
+      // Also check if we're in recovery mode and have a session
+      if (isRecoveryMode && session) {
+        setSessionReady(true);
+      }
     });
+    
+    // Check immediately if we already have a session
+    if (isRecoveryMode) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) setSessionReady(true);
+      });
+    }
+    
     return () => sub.subscription.unsubscribe();
-  }, []);
+  }, [isRecoveryMode]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -152,6 +168,12 @@ const Login = () => {
 
     setUpdateLoading(true);
     try {
+      // Verify we have a session first
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("No active session. Please request a new password reset link.");
+      }
+
       const { error: updateError } = await supabase.auth.updateUser({
         password: newPassword,
       });
@@ -191,9 +213,14 @@ const Login = () => {
 
           {/* Recovery screen: set a new password */}
           {isRecoveryMode ? (
-            <form onSubmit={handleUpdatePassword} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="newPassword">{t("auth.newPassword")}</Label>
+            !sessionReady ? (
+              <div className="text-center py-8 text-muted-foreground">
+                {t("common.loading")}...
+              </div>
+            ) : (
+              <form onSubmit={handleUpdatePassword} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="newPassword">{t("auth.newPassword")}</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -229,18 +256,20 @@ const Login = () => {
               <Button type="submit" className="w-full" disabled={updateLoading}>
                 {updateLoading ? t("common.loading") : t("auth.updatePassword")}
               </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full"
-                onClick={() => {
-                  window.location.hash = "";
-                  setIsRecoveryMode(false);
-                }}
-              >
-                {t("auth.backToLogin")}
-              </Button>
-            </form>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    window.location.hash = "";
+                    setIsRecoveryMode(false);
+                    setSessionReady(false);
+                  }}
+                >
+                  {t("auth.backToLogin")}
+                </Button>
+              </form>
+            )
           ) : (
             <>
               {/* Email/password login */}
