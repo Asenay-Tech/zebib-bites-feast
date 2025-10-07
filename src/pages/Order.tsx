@@ -207,8 +207,36 @@ const Order = () => {
   }, 0);
 
   const handleCheckout = () => {
-    // This would integrate with Stripe in a real implementation
-    console.log("Checkout with cart:", cart);
+    // This would integrate with Stripe
+    if (cart.length === 0) return;
+
+    // build the reservation Date from selected date + time
+    const when = new Date(date ?? new Date());
+    when.setHours(Number(hour), Number(minute), 0, 0);
+
+    const order = {
+      userId: user?.id,
+      diningType,
+      dateISO: when.toISOString(),
+      table: diningType === "dine-in" ? selectedTable : null,
+      items: cart.map((it) => ({
+        name_de: it.name_de,
+        name_en: it.name_en,
+        variant: it.variant ?? null,
+        qty: it.quantity,
+        unitPrice: it.price,
+        lineTotal: +(it.price * it.quantity).toFixed(2),
+      })),
+      subtotal: +cart
+        .reduce((s, it) => s + it.price * it.quantity, 0)
+        .toFixed(2),
+      createdAt: new Date().toISOString(),
+    };
+
+    // persist for the checkout page (also passed via state)
+    localStorage.setItem("order_draft", JSON.stringify(order));
+
+    navigate("/checkout", { state: { order } });
   };
 
   if (!user) {
