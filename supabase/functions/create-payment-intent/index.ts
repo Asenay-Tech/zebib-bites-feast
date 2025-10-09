@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@14.14.0?target=deno";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
+import Stripe from "https://esm.sh/stripe@18.5.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -14,7 +14,7 @@ serve(async (req) => {
 
   try {
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
-      apiVersion: "2023-10-16",
+      apiVersion: "2025-08-27.basil",
     });
 
     const supabaseClient = createClient(
@@ -37,19 +37,7 @@ serve(async (req) => {
 
     const { amount, items, date, time, diningType, tableNumber, name, phone } = await req.json();
 
-    console.log("Creating payment intent:", { amount, user: user.id, diningType });
-
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100), // Convert to cents
-      currency: "eur",
-      metadata: {
-        user_id: user.id,
-        dining_type: diningType,
-        table_number: tableNumber?.toString() || "",
-        order_date: date,
-        order_time: time,
-      },
-    });
+    console.log("Creating Stripe checkout session:", { amount, user: user.id, diningType });
 
     // Create order in database
     const { data: order, error: orderError } = await supabaseClient
@@ -74,11 +62,34 @@ serve(async (req) => {
       throw orderError;
     }
 
-    console.log("Payment intent created:", paymentIntent.id);
+    // Create Stripe Checkout session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: items.map((item: any) => ({
+        price_data: {
+          currency: 'eur',
+          product_data: {
+            name: item.name,
+            description: `${diningType} order`,
+          },
+          unit_amount: Math.round((item.price || 0)),
+        },
+        quantity: item.quantity || 1,
+      })),
+      mode: 'payment',
+      success_url: `${req.headers.get("origin")}/checkout?success=true&order_id=${order.id}`,
+      cancel_url: `${req.headers.get("origin")}/checkout?canceled=true`,
+      metadata: {
+        order_id: order.id,
+        user_id: user.id,
+      },
+    });
+
+    console.log("Checkout session created:", session.id);
 
     return new Response(
       JSON.stringify({
-        clientSecret: paymentIntent.client_secret,
+        sessionUrl: session.url,
         orderId: order.id,
       }),
       {
