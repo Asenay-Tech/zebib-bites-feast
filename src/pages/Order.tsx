@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
@@ -98,6 +99,7 @@ const menuData: MenuItem[] = categories.flatMap((cat) =>
 const Order = () => {
   const navigate = useNavigate();
   const { t, language } = useLanguage();
+  const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [diningType, setDiningType] = useState<"pickup" | "dine-in">("pickup");
   const [date, setDate] = useState<Date>();
@@ -207,17 +209,20 @@ const Order = () => {
   }, 0);
 
   const handleCheckout = async () => {
-    if (cart.length === 0) return;
+    if (cart.length === 0) {
+      toast({ title: "Cart is empty", variant: "destructive" });
+      return;
+    }
     if (diningType === "dine-in" && !selectedTable) {
-      console.error("Please select a table");
+      toast({ title: "Please select a table", variant: "destructive" });
       return;
     }
     if (!date) {
-      console.error("Please select a date");
+      toast({ title: "Please select a date", variant: "destructive" });
       return;
     }
     if (!user?.email) {
-      console.error("Please log in");
+      toast({ title: "Please log in to continue", variant: "destructive" });
       return;
     }
 
@@ -230,10 +235,10 @@ const Order = () => {
       .from("profiles")
       .select("name, phone")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     try {
-      console.log("Creating checkout session...");
+      toast({ title: "Creating checkout session...", description: "Please wait" });
       
       const { data, error } = await supabase.functions.invoke("create-payment-intent", {
         body: {
@@ -255,16 +260,35 @@ const Order = () => {
 
       if (error) {
         console.error("Checkout error:", error);
+        toast({ 
+          title: "Checkout failed", 
+          description: error.message || "Please try again", 
+          variant: "destructive" 
+        });
         return;
       }
 
       if (data?.sessionUrl) {
         // Open Stripe Checkout in new tab
         window.open(data.sessionUrl, "_blank");
-        console.log("Redirecting to payment");
+        toast({ 
+          title: "Redirecting to payment", 
+          description: "Opening Stripe Checkout in new tab" 
+        });
+      } else {
+        toast({ 
+          title: "Error", 
+          description: "No checkout URL received", 
+          variant: "destructive" 
+        });
       }
     } catch (err) {
       console.error("Checkout error:", err);
+      toast({ 
+        title: "Checkout failed", 
+        description: "An unexpected error occurred", 
+        variant: "destructive" 
+      });
     }
   };
 
