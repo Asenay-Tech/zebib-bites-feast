@@ -1,10 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@4.0.0";
-import { renderAsync } from "npm:@react-email/components@0.0.22";
-import React from "npm:react@18.3.1";
-import { WelcomeEmail } from "./_templates/welcome.tsx";
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY") as string);
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -21,19 +17,35 @@ serve(async (req) => {
 
     console.log("Sending welcome email to:", email);
 
-    const html = await renderAsync(
-      React.createElement(WelcomeEmail, {
-        name,
-        email,
-      })
-    );
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <body style="font-family: Arial, sans-serif; padding: 20px;">
+          <h1>🍽️ Welcome to Zebib Foods!</h1>
+          <p>Hello ${name},</p>
+          <p>Thank you for joining us. We're excited to serve you authentic East African cuisine.</p>
+          <p>Visit us at zebibfood.de to explore our menu and place your first order!</p>
+          <p>Best regards,<br>The Zebib Foods Team</p>
+        </body>
+      </html>
+    `;
 
-    const { data, error } = await resend.emails.send({
-      from: "Zebib Foods <welcome@zebibfood.de>",
-      to: [email],
-      subject: "Welcome to Zebib Foods! 🎉",
-      html,
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${RESEND_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: "Zebib Foods <welcome@zebibfood.de>",
+        to: [email],
+        subject: "Welcome to Zebib Foods! 🎉",
+        html,
+      }),
     });
+
+    const data = await response.json();
+    const error = !response.ok ? data : null;
 
     if (error) {
       console.error("Error sending email:", error);

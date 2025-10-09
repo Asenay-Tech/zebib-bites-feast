@@ -1,10 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@4.0.0";
-import { renderAsync } from "npm:@react-email/components@0.0.22";
-import React from "npm:react@18.3.1";
-import { PasswordResetEmail } from "./_templates/password-reset.tsx";
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY") as string);
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -21,19 +17,36 @@ serve(async (req) => {
 
     console.log("Sending password reset email to:", email);
 
-    const html = await renderAsync(
-      React.createElement(PasswordResetEmail, {
-        resetLink,
-        name,
-      })
-    );
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <body style="font-family: Arial, sans-serif; padding: 20px;">
+          <h1>Password Reset - Zebib Foods</h1>
+          <p>Hello ${name || 'there'},</p>
+          <p>You requested to reset your password for your Zebib Foods account.</p>
+          <p style="margin: 30px 0;"><a href="${resetLink}" style="padding: 12px 24px; background-color: #D97706; color: white; text-decoration: none; border-radius: 5px; display: inline-block;">Reset Password</a></p>
+          <p>If you didn't request this, please ignore this email.</p>
+          <p>Best regards,<br>The Zebib Foods Team</p>
+        </body>
+      </html>
+    `;
 
-    const { data, error } = await resend.emails.send({
-      from: "Zebib Foods <noreply@zebibfood.de>",
-      to: [email],
-      subject: "Reset Your Password - Zebib Foods",
-      html,
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${RESEND_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: "Zebib Foods <noreply@zebibfood.de>",
+        to: [email],
+        subject: "Reset Your Password - Zebib Foods",
+        html,
+      }),
     });
+
+    const data = await response.json();
+    const error = !response.ok ? data : null;
 
     if (error) {
       console.error("Error sending email:", error);

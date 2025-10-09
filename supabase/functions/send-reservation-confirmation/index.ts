@@ -1,10 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@4.0.0";
-import { renderAsync } from "npm:@react-email/components@0.0.22";
-import React from "npm:react@18.3.1";
-import { ReservationConfirmationEmail } from "./_templates/reservation-confirmation.tsx";
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY") as string);
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -33,28 +29,45 @@ serve(async (req) => {
 
     console.log("Sending reservation confirmation email to:", email);
 
-    const html = await renderAsync(
-      React.createElement(ReservationConfirmationEmail, {
-        name,
-        email,
-        reservationId,
-        date,
-        time,
-        people,
-        tableNumber,
-        eventType,
-        services,
-        notes,
-        phone,
-      })
-    );
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <body style="font-family: Arial, sans-serif; padding: 20px;">
+          <h1>🍽️ Reservation Confirmed - Zebib Foods</h1>
+          <p>Hello ${name},</p>
+          <p>Your reservation has been confirmed!</p>
+          <div style="background-color: #f9f9f9; padding: 20px; margin: 20px 0; border-radius: 5px;">
+            <p><strong>Reservation ID:</strong> ${reservationId?.slice(0, 8).toUpperCase()}</p>
+            <p><strong>Date:</strong> ${date}</p>
+            <p><strong>Time:</strong> ${time}</p>
+            <p><strong>Guests:</strong> ${people}</p>
+            ${tableNumber ? `<p><strong>Table:</strong> ${tableNumber}</p>` : ''}
+            ${eventType ? `<p><strong>Event Type:</strong> ${eventType}</p>` : ''}
+            ${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ''}
+            ${notes ? `<p><strong>Special Requests:</strong> ${notes}</p>` : ''}
+          </div>
+          <p>We look forward to serving you!</p>
+          <p>Best regards,<br>The Zebib Foods Team</p>
+        </body>
+      </html>
+    `;
 
-    const { data, error } = await resend.emails.send({
-      from: "Zebib Foods <reservations@zebibfood.de>",
-      to: [email],
-      subject: `Reservation Confirmed #${reservationId} - Zebib Foods`,
-      html,
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${RESEND_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: "Zebib Foods <reservations@zebibfood.de>",
+        to: [email],
+        subject: `Reservation Confirmed - ${date} at ${time}`,
+        html,
+      }),
     });
+
+    const data = await response.json();
+    const error = !response.ok ? data : null;
 
     if (error) {
       console.error("Error sending email:", error);

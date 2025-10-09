@@ -36,11 +36,22 @@ serve(async (req) => {
 
     console.log("Order updated successfully:", order.id);
 
+    // Get user email from profiles
+    const { data: profile } = await supabaseClient
+      .from("profiles")
+      .select("email")
+      .eq("id", order.user_id)
+      .single();
+
+    const userEmail = profile?.email || "";
+
+    console.log("Sending confirmation email to:", userEmail);
+
     // Send order confirmation email
     const emailResponse = await supabaseClient.functions.invoke("send-order-confirmation", {
       body: {
         name: order.name,
-        email: order.email || "",
+        email: userEmail,
         orderId: order.id,
         items: order.items,
         totalAmount: order.total_amount_cents,

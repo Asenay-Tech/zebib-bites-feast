@@ -206,37 +206,66 @@ const Order = () => {
     return sum + p * item.quantity;
   }, 0);
 
-  const handleCheckout = () => {
-    // This would integrate with Stripe
+  const handleCheckout = async () => {
     if (cart.length === 0) return;
+    if (diningType === "dine-in" && !selectedTable) {
+      console.error("Please select a table");
+      return;
+    }
+    if (!date) {
+      console.error("Please select a date");
+      return;
+    }
+    if (!user?.email) {
+      console.error("Please log in");
+      return;
+    }
 
-    // build the reservation Date from selected date + time
-    const when = new Date(date ?? new Date());
+    // Build the order date-time
+    const when = new Date(date);
     when.setHours(Number(hour), Number(minute), 0, 0);
 
-    const order = {
-      userId: user?.id,
-      diningType,
-      dateISO: when.toISOString(),
-      table: diningType === "dine-in" ? selectedTable : null,
-      items: cart.map((it) => ({
-        name_de: it.name_de,
-        name_en: it.name_en,
-        variant: it.variant ?? null,
-        qty: it.quantity,
-        unitPrice: it.price,
-        lineTotal: +(it.price * it.quantity).toFixed(2),
-      })),
-      subtotal: +cart
-        .reduce((s, it) => s + it.price * it.quantity, 0)
-        .toFixed(2),
-      createdAt: new Date().toISOString(),
-    };
+    // Get profile info for name and phone
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("name, phone")
+      .eq("id", user.id)
+      .single();
 
-    // persist for the checkout page (also passed via state)
-    localStorage.setItem("order_draft", JSON.stringify(order));
+    try {
+      console.log("Creating checkout session...");
+      
+      const { data, error } = await supabase.functions.invoke("create-payment-intent", {
+        body: {
+          amount: subtotal,
+          items: cart.map((c) => ({
+            name: c.name_en,
+            price: Math.round(c.price * 100), // Convert to cents
+            quantity: c.quantity,
+            variant: c.variant,
+          })),
+          date: when.toISOString().split('T')[0], // YYYY-MM-DD
+          time: `${hour}:${minute}`,
+          diningType,
+          tableNumber: diningType === "dine-in" ? selectedTable : null,
+          name: profile?.name || user.email,
+          phone: profile?.phone || "",
+        },
+      });
 
-    navigate("/checkout", { state: { order } });
+      if (error) {
+        console.error("Checkout error:", error);
+        return;
+      }
+
+      if (data?.sessionUrl) {
+        // Open Stripe Checkout in new tab
+        window.open(data.sessionUrl, "_blank");
+        console.log("Redirecting to payment");
+      }
+    } catch (err) {
+      console.error("Checkout error:", err);
+    }
   };
 
   if (!user) {
