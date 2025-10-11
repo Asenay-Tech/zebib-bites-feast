@@ -130,15 +130,26 @@ const Login = () => {
   const handleGoogleLogin = async () => {
     setError("");
     try {
-      // Persist intended redirect target across the OAuth roundtrip
+      // Preserve intended redirect after OAuth
       const intended = searchParams.get("redirect") || "/";
       localStorage.setItem("post_oauth_redirect", intended);
+
+      const hostname = window.location.hostname;
+      let redirectUrl;
+
+      if (hostname === "localhost") {
+        redirectUrl = "http://localhost:8080/auth/v1/callback";
+      } else if (hostname.includes("lovable.app")) {
+        redirectUrl =
+          "https://preview--zebib-bites-feast.lovable.app/auth/v1/callback";
+      } else {
+        redirectUrl = "https://zebibfood.de/auth/v1/callback";
+      }
 
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          // redirectTo: `${window.location.origin}/login`,
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: redirectUrl,
           queryParams: {
             access_type: "offline",
             prompt: "consent",
@@ -146,6 +157,7 @@ const Login = () => {
           },
         },
       });
+
       if (oauthError) throw oauthError;
     } catch (err: any) {
       console.error("Google OAuth error:", err);
