@@ -37,7 +37,7 @@ serve(async (req) => {
         "Authorization": `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Zebib Foods <welcome@zebibfood.de>",
+        from: "Zebib Foods <mail@zebibfood.de>",
         to: [email],
         subject: "Welcome to Zebib Foods! 🎉",
         html,

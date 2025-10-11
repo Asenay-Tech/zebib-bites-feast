@@ -60,6 +60,19 @@ const Register = () => {
 
       if (signUpError) throw signUpError;
 
+      // Send welcome email
+      try {
+        await supabase.functions.invoke("send-welcome-email", {
+          body: {
+            name,
+            email,
+          },
+        });
+      } catch (emailError) {
+        console.error("Failed to send welcome email:", emailError);
+        // Don't block registration if email fails
+      }
+
       // Success - navigate to home
       navigate("/");
     } catch (err: any) {
