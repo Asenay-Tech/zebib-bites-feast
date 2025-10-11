@@ -125,16 +125,19 @@ const Login = () => {
   const handleGoogleLogin = async () => {
     setError("");
     try {
-      const redirectTo = `${window.location.origin}/login`;
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: { 
-          redirectTo,
-          queryParams: { prompt: "select_account" }
+          redirectTo: `${window.location.origin}/`,
+          queryParams: { 
+            access_type: 'offline',
+            prompt: 'consent'
+          }
         },
       });
       if (oauthError) throw oauthError;
     } catch (err: any) {
+      console.error("Google OAuth error:", err);
       setError(err.message || t("common.error"));
     }
   };
