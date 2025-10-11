@@ -71,7 +71,10 @@ const Login = () => {
         /type=recovery/.test(hash) || searchParams.get("type") === "recovery";
 
       if (session && !recovery && !isRecoveryMode) {
-        const redirectTo = searchParams.get("redirect") || "/";
+        // Prefer redirect param, else any stored post-oauth target, else root
+        const stored = localStorage.getItem("post_oauth_redirect");
+        const redirectTo = searchParams.get("redirect") || stored || "/";
+        if (stored) localStorage.removeItem("post_oauth_redirect");
         navigate(redirectTo, { replace: true });
       }
     };
@@ -125,13 +128,18 @@ const Login = () => {
   const handleGoogleLogin = async () => {
     setError("");
     try {
+      // Persist intended redirect target across the OAuth roundtrip
+      const intended = searchParams.get("redirect") || "/";
+      localStorage.setItem("post_oauth_redirect", intended);
+
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: { 
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: `${window.location.origin}/login`,
           queryParams: { 
             access_type: 'offline',
-            prompt: 'consent'
+            prompt: 'consent',
+            scope: 'openid email profile'
           }
         },
       });
