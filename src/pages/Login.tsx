@@ -146,11 +146,30 @@ const Login = () => {
     setResetSent(false);
     try {
       const redirectTo = `${window.location.origin}/login?type=recovery`;
+      
+      // First, trigger the actual password reset
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(
         resetEmail,
         { redirectTo }
       );
       if (resetError) throw resetError;
+
+      // Get user's name if available
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("name")
+        .eq("email", resetEmail)
+        .maybeSingle();
+
+      // Send custom branded email via Resend
+      await supabase.functions.invoke("send-custom-password-reset", {
+        body: {
+          email: resetEmail,
+          resetLink: `${redirectTo}#access_token=will_be_in_actual_email`,
+          name: profile?.name || "User",
+        },
+      });
+
       setResetSent(true);
     } catch (err: any) {
       setError(err.message || t("common.error"));
