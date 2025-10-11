@@ -83,24 +83,26 @@ const Login = () => {
 
   // 3) Optional: react to Supabase's recovery event
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === "PASSWORD_RECOVERY") {
-        setIsRecoveryMode(true);
-        setSessionReady(true);
+    const { data: sub } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === "PASSWORD_RECOVERY") {
+          setIsRecoveryMode(true);
+          setSessionReady(true);
+        }
+        // Also check if we're in recovery mode and have a session
+        if (isRecoveryMode && session) {
+          setSessionReady(true);
+        }
       }
-      // Also check if we're in recovery mode and have a session
-      if (isRecoveryMode && session) {
-        setSessionReady(true);
-      }
-    });
-    
+    );
+
     // Check immediately if we already have a session
     if (isRecoveryMode) {
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (session) setSessionReady(true);
       });
     }
-    
+
     return () => sub.subscription.unsubscribe();
   }, [isRecoveryMode]);
 
@@ -134,13 +136,14 @@ const Login = () => {
 
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: "google",
-        options: { 
-          redirectTo: `${window.location.origin}/login`,
-          queryParams: { 
-            access_type: 'offline',
-            prompt: 'consent',
-            scope: 'openid email profile'
-          }
+        options: {
+          // redirectTo: `${window.location.origin}/login`,
+          redirectTo: `${window.location.origin}/`,
+          queryParams: {
+            access_type: "offline",
+            prompt: "consent",
+            scope: "openid email profile",
+          },
         },
       });
       if (oauthError) throw oauthError;
@@ -157,7 +160,7 @@ const Login = () => {
     setResetSent(false);
     try {
       const redirectTo = `${window.location.origin}/login?type=recovery`;
-      
+
       // First, trigger the actual password reset
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(
         resetEmail,
@@ -199,9 +202,13 @@ const Login = () => {
     setUpdateLoading(true);
     try {
       // Verify we have a session first
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) {
-        throw new Error("No active session. Please request a new password reset link.");
+        throw new Error(
+          "No active session. Please request a new password reset link."
+        );
       }
 
       const { error: updateError } = await supabase.auth.updateUser({
@@ -251,41 +258,47 @@ const Login = () => {
               <form onSubmit={handleUpdatePassword} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="newPassword">{t("auth.newPassword")}</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="newPassword"
-                    type="password"
-                    placeholder={t("auth.passwordPlaceholder")}
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    required
-                    className="pl-10"
-                  />
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="newPassword"
+                      type="password"
+                      placeholder={t("auth.passwordPlaceholder")}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      required
+                      className="pl-10"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="confirmNewPassword">
-                  {t("auth.confirmPassword")}
-                </Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="confirmNewPassword"
-                    type="password"
-                    placeholder={t("auth.confirmPasswordPlaceholder")}
-                    value={confirmNewPassword}
-                    onChange={(e) => setConfirmNewPassword(e.target.value)}
-                    required
-                    className="pl-10"
-                  />
+                <div className="space-y-2">
+                  <Label htmlFor="confirmNewPassword">
+                    {t("auth.confirmPassword")}
+                  </Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="confirmNewPassword"
+                      type="password"
+                      placeholder={t("auth.confirmPasswordPlaceholder")}
+                      value={confirmNewPassword}
+                      onChange={(e) => setConfirmNewPassword(e.target.value)}
+                      required
+                      className="pl-10"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <Button type="submit" className="w-full" disabled={updateLoading}>
-                {updateLoading ? t("common.loading") : t("auth.updatePassword")}
-              </Button>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={updateLoading}
+                >
+                  {updateLoading
+                    ? t("common.loading")
+                    : t("auth.updatePassword")}
+                </Button>
                 <Button
                   type="button"
                   variant="outline"
