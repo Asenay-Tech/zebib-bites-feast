@@ -1,91 +1,100 @@
 {
   "Aperitif": [
-    { "name_de": "Crémant", "name_en": "Crémant", "price": {"0.1L": 7.00, "0.75L": 32.00} },
-    { "name_de": "Champagne", "name_en": "Champagne", "price": {"0.1L": 7.00, "0.75L": 42.00} },
-    { "name_de": "Martini", "name_en": "Martini", "price": {"0.1L": 7.00, "0.75L": 22.00} },
-    { "name_de": "Lillet", "name_en": "Lillet", "price": 9.40 },
-    { "name_de": "Campari Orange", "name_en": "Campari Orange", "price": 6.60 },
-    { "name_de": "Aperol Spritz", "name_en": "Aperol Spritz", "price": 7.00 },
-    { "name_de": "Gin Tonic", "name_en": "Gin Tonic", "price": 9.45 },
-    { "name_de": "Sanbitter (alkoholfrei)", "name_en": "Sanbitter (non-alcoholic)", "price": 8.50 }
+    { "name_de": "Crémant", "name_en": "Crémant", "price": {"0.1L": 7.00, "0.75L": 32.00}, "image": "cremant.jpg" },
+    { "name_de": "Champagne", "name_en": "Champagne", "price": {"0.1L": 7.00, "0.75L": 42.00}, "image": "champagne.jpg" },
+    { "name_de": "Martini", "name_en": "Martini", "price": {"0.1L": 7.00, "0.75L": 22.00}, "image": "martini.jpg" },
+    { "name_de": "Lillet", "name_en": "Lillet", "price": 9.40, "image": "lillet.jpg" },
+    { "name_de": "Campari Orange", "name_en": "Campari Orange", "price": 6.60, "image": "campari-orange.jpg" },
+    { "name_de": "Aperol Spritz", "name_en": "Aperol Spritz", "price": 7.00, "image": "aperol-spritz.jpg" },
+    { "name_de": "Gin Tonic", "name_en": "Gin Tonic", "price": 9.45, "image": "gin-tonic.jpg" },
+    { "name_de": "Sanbitter (alkoholfrei)", "name_en": "Sanbitter (non-alcoholic)", "price": 8.50, "image": "sanbitter.jpg" }
   ],
+
   "Weine": [
-    { "name_de": "Golden Kaan Shiraz", "name_en": "Golden Kaan Shiraz", "description_de": "kraftvoller & fruchtiger Rotwein", "description_en": "powerful & fruity red wine", "price": {"0.75L": 19.90, "0.2L": 6.90} },
-    { "name_de": "Bordeaux", "name_en": "Bordeaux", "description_de": "trocken", "description_en": "dry", "price": {"0.75L": 22.90, "0.2L": 7.90} },
-    { "name_de": "Golden Kaan Rosé", "name_en": "Golden Kaan Rosé", "description_de": "trocken", "description_en": "dry", "price": {"0.75L": 19.90, "0.2L": 6.90} },
-    { "name_de": "Sauvignon Blanc", "name_en": "Sauvignon Blanc", "description_de": "trocken", "description_en": "dry", "price": {"0.75L": 19.90, "0.2L": 6.90} },
-    { "name_de": "Weinschorle", "name_en": "Wine spritzer", "price": {"0.2L": 5.50} }
+    { "name_de": "Golden Kaan Shiraz", "name_en": "Golden Kaan Shiraz", "description_de": "kraftvoller & fruchtiger Rotwein", "description_en": "powerful & fruity red wine", "price": {"0.75L": 19.90, "0.2L": 6.90}, "image": "golden-kaan-shiraz.jpg" },
+    { "name_de": "Bordeaux", "name_en": "Bordeaux", "description_de": "trocken", "description_en": "dry", "price": {"0.75L": 22.90, "0.2L": 7.90}, "image": "bordeaux.jpg" },
+    { "name_de": "Golden Kaan Rosé", "name_en": "Golden Kaan Rosé", "description_de": "trocken", "description_en": "dry", "price": {"0.75L": 19.90, "0.2L": 6.90}, "image": "golden-kaan-rose.jpg" },
+    { "name_de": "Sauvignon Blanc", "name_en": "Sauvignon Blanc", "description_de": "trocken", "description_en": "dry", "price": {"0.75L": 19.90, "0.2L": 6.90}, "image": "sauvignon-blanc.jpg" },
+    { "name_de": "Weinschorle", "name_en": "Wine spritzer", "price": {"0.2L": 5.50}, "image": "weinschorle.jpg" }
   ],
+
   "Bier": [
-    { "name_de": "Warsteiner Pils (vom Fass)", "name_en": "Warsteiner Pils (draft)", "price": {"0.33L": 2.90, "0.5L": 4.20} },
-    { "name_de": "König Ludwig Hefeweizen", "name_en": "König Ludwig wheat beer", "price": {"0.5L": 3.90} },
-    { "name_de": "Warsteiner (alkoholfrei)", "name_en": "Warsteiner (non-alcoholic)", "price": {"0.33L": 2.90} },
-    { "name_de": "Radler", "name_en": "Radler (beer with lemonade)", "price": {"0.33L": 3.50, "0.5L": 4.20} }
+    { "name_de": "Warsteiner Pils (vom Fass)", "name_en": "Warsteiner Pils (draft)", "price": {"0.33L": 2.90, "0.5L": 4.20}, "image": "warsteiner-pils.jpg" },
+    { "name_de": "König Ludwig Hefeweizen", "name_en": "König Ludwig wheat beer", "price": {"0.5L": 3.90}, "image": "konig-ludwig-hefeweizen.jpg" },
+    { "name_de": "Warsteiner (alkoholfrei)", "name_en": "Warsteiner (non-alcoholic)", "price": {"0.33L": 2.90}, "image": "warsteiner-alkoholfrei.jpg" },
+    { "name_de": "Radler", "name_en": "Radler (beer with lemonade)", "price": {"0.33L": 3.50, "0.5L": 4.20}, "image": "radler.jpg" }
   ],
+
   "Softdrinks": [
-    { "name_de": "Pepsi Cola", "name_en": "Pepsi Cola", "price": {"0.33L": 2.90} },
-    { "name_de": "Pepsi Cola Zero", "name_en": "Pepsi Cola Zero", "price": {"0.33L": 2.90} },
-    { "name_de": "SchwipSchwap Orangenlimo", "name_en": "SchwipSchwap orange soda", "price": {"0.33L": 2.90} },
-    { "name_de": "7Up Zitronenlimonade", "name_en": "7Up lemon soda", "price": {"0.33L": 2.90} },
-    { "name_de": "Schweppes Bitter Lemon", "name_en": "Schweppes bitter lemon", "price": {"0.2L": 2.90} },
-    { "name_de": "Schweppes Ginger Ale", "name_en": "Schweppes ginger ale", "price": {"0.2L": 2.90} },
-    { "name_de": "Schweppes Tonic Water", "name_en": "Schweppes tonic water", "price": {"0.2L": 2.90} }
+    { "name_de": "Pepsi Cola", "name_en": "Pepsi Cola", "price": {"0.33L": 2.90}, "image": "pepsi-cola.jpg" },
+    { "name_de": "Pepsi Cola Zero", "name_en": "Pepsi Cola Zero", "price": {"0.33L": 2.90}, "image": "pepsi-zero.jpg" },
+    { "name_de": "SchwipSchwap Orangenlimo", "name_en": "SchwipSchwap orange soda", "price": {"0.33L": 2.90}, "image": "schwip-schwap.jpg" },
+    { "name_de": "7Up Zitronenlimonade", "name_en": "7Up lemon soda", "price": {"0.33L": 2.90}, "image": "7up.jpg" },
+    { "name_de": "Schweppes Bitter Lemon", "name_en": "Schweppes bitter lemon", "price": {"0.2L": 2.90}, "image": "schweppes-bitter-lemon.jpg" },
+    { "name_de": "Schweppes Ginger Ale", "name_en": "Schweppes ginger ale", "price": {"0.2L": 2.90}, "image": "schweppes-ginger-ale.jpg" },
+    { "name_de": "Schweppes Tonic Water", "name_en": "Schweppes tonic water", "price": {"0.2L": 2.90}, "image": "schweppes-tonic-water.jpg" }
   ],
+
   "Mineralwasser": [
-    { "name_de": "El Puro Feinperlig", "name_en": "El Puro sparkling", "price": {"0.25L": 2.50, "0.75L": 6.50} },
-    { "name_de": "El Puro Naturell", "name_en": "El Puro still", "price": {"0.25L": 2.50, "0.75L": 6.50} }
+    { "name_de": "El Puro Feinperlig", "name_en": "El Puro sparkling", "price": {"0.25L": 2.50, "0.75L": 6.50}, "image": "el-puro-sparkling.jpg" },
+    { "name_de": "El Puro Naturell", "name_en": "El Puro still", "price": {"0.25L": 2.50, "0.75L": 6.50}, "image": "el-puro-still.jpg" }
   ],
+
   "Säfte": [
-    { "name_de": "Apfelsaft", "name_en": "Apple juice", "price": {"0.3L": 2.90} },
-    { "name_de": "Orangensaft", "name_en": "Orange juice", "price": {"0.3L": 2.90} },
-    { "name_de": "Kirschsaft", "name_en": "Cherry juice", "price": {"0.3L": 2.90} },
-    { "name_de": "Bananensaft", "name_en": "Banana juice", "price": {"0.3L": 2.90} },
-    { "name_de": "Mangosaft", "name_en": "Mango juice", "price": {"0.3L": 2.90} },
-    { "name_de": "Maracujasaft", "name_en": "Passion fruit juice", "price": {"0.3L": 2.90} },
-    { "name_de": "Johannisbeersaft", "name_en": "Blackcurrant juice", "price": {"0.3L": 2.90} }
+    { "name_de": "Apfelsaft", "name_en": "Apple juice", "price": {"0.3L": 2.90}, "image": "apple-juice.jpg" },
+    { "name_de": "Orangensaft", "name_en": "Orange juice", "price": {"0.3L": 2.90}, "image": "orange-juice.jpg" },
+    { "name_de": "Kirschsaft", "name_en": "Cherry juice", "price": {"0.3L": 2.90}, "image": "cherry-juice.jpg" },
+    { "name_de": "Bananensaft", "name_en": "Banana juice", "price": {"0.3L": 2.90}, "image": "banana-juice.jpg" },
+    { "name_de": "Mangosaft", "name_en": "Mango juice", "price": {"0.3L": 2.90}, "image": "mango-juice.jpg" },
+    { "name_de": "Maracujasaft", "name_en": "Passion fruit juice", "price": {"0.3L": 2.90}, "image": "passion-fruit-juice.jpg" },
+    { "name_de": "Johannisbeersaft", "name_en": "Blackcurrant juice", "price": {"0.3L": 2.90}, "image": "blackcurrant-juice.jpg" }
   ],
+
   "Warme Getränke": [
-    { "name_de": "Espresso", "name_en": "Espresso", "price": 2.50 },
-    { "name_de": "Cappuccino", "name_en": "Cappuccino", "price": 3.50 },
-    { "name_de": "Latte Macchiato", "name_en": "Latte macchiato", "price": 3.50 },
-    { "name_de": "Frischer Minztee", "name_en": "Fresh mint tea", "price": 3.00 },
-    { "name_de": "Frischer Ingwertee", "name_en": "Fresh ginger tea", "price": 3.00 },
-    { "name_de": "Schwarztee mit Gewürzen", "name_en": "Black tea with spices", "price": 3.00 },
-    { "name_de": "Ostafrikanische Kaffeezeremonie", "name_en": "East African coffee ceremony", "price": "7.00 per person" }
+    { "name_de": "Espresso", "name_en": "Espresso", "price": 2.50, "image": "espresso.jpg" },
+    { "name_de": "Cappuccino", "name_en": "Cappuccino", "price": 3.50, "image": "cappuccino.jpg" },
+    { "name_de": "Latte Macchiato", "name_en": "Latte macchiato", "price": 3.50, "image": "latte-macchiato.jpg" },
+    { "name_de": "Frischer Minztee", "name_en": "Fresh mint tea", "price": 3.00, "image": "mint-tea.jpg" },
+    { "name_de": "Frischer Ingwertee", "name_en": "Fresh ginger tea", "price": 3.00, "image": "ginger-tea.jpg" },
+    { "name_de": "Schwarztee mit Gewürzen", "name_en": "Black tea with spices", "price": 3.00, "image": "black-tea-spices.jpg" },
+    { "name_de": "Ostafrikanische Kaffeezeremonie", "name_en": "East African coffee ceremony", "price": "7.00 per person", "image": "coffee-ceremony.jpg" }
   ],
+
   "Frühstück": [
-    { "name_de": "Ein Frühstück deiner Wahl inkl. Tee oder Kaffee", "name_en": "Breakfast of your choice incl. tea or coffee", "price": "10.00 per person" },
-    { "name_de": "Kicha Fit Fit", "name_en": "Kicha Fit Fit", "description_de": "selbstgemachtes Brot in gewürzter Butter & Berbere getränkt, mit Joghurt serviert", "description_en": "homemade bread soaked in spiced butter & berbere, served with yogurt" },
-    { "name_de": "Ful Medames", "name_en": "Ful Medames", "description_de": "gekochte Bohnen mit roten Zwiebeln, Tomaten, Knoblauch; serviert mit Brot & Schafskäse", "description_en": "cooked beans with red onions, tomatoes, garlic; served with bread & feta" },
-    { "name_de": "Ga'at", "name_en": "Ga'at", "description_de": "Brei aus Gerstenmehl, mit gewürzter Butter & Berbere, serviert mit Joghurt", "description_en": "porridge of barley flour with spiced butter & berbere, served with yogurt" },
-    { "name_de": "Eritreische Frittata", "name_en": "Eritrean frittata", "description_de": "Rührei mit Gemüse", "description_en": "scrambled eggs with vegetables" }
+    { "name_de": "Ein Frühstück deiner Wahl inkl. Tee oder Kaffee", "name_en": "Breakfast of your choice incl. tea or coffee", "price": "10.00 per person", "image": "breakfast-choice.jpg" },
+    { "name_de": "Kicha Fit Fit", "name_en": "Kicha Fit Fit", "description_de": "selbstgemachtes Brot in gewürzter Butter & Berbere getränkt, mit Joghurt serviert", "description_en": "homemade bread soaked in spiced butter & berbere, served with yogurt", "image": "kicha-fitfit.jpg" },
+    { "name_de": "Ful Medames", "name_en": "Ful Medames", "description_de": "gekochte Bohnen mit roten Zwiebeln, Tomaten, Knoblauch; serviert mit Brot & Schafskäse", "description_en": "cooked beans with red onions, tomatoes, garlic; served with bread & feta", "image": "ful-medames.jpg" },
+    { "name_de": "Ga'at", "name_en": "Ga'at", "description_de": "Brei aus Gerstenmehl, mit gewürzter Butter & Berbere, serviert mit Joghurt", "description_en": "porridge of barley flour with spiced butter & berbere, served with yogurt", "image": "gaat.jpg" },
+    { "name_de": "Eritreische Frittata", "name_en": "Eritrean frittata", "description_de": "Rührei mit Gemüse", "description_en": "scrambled eggs with vegetables", "image": "frittata.jpg" }
   ],
+
   "Vorspeisen": [
-    { "name_de": "Sambusa Gemüse (8 Stk.)", "name_en": "Vegetable sambusa (8 pcs)", "description_de": "Teigtaschen mit Gemüse + Dip", "description_en": "Pastry filled with vegetables + dip", "price": 5.50 },
-    { "name_de": "Sambusa Hackfleisch (3 Stk.)", "name_en": "Meat sambusa (3 pcs)", "description_de": "Teigtaschen mit Hackfleisch + Dip", "description_en": "Pastry filled with minced meat + dip", "price": 6.50 },
-    { "name_de": "Kategna", "name_en": "Kategna", "description_de": "Injera mit gewürzter Butter & Berbere", "description_en": "Injera with spiced butter & berbere", "price": 4.90 }
+    { "name_de": "Sambusa Gemüse (8 Stk.)", "name_en": "Vegetable sambusa (8 pcs)", "description_de": "Teigtaschen mit Gemüse + Dip", "description_en": "Pastry filled with vegetables + dip", "price": 5.50, "image": "sambusa-vegetable.jpg" },
+    { "name_de": "Sambusa Hackfleisch (3 Stk.)", "name_en": "Meat sambusa (3 pcs)", "description_de": "Teigtaschen mit Hackfleisch + Dip", "description_en": "Pastry filled with minced meat + dip", "price": 6.50, "image": "sambusa-meat.jpg" },
+    { "name_de": "Kategna", "name_en": "Kategna", "description_de": "Injera mit gewürzter Butter & Berbere", "description_en": "Injera with spiced butter & berbere", "price": 4.90, "image": "kategna.jpg" }
   ],
+
   "Fleischgerichte": [
-    { "name_de": "Tzada-Kilua", "name_en": "Tzada-Kilua", "description_de": "Rindfleisch in Zwiebeln gedünstet", "description_en": "beef simmered with onions", "price": 14.90 },
-    { "name_de": "Keyih-Kilua", "name_en": "Keyih-Kilua", "description_de": "Lammfleisch mit Paprika & Zwiebeln", "description_en": "lamb with peppers & onions", "price": 14.90 },
-    { "name_de": "Zigni-Beiray", "name_en": "Zigni-Beiray", "description_de": "Rindfleisch in scharfer Sauce", "description_en": "beef in spicy sauce", "price": 14.90 },
-    { "name_de": "Zilzil Tibs", "name_en": "Zilzil Tibs", "description_de": "Rindfleisch gebraten in gewürzter Butter", "description_en": "beef fried in spiced butter", "price": 16.90 },
-    { "name_de": "Gored-Gored", "name_en": "Gored-Gored", "description_de": "Rindfleischwürfel, leicht gebraten, mit Berbere & Butter", "description_en": "beef cubes, lightly fried with berbere & butter", "price": 16.90 },
-    { "name_de": "Kitfo", "name_en": "Kitfo", "description_de": "Tatar mit Butter & Chillimischung (roh oder angebraten)", "description_en": "tartare with butter & chili mix (raw or lightly cooked)", "price": 16.90 },
-    { "name_de": "Kilua-Begie", "name_en": "Kilua-Begie", "description_de": "Lammfleisch mit Paprika & Zwiebeln", "description_en": "lamb with peppers & onions", "price": 15.90 },
-    { "name_de": "Tzebhi-Begie", "name_en": "Tzebhi-Begie", "description_de": "Lammfleisch in scharfer Sauce", "description_en": "lamb in spicy sauce", "price": 15.90 },
-    { "name_de": "Tibs Begie", "name_en": "Tibs Begie", "description_de": "Lammfleisch mit Paprika, Peperoni & Zwiebeln", "description_en": "lamb with peppers, chili & onions", "price": 15.90 },
-    { "name_de": "Tzebhi-Derrho", "name_en": "Tzebhi-Derrho", "description_de": "Hähnchenkeule in scharfer Zwiebelsauce mit Ei", "description_en": "chicken drumstick in spicy onion sauce with egg", "price": 14.90 }
+    { "name_de": "Tzada-Kilua", "name_en": "Tzada-Kilua", "description_de": "Rindfleisch in Zwiebeln gedünstet", "description_en": "beef simmered with onions", "price": 14.90, "image": "tzada-kilua.jpg" },
+    { "name_de": "Keyih-Kilua", "name_en": "Keyih-Kilua", "description_de": "Lammfleisch mit Paprika & Zwiebeln", "description_en": "lamb with peppers & onions", "price": 14.90, "image": "keyih-kilua.jpg" },
+    { "name_de": "Zigni-Beiray", "name_en": "Zigni-Beiray", "description_de": "Rindfleisch in scharfer Sauce", "description_en": "beef in spicy sauce", "price": 14.90, "image": "zigni-beiray.jpg" },
+    { "name_de": "Zilzil Tibs", "name_en": "Zilzil Tibs", "description_de": "Rindfleisch gebraten in gewürzter Butter", "description_en": "beef fried in spiced butter", "price": 16.90, "image": "zilzil-tibs.jpg" },
+    { "name_de": "Gored-Gored", "name_en": "Gored-Gored", "description_de": "Rindfleischwürfel, leicht gebraten, mit Berbere & Butter", "description_en": "beef cubes, lightly fried with berbere & butter", "price": 16.90, "image": "gored-gored.jpg" },
+    { "name_de": "Kitfo", "name_en": "Kitfo", "description_de": "Tatar mit Butter & Chillimischung (roh oder angebraten)", "description_en": "tartare with butter & chili mix (raw or lightly cooked)", "price": 16.90, "image": "kitfo.jpg" },
+    { "name_de": "Kilua-Begie", "name_en": "Kilua-Begie", "description_de": "Lammfleisch mit Paprika & Zwiebeln", "description_en": "lamb with peppers & onions", "price": 15.90, "image": "kilua-begie.jpg" },
+    { "name_de": "Tzebhi-Begie", "name_en": "Tzebhi-Begie", "description_de": "Lammfleisch in scharfer Sauce", "description_en": "lamb in spicy sauce", "price": 15.90, "image": "tzebhi-begie.jpg" },
+    { "name_de": "Tibs Begie", "name_en": "Tibs Begie", "description_de": "Lammfleisch mit Paprika, Peperoni & Zwiebeln", "description_en": "lamb with peppers, chili & onions", "price": 15.90, "image": "tibs-begie.jpg" },
+    { "name_de": "Tzebhi-Derrho", "name_en": "Tzebhi-Derrho", "description_de": "Hähnchenkeule in scharfer Zwiebelsauce mit Ei", "description_en": "chicken drumstick in spicy onion sauce with egg", "price": 14.90, "image": "tzebhi-derrho.jpg" }
   ],
+
   "Vegetarisch & Vegan": [
-    { "name_de": "Alicha", "name_en": "Alicha", "description_de": "Kartoffeln, Karotten, Zwiebeln, Tomaten, Knoblauch", "description_en": "potatoes, carrots, onions, tomatoes, garlic", "price": 12.90 },
-    { "name_de": "Hamli", "name_en": "Hamli", "description_de": "Spinat in Tomatensauce mit Zwiebeln, Knoblauch", "description_en": "spinach in tomato sauce with onions & garlic", "price": 12.90 },
-    { "name_de": "Timtimo", "name_en": "Timtimo", "description_de": "Linsen in Tomatensauce", "description_en": "lentils in tomato sauce", "price": 12.90 },
-    { "name_de": "Shiro", "name_en": "Shiro", "description_de": "Kichererbsen mit Zwiebeln & Tomaten", "description_en": "chickpeas with onions & tomatoes", "price": 12.90 }
+    { "name_de": "Alicha", "name_en": "Alicha", "description_de": "Kartoffeln, Karotten, Zwiebeln, Tomaten, Knoblauch", "description_en": "potatoes, carrots, onions, tomatoes, garlic", "price": 12.90, "image": "alicha.jpg" },
+    { "name_de": "Hamli", "name_en": "Hamli", "description_de": "Spinat in Tomatensauce mit Zwiebeln, Knoblauch", "description_en": "spinach in tomato sauce with onions & garlic", "price": 12.90, "image": "hamli.jpg" },
+    { "name_de": "Timtimo", "name_en": "Timtimo", "description_de": "Linsen in Tomatensauce", "description_en": "lentils in tomato sauce", "price": 12.90, "image": "timtimo.jpg" },
+    { "name_de": "Shiro", "name_en": "Shiro", "description_de": "Kichererbsen mit Zwiebeln & Tomaten", "description_en": "chickpeas with onions & tomatoes", "price": 12.90, "image": "shiro.jpg" }
   ],
+
   "Mix-Platten": [
-    { "name_de": "Veggi-Platte", "name_en": "Veggie platter", "description_de": "Auswahl vegetarischer Gerichte (Alicha, Hamli, Timtimo, Shiro)", "description_en": "selection of vegetarian dishes (Alicha, Hamli, Timtimo, Shiro)", "price": "15.90 per person" },
-    { "name_de": "Fleisch-Platte", "name_en": "Meat platter", "description_de": "Zigni Beiray (Rind), Tzebhi Begie (Lamm), Tzebhi Dero (Huhn)", "description_en": "Zigni Beiray (beef), Tzebhi Begie (lamb), Tzebhi Dero (chicken)", "price": "18.90 per person" },
-    { "name_de": "Mix-Platte", "name_en": "Mix platter", "description_de": "Kombination aus Veggi- und Fleischplatte", "description_en": "combination of veggie and meat platter", "price": "19.90 per person" }
-  ]
-}
+    { "name_de": "Veggi-Platte", "name_en": "Veggie platter", "description_de": "Auswahl vegetarischer Gerichte (Alicha, Hamli, Timtimo, Shiro)", "description_en": "selection of vegetarian dishes (Alicha, Hamli, Timtimo, Shiro)", "price": "15.90 per person", "image": "veggie-platter.jpg" },
+    { "name_de": "Fleisch-Platte", "name_en": "Meat platter", "description_de": "Zigni Beiray (Rind), Tzebhi Begie (Lamm), Tzebhi Dero (Huhn)", "description_en": "Zigni Beiray (beef), Tzebhi Begie (lamb), Tzebhi Dero (chicken)", "price": "18.90 per person", "image": "meat-platter.jpg" },
+    { "name_de": "Mix-Platte", "name_en": "Mix platter", "description_de": "Kombination aus Veggi- und Fleischplatte", "description_en": "
