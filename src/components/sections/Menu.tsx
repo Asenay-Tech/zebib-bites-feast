@@ -13,6 +13,7 @@ interface MenuItem {
   description_de?: string;
   description_en?: string;
   price: number | string | Record<string, number | string>;
+  image?: string; // added image key from menu.json
 }
 
 export function Menu() {
@@ -23,72 +24,60 @@ export function Menu() {
   const categories = Object.keys(menuData);
   const categoryOptions = [
     { value: "all", label: t("menu.category.all") },
-    ...categories.map(cat => ({ 
-      value: cat, 
-      label: language === "de" ? cat : cat // You might want to translate category names
-    }))
+    ...categories.map((cat) => ({
+      value: cat,
+      label: language === "de" ? cat : cat, // translation placeholder
+    })),
   ];
 
   // Filter items based on selected category
   const getFilteredItems = () => {
     if (selectedCategory === "all") {
-      return Object.entries(menuData).flatMap(([category, items]) =>
-        items.map(item => ({ ...item, category }))
-      );
+      return Object.entries(menuData).flatMap(([category, items]) => items.map((item) => ({ ...item, category })));
     }
-    return menuData[selectedCategory as keyof typeof menuData]?.map(item => 
-      ({ ...item, category: selectedCategory })
-    ) || [];
+    return (
+      menuData[selectedCategory as keyof typeof menuData]?.map((item) => ({ ...item, category: selectedCategory })) ||
+      []
+    );
   };
 
   const filteredItems = getFilteredItems();
 
-  // Helper to get item name in current language
-  const getItemName = (item: MenuItem) => {
-    return language === "de" ? item.name_de : item.name_en;
-  };
+  // Helpers
+  const getItemName = (item: MenuItem) => (language === "de" ? item.name_de : item.name_en);
 
-  // Helper to get item description in current language
-  const getItemDescription = (item: MenuItem) => {
-    const desc = language === "de" ? item.description_de : item.description_en;
-    return desc || "";
-  };
+  const getItemDescription = (item: MenuItem) => (language === "de" ? item.description_de : item.description_en) || "";
 
-  // Helper to format price
   const formatPrice = (price: number | string | Record<string, number | string>, variant?: string) => {
     if (price === undefined || price === null) return "€0.00";
-
     const toEuro = (val: number | string) => {
       if (typeof val === "number" && isFinite(val)) return `€${val.toFixed(2)}`;
       if (typeof val === "string") return val.includes("€") ? val : `€${val}`;
       return "€0.00";
     };
-
     if (typeof price === "object") {
       const record = price as Record<string, number | string>;
       const pick = (key?: string) => (key ? record[key] : undefined);
-
       const chosen = variant ? pick(variant) : undefined;
       if (chosen !== undefined && chosen !== null) return toEuro(chosen);
-
-      // Fallback to first defined value
       for (const key of Object.keys(record)) {
         const v = record[key];
         if (v !== undefined && v !== null) return toEuro(v);
       }
       return "€0.00";
     }
-
     return toEuro(price as number | string);
   };
-  // Helper to get item variants (for items with multiple sizes/volumes)
-  const getItemVariants = (price: number | string | Record<string, number | string>) => {
-    return typeof price === "object" ? Object.keys(price) : [];
-  };
 
-  // Helper to get unique item ID
-  const getItemId = (item: MenuItem & { category: string }, index: number) => {
-    return `${item.category}-${index}`;
+  const getItemVariants = (price: number | string | Record<string, number | string>) =>
+    typeof price === "object" ? Object.keys(price) : [];
+
+  const getItemId = (item: MenuItem & { category: string }, index: number) => `${item.category}-${index}`;
+
+  // Helper to safely load image from public/menu-images/
+  const getImageSrc = (item: MenuItem) => {
+    if (item.image) return `/menu-images/${item.image}`;
+    return menuPlaceholder;
   };
 
   return (
@@ -96,12 +85,8 @@ export function Menu() {
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4 tracking-wide">
-            {t("menu.title")}
-          </h2>
-          <p className="text-xl text-body max-w-2xl mx-auto">
-            {t("menu.subtitle")}
-          </p>
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4 tracking-wide">{t("menu.title")}</h2>
+          <p className="text-xl text-body max-w-2xl mx-auto">{t("menu.subtitle")}</p>
         </div>
 
         {/* Category Filter */}
@@ -112,7 +97,7 @@ export function Menu() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-surface border-border">
-                {categoryOptions.map(category => (
+                {categoryOptions.map((category) => (
                   <SelectItem key={category.value} value={category.value}>
                     {category.label}
                   </SelectItem>
@@ -122,7 +107,7 @@ export function Menu() {
           </div>
 
           <div className="hidden md:flex flex-wrap gap-2 justify-center">
-            {categoryOptions.map(category => (
+            {categoryOptions.map((category) => (
               <Button
                 key={category.value}
                 variant={selectedCategory === category.value ? "default" : "outline"}
@@ -147,25 +132,31 @@ export function Menu() {
             const displayPrice = variants.length > 0 ? variants[0] : undefined;
 
             return (
-              <Card key={itemId} className="bg-surface border-border hover:shadow-card-hover transition-all duration-300 overflow-hidden">
+              <Card
+                key={itemId}
+                className="bg-surface border-border hover:shadow-card-hover transition-all duration-300 overflow-hidden"
+              >
                 <CardContent className="p-0">
                   {/* Thumbnail Image */}
-                  <img 
-                    src={menuPlaceholder} 
+                  <img
+                    src={getImageSrc(item)}
                     alt={getItemName(item)}
                     className="w-full h-48 object-cover"
+                    loading="lazy"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = menuPlaceholder;
+                    }}
                   />
-                  
+
                   <div className="p-6">
                     {/* Item Name */}
-                    <h3 className="text-lg font-semibold text-foreground mb-4">
-                      {getItemName(item)}
-                    </h3>
+                    <h3 className="text-lg font-semibold text-foreground mb-4">{getItemName(item)}</h3>
+
+                    {/* Item Description */}
+                    {getItemDescription(item) && <p className="text-body text-sm mb-4">{getItemDescription(item)}</p>}
 
                     {/* Price Display */}
-                    <div className="text-xl font-bold text-accent">
-                      {formatPrice(item.price, displayPrice)}
-                    </div>
+                    <div className="text-xl font-bold text-accent">{formatPrice(item.price, displayPrice)}</div>
                   </div>
                 </CardContent>
               </Card>
@@ -175,16 +166,13 @@ export function Menu() {
 
         {/* Special Section */}
         <div className="mt-20">
-          <h3 className="text-3xl font-bold text-foreground mb-8 text-center tracking-wide">
-            UNSERE SPEZIALITÄTEN
-          </h3>
+          <h3 className="text-3xl font-bold text-foreground mb-8 text-center tracking-wide">UNSERE SPEZIALITÄTEN</h3>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
               {filteredItems.slice(0, 6).map((item, index) => {
                 const itemId = getItemId(item, index);
                 const variants = getItemVariants(item.price);
                 const displayPrice = variants.length > 0 ? variants[0] : undefined;
-                
                 return (
                   <div key={itemId} className="flex items-center justify-between py-3 border-b border-border/50">
                     <div className="flex-1">
@@ -192,15 +180,14 @@ export function Menu() {
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="w-16 h-px bg-accent"></div>
-                      <span className="text-accent font-bold">
-                        {formatPrice(item.price, displayPrice)}
-                      </span>
+                      <span className="text-accent font-bold">{formatPrice(item.price, displayPrice)}</span>
                     </div>
                   </div>
                 );
               })}
             </div>
-          <div className="relative">
+
+            <div className="relative">
               <img
                 src={traditionalPlatterImage}
                 alt="Traditional Eritrean Platter"
