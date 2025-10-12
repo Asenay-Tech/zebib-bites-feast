@@ -1,73 +1,71 @@
-# Welcome to your Lovable project
+# 🚀 Zebib Bites Feast – Deployment Guide
 
-## Project info
+This project uses a clean workflow for deploying updates to Hostinger via GitHub.
 
-**URL**: https://lovable.dev/projects/627f22f1-4833-4a4d-ba1e-8d8b7cce165c
+We keep the main branch (`main`) for development and use a separate deployment branch (`deploy`) that contains the built static files from `dist/`.
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## ✅ Everyday Deployment Workflow
 
-**Use Lovable**
+Follow this routine every time you want to make changes and publish them online:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/627f22f1-4833-4a4d-ba1e-8d8b7cce165c) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+### 🧑‍💻 1. Make Changes Locally
 
-**Use your preferred IDE**
+```bash
+#*********************************#
+git checkout main
+# edit your code...
+git add -A
+git commit -m "Describe what you changed"
+git push origin main
+#*********************************#
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+# 🏗️ 2. Build and Publish
+#*********************************#
+# After pushing your latest changes to main, run:
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+./deploy.sh
+#*********************************#
 
-Follow these steps:
+#Project Structure
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+├── public/
+├── src/
+├── deploy-support/
+│   └── .htaccess      ← needed for proper routing on Hostinger
+├── dist/              ← generated after build
+├── deploy.sh          ← auto-deploy script
+├── README.md
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+First-Time Setup (for new team members)
 
-# Step 3: Install the necessary dependencies.
-npm i
+Clone the repo:
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+git clone https://github.com/Asenay-Tech/zebib-bites-feast.git
+cd zebib-bites-feast
+
+
+Install dependencies:
+
+npm install
+
+
+Make sure you have deploy-support/.htaccess and deploy.sh.
+
+You're ready to follow the everyday workflow above.
+
+Requirements
+
+Node.js + npm
+
+Git
+
+Bash (for running deploy.sh)
+
+Hosting
+
+We deploy using Hostinger Git Integration with a Webhook tied to the deploy branch. All files in dist/ are synced to public_html/.
 ```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/627f22f1-4833-4a4d-ba1e-8d8b7cce165c) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
