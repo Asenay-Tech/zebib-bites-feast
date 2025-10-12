@@ -137,14 +137,7 @@ const Login = () => {
       const hostname = window.location.hostname;
       let redirectUrl;
 
-      if (hostname === "localhost") {
-        redirectUrl = "http://localhost:8080/auth/v1/callback";
-      } else if (hostname.includes("lovable.app")) {
-        redirectUrl =
-          "https://preview--zebib-bites-feast.lovable.app/auth/v1/callback";
-      } else {
-        redirectUrl = "https://zebibfood.de/auth/v1/callback";
-      }
+      redirectUrl = `${window.location.origin}/auth/v1/callback`;
 
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: "google",

@@ -18,6 +18,7 @@ import Orders from "./pages/admin/Orders";
 import Reservations from "./pages/admin/Reservations";
 import MenuManager from "./pages/admin/MenuManager";
 import Checkout from "./pages/Checkout";
+import CallbackHandler from "./pages/CallbackHandler";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/reserve" element={<Reserve />} />
             <Route path="/order" element={<Order />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="/auth/v1/callback" element={<CallbackHandler />} />
 
             {/* Admin Routes */}
             <Route
