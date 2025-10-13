@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/components/ui/language-switcher";
 import menuData from "@/data/menu.json";
-import traditionalPlatterImage from "@/assets/traditional-platter.jpg";
-import menuPlaceholder from "@/assets/menu-placeholder.jpg";
+import traditionalPlatterImage from "@/assets/traditional-platter.jpg?url";
+import menuPlaceholder from "@/assets/menu-placeholder.jpg?url";
 
 interface MenuItem {
   name_de: string;
@@ -74,12 +74,44 @@ export function Menu() {
 
   const getItemId = (item: MenuItem & { category: string }, index: number) => `${item.category}-${index}`;
 
-  // Helper to safely load image from public/menu-images/
-  const getImageSrc = (item: MenuItem) => {
-    if (item.image) return `/menu-images/${item.image}`;
-    return menuPlaceholder;
+  // Helper to build possible image paths from public/menu-images/
+  const buildImageCandidates = (item: MenuItem): string[] => {
+    const candidates: string[] = [];
+    if (item.image) {
+      // 1) As authored
+      candidates.push(`/menu-images/${item.image}`);
+
+      // 2) URL-encoded authored
+      candidates.push(`/menu-images/${encodeURIComponent(item.image)}`);
+
+      // 3) Hyphenated to Title Case with spaces (e.g., "zilzil-tibs.jpg" -> "Zilzil Tibs.jpg")
+      const m = item.image.match(/^(.*)\.(jpg|jpeg|png|webp|gif)$/i);
+      if (m) {
+        const base = m[1]
+          .split(/[-_]+/)
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(" ");
+        const ext = m[2];
+        candidates.push(`/menu-images/${base}.${ext}`);
+        candidates.push(`/menu-images/${encodeURIComponent(base)}.${ext}`);
+      }
+    }
+
+    // 4) Try name_en and name_de as filenames
+    const toNameCandidate = (name?: string) =>
+      name ? [`/menu-images/${name}.jpg`, `/menu-images/${encodeURIComponent(name)}.jpg`] : [];
+
+    candidates.push(...toNameCandidate((item as any).name_en));
+    candidates.push(...toNameCandidate((item as any).name_de));
+
+    // Ensure uniqueness to avoid loops
+    return Array.from(new Set(candidates));
   };
 
+  const getInitialImageSrc = (item: MenuItem) => {
+    const list = buildImageCandidates(item);
+    return list.length ? list[0] : menuPlaceholder;
+  };
   return (
     <section id="menu" className="py-20 bg-background">
       <div className="container mx-auto px-4">
@@ -137,14 +169,23 @@ export function Menu() {
                 className="bg-surface border-border hover:shadow-card-hover transition-all duration-300 overflow-hidden"
               >
                 <CardContent className="p-0">
-                  {/* Thumbnail Image */}
                   <img
-                    src={getImageSrc(item)}
+                    src={getInitialImageSrc(item)}
                     alt={getItemName(item)}
                     className="w-full h-48 object-cover"
                     loading="lazy"
+                    data-fallback-index="0"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = menuPlaceholder;
+                      const img = e.currentTarget as HTMLImageElement;
+                      const list = buildImageCandidates(item);
+                      const currentIndex = Number(img.dataset.fallbackIndex || "0");
+                      const nextIndex = currentIndex + 1;
+                      if (nextIndex < list.length) {
+                        img.dataset.fallbackIndex = String(nextIndex);
+                        img.src = list[nextIndex];
+                      } else {
+                        img.src = menuPlaceholder;
+                      }
                     }}
                   />
 

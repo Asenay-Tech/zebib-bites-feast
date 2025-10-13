@@ -1,8 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { ChefHat, Users, Leaf, Calendar } from "lucide-react";
 import { useLanguage } from "@/components/ui/language-switcher";
-import coffeeImage from "@/assets/coffee-ceremony.jpg";
-import platterImage from "@/assets/traditional-platter.jpg";
+import coffeeImage from "@/assets/coffee-ceremony.jpg?url";
+import platterImage from "@/assets/traditional-platter.jpg?url";
 
 export function WhyChooseUs() {
   const { language, t } = useLanguage();

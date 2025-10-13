@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 import { useLanguage } from "@/components/ui/language-switcher";
-import heroImage from "@/assets/hero-restaurant.jpg";
+import heroImage from "@/assets/hero-restaurant.jpg?url";
 
 interface HeroProps {
   onScrollToMenu: () => void;
