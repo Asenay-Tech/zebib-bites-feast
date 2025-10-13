@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useLanguage } from "@/components/ui/language-switcher";
 import menuData from "@/data/menu.json";
 import traditionalPlatterImage from "@/assets/traditional-platter.jpg?url";
-import menuPlaceholder from "@/assets/menu-placeholder.jpg?url";
+
 
 interface MenuItem {
   name_de: string;
@@ -75,7 +75,7 @@ export function Menu() {
   const getItemId = (item: MenuItem & { category: string }, index: number) => `${item.category}-${index}`;
 
   const getItemImageSrc = (item: MenuItem) => {
-    return item.image ? `/menu-images/${item.image}` : menuPlaceholder;
+    return item.image ? `/menu-images/${item.image}` : undefined;
   };
   return (
     <section id="menu" className="py-20 bg-background">
@@ -134,15 +134,17 @@ export function Menu() {
                 className="bg-surface border-border hover:shadow-card-hover transition-all duration-300 overflow-hidden"
               >
                 <CardContent className="p-0">
-                  <img
-                    src={getItemImageSrc(item)}
-                    alt={getItemName(item)}
-                    className="w-full h-48 object-cover"
-                    loading="lazy"
-                    onError={(e) => {
-                      e.currentTarget.src = menuPlaceholder;
-                    }}
-                  />
+                  {getItemImageSrc(item) && (
+                    <img
+                      src={getItemImageSrc(item)!}
+                      alt={getItemName(item)}
+                      className="w-full h-48 object-cover"
+                      loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
+                  )}
 
                   <div className="p-6">
                     {/* Item Name */}

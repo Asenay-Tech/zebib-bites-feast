@@ -62,23 +62,23 @@
 
   "Frühstück": [
     { "name_de": "Ein Frühstück deiner Wahl inkl. Tee oder Kaffee", "name_en": "Breakfast of your choice incl. tea or coffee", "price": "10.00 per person", "image": "breakfast-choice.jpg" },
-    { "name_de": "Kicha Fit Fit", "name_en": "Kicha Fit Fit", "description_de": "selbstgemachtes Brot in gewürzter Butter & Berbere getränkt, mit Joghurt serviert", "description_en": "homemade bread soaked in spiced butter & berbere, served with yogurt", "image": "kicha-fitfit.jpg" },
-    { "name_de": "Ful Medames", "name_en": "Ful Medames", "description_de": "gekochte Bohnen mit roten Zwiebeln, Tomaten, Knoblauch; serviert mit Brot & Schafskäse", "description_en": "cooked beans with red onions, tomatoes, garlic; served with bread & feta", "image": "ful-medames.jpg" },
+    { "name_de": "Kicha Fit Fit", "name_en": "Kicha Fit Fit", "description_de": "selbstgemachtes Brot in gewürzter Butter & Berbere getränkt, mit Joghurt serviert", "description_en": "homemade bread soaked in spiced butter & berbere, served with yogurt", "image": "Kicha Fit Fit.jpg" },
+    { "name_de": "Ful Medames", "name_en": "Ful Medames", "description_de": "gekochte Bohnen mit roten Zwiebeln, Tomaten, Knoblauch; serviert mit Brot & Schafskäse", "description_en": "cooked beans with red onions, tomatoes, garlic; served with bread & feta", "image": "Ful Medames.jpg" },
     { "name_de": "Ga'at", "name_en": "Ga'at", "description_de": "Brei aus Gerstenmehl, mit gewürzter Butter & Berbere, serviert mit Joghurt", "description_en": "porridge of barley flour with spiced butter & berbere, served with yogurt", "image": "gaat.jpg" },
     { "name_de": "Eritreische Frittata", "name_en": "Eritrean frittata", "description_de": "Rührei mit Gemüse", "description_en": "scrambled eggs with vegetables", "image": "frittata.jpg" }
   ],
 
   "Vorspeisen": [
     { "name_de": "Sambusa Gemüse (8 Stk.)", "name_en": "Vegetable sambusa (8 pcs)", "description_de": "Teigtaschen mit Gemüse + Dip", "description_en": "Pastry filled with vegetables + dip", "price": 5.50, "image": "sambusa-vegetable.jpg" },
-    { "name_de": "Sambusa Hackfleisch (3 Stk.)", "name_en": "Meat sambusa (3 pcs)", "description_de": "Teigtaschen mit Hackfleisch + Dip", "description_en": "Pastry filled with minced meat + dip", "price": 6.50, "image": "sambusa-meat.jpg" },
+    { "name_de": "Sambusa Hackfleisch (3 Stk.)", "name_en": "Meat sambusa (3 pcs)", "description_de": "Teigtaschen mit Hackfleisch + Dip", "description_en": "Pastry filled with minced meat + dip", "price": 6.50, "image": "Sambusa Hackfleisch (3 Stück).jpg" },
     { "name_de": "Kategna", "name_en": "Kategna", "description_de": "Injera mit gewürzter Butter & Berbere", "description_en": "Injera with spiced butter & berbere", "price": 4.90, "image": "kategna.jpg" }
   ],
 
   "Fleischgerichte": [
-    { "name_de": "Tzada-Kilua", "name_en": "Tzada-Kilua", "description_de": "Rindfleisch in Zwiebeln gedünstet", "description_en": "beef simmered with onions", "price": 14.90, "image": "tzada-kilua.jpg" },
+    { "name_de": "Tzada-Kilua", "name_en": "Tzada-Kilua", "description_de": "Rindfleisch in Zwiebeln gedünstet", "description_en": "beef simmered with onions", "price": 14.90, "image": "Tzada Kilua.jpg" },
     { "name_de": "Keyih-Kilua", "name_en": "Keyih-Kilua", "description_de": "Lammfleisch mit Paprika & Zwiebeln", "description_en": "lamb with peppers & onions", "price": 14.90, "image": "keyih-kilua.jpg" },
     { "name_de": "Zigni-Beiray", "name_en": "Zigni-Beiray", "description_de": "Rindfleisch in scharfer Sauce", "description_en": "beef in spicy sauce", "price": 14.90, "image": "zigni-beiray.jpg" },
-    { "name_de": "Zilzil Tibs", "name_en": "Zilzil Tibs", "description_de": "Rindfleisch gebraten in gewürzter Butter", "description_en": "beef fried in spiced butter", "price": 16.90, "image": "zilzil-tibs.jpg" },
+    { "name_de": "Zilzil Tibs", "name_en": "Zilzil Tibs", "description_de": "Rindfleisch gebraten in gewürzter Butter", "description_en": "beef fried in spiced butter", "price": 16.90, "image": "Zilzil Tibs.jpg" },
     { "name_de": "Gored-Gored", "name_en": "Gored-Gored", "description_de": "Rindfleischwürfel, leicht gebraten, mit Berbere & Butter", "description_en": "beef cubes, lightly fried with berbere & butter", "price": 16.90, "image": "gored-gored.jpg" },
     { "name_de": "Kitfo", "name_en": "Kitfo", "description_de": "Tatar mit Butter & Chillimischung (roh oder angebraten)", "description_en": "tartare with butter & chili mix (raw or lightly cooked)", "price": 16.90, "image": "kitfo.jpg" },
     { "name_de": "Kilua-Begie", "name_en": "Kilua-Begie", "description_de": "Lammfleisch mit Paprika & Zwiebeln", "description_en": "lamb with peppers & onions", "price": 15.90, "image": "kilua-begie.jpg" },
@@ -89,14 +89,14 @@
 
   "Vegetarisch & Vegan": [
     { "name_de": "Alicha", "name_en": "Alicha", "description_de": "Kartoffeln, Karotten, Zwiebeln, Tomaten, Knoblauch", "description_en": "potatoes, carrots, onions, tomatoes, garlic", "price": 12.90, "image": "alicha.jpg" },
-    { "name_de": "Hamli", "name_en": "Hamli", "description_de": "Spinat in Tomatensauce mit Zwiebeln, Knoblauch", "description_en": "spinach in tomato sauce with onions & garlic", "price": 12.90, "image": "hamli.jpg" },
-    { "name_de": "Timtimo", "name_en": "Timtimo", "description_de": "Linsen in Tomatensauce", "description_en": "lentils in tomato sauce", "price": 12.90, "image": "timtimo.jpg" },
-    { "name_de": "Shiro", "name_en": "Shiro", "description_de": "Kichererbsen mit Zwiebeln & Tomaten", "description_en": "chickpeas with onions & tomatoes", "price": 12.90, "image": "shiro.jpg" }
+    { "name_de": "Hamli", "name_en": "Hamli", "description_de": "Spinat in Tomatensauce mit Zwiebeln, Knoblauch", "description_en": "spinach in tomato sauce with onions & garlic", "price": 12.90, "image": "Hamli.jpg" },
+    { "name_de": "Timtimo", "name_en": "Timtimo", "description_de": "Linsen in Tomatensauce", "description_en": "lentils in tomato sauce", "price": 12.90, "image": "Timtimo.jpg" },
+    { "name_de": "Shiro", "name_en": "Shiro", "description_de": "Kichererbsen mit Zwiebeln & Tomaten", "description_en": "chickpeas with onions & tomatoes", "price": 12.90, "image": "Shiro.jpg" }
   ],
 
   "Mix-Platten": [
-    { "name_de": "Veggi-Platte", "name_en": "Veggie platter", "description_de": "Auswahl vegetarischer Gerichte (Alicha, Hamli, Timtimo, Shiro)", "description_en": "selection of vegetarian dishes (Alicha, Hamli, Timtimo, Shiro)", "price": "15.90 per person", "image": "veggie-platter.jpg" },
-    { "name_de": "Fleisch-Platte", "name_en": "Meat platter", "description_de": "Zigni Beiray (Rind), Tzebhi Begie (Lamm), Tzebhi Dero (Huhn)", "description_en": "Zigni Beiray (beef), Tzebhi Begie (lamb), Tzebhi Dero (chicken)", "price": "18.90 per person", "image": "meat-platter.jpg" },
-    { "name_de": "Mix-Platte", "name_en": "Mix platter", "description_de": "Kombination aus Veggi- und Fleischplatte", "description_en": "combination of veggie and meat platter", "price": "17.90 per person", "image": "mix-platter.jpg" }
+    { "name_de": "Veggi-Platte", "name_en": "Veggie platter", "description_de": "Auswahl vegetarischer Gerichte (Alicha, Hamli, Timtimo, Shiro)", "description_en": "selection of vegetarian dishes (Alicha, Hamli, Timtimo, Shiro)", "price": "15.90 per person", "image": "Veggi Platte (für 1 Person).jpg" },
+    { "name_de": "Fleisch-Platte", "name_en": "Meat platter", "description_de": "Zigni Beiray (Rind), Tzebhi Begie (Lamm), Tzebhi Dero (Huhn)", "description_en": "Zigni Beiray (beef), Tzebhi Begie (lamb), Tzebhi Dero (chicken)", "price": "18.90 per person", "image": "Fleisch Platte (für 1 Person).jpg" },
+    { "name_de": "Mix-Platte", "name_en": "Mix platter", "description_de": "Kombination aus Veggi- und Fleischplatte", "description_en": "combination of veggie and meat platter", "price": "17.90 per person", "image": "Mix aus allem (für 1 Person).jpg" }
   ]
 }
