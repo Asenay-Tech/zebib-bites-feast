@@ -97,4 +97,6 @@
   "Mix-Platten": [
     { "name_de": "Veggi-Platte", "name_en": "Veggie platter", "description_de": "Auswahl vegetarischer Gerichte (Alicha, Hamli, Timtimo, Shiro)", "description_en": "selection of vegetarian dishes (Alicha, Hamli, Timtimo, Shiro)", "price": "15.90 per person", "image": "veggie-platter.jpg" },
     { "name_de": "Fleisch-Platte", "name_en": "Meat platter", "description_de": "Zigni Beiray (Rind), Tzebhi Begie (Lamm), Tzebhi Dero (Huhn)", "description_en": "Zigni Beiray (beef), Tzebhi Begie (lamb), Tzebhi Dero (chicken)", "price": "18.90 per person", "image": "meat-platter.jpg" },
-    { "name_de": "Mix-Platte", "name_en": "Mix platter", "description_de": "Kombination aus Veggi- und Fleischplatte", "description_en": "
+    { "name_de": "Mix-Platte", "name_en": "Mix platter", "description_de": "Kombination aus Veggi- und Fleischplatte", "description_en": "combination of veggie and meat platter", "price": "17.90 per person", "image": "mix-platter.jpg" }
+  ]
+}
