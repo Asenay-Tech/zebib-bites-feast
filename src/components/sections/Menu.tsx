@@ -74,43 +74,8 @@ export function Menu() {
 
   const getItemId = (item: MenuItem & { category: string }, index: number) => `${item.category}-${index}`;
 
-  // Helper to build possible image paths from public/menu-images/
-  const buildImageCandidates = (item: MenuItem): string[] => {
-    const candidates: string[] = [];
-    if (item.image) {
-      // 1) As authored
-      candidates.push(`/menu-images/${item.image}`);
-
-      // 2) URL-encoded authored
-      candidates.push(`/menu-images/${encodeURIComponent(item.image)}`);
-
-      // 3) Hyphenated to Title Case with spaces (e.g., "zilzil-tibs.jpg" -> "Zilzil Tibs.jpg")
-      const m = item.image.match(/^(.*)\.(jpg|jpeg|png|webp|gif)$/i);
-      if (m) {
-        const base = m[1]
-          .split(/[-_]+/)
-          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-          .join(" ");
-        const ext = m[2];
-        candidates.push(`/menu-images/${base}.${ext}`);
-        candidates.push(`/menu-images/${encodeURIComponent(base)}.${ext}`);
-      }
-    }
-
-    // 4) Try name_en and name_de as filenames
-    const toNameCandidate = (name?: string) =>
-      name ? [`/menu-images/${name}.jpg`, `/menu-images/${encodeURIComponent(name)}.jpg`] : [];
-
-    candidates.push(...toNameCandidate((item as any).name_en));
-    candidates.push(...toNameCandidate((item as any).name_de));
-
-    // Ensure uniqueness to avoid loops
-    return Array.from(new Set(candidates));
-  };
-
-  const getInitialImageSrc = (item: MenuItem) => {
-    const list = buildImageCandidates(item);
-    return list.length ? list[0] : menuPlaceholder;
+  const getItemImageSrc = (item: MenuItem) => {
+    return item.image ? `/menu-images/${item.image}` : menuPlaceholder;
   };
   return (
     <section id="menu" className="py-20 bg-background">
@@ -170,22 +135,12 @@ export function Menu() {
               >
                 <CardContent className="p-0">
                   <img
-                    src={getInitialImageSrc(item)}
+                    src={getItemImageSrc(item)}
                     alt={getItemName(item)}
                     className="w-full h-48 object-cover"
                     loading="lazy"
-                    data-fallback-index="0"
                     onError={(e) => {
-                      const img = e.currentTarget as HTMLImageElement;
-                      const list = buildImageCandidates(item);
-                      const currentIndex = Number(img.dataset.fallbackIndex || "0");
-                      const nextIndex = currentIndex + 1;
-                      if (nextIndex < list.length) {
-                        img.dataset.fallbackIndex = String(nextIndex);
-                        img.src = list[nextIndex];
-                      } else {
-                        img.src = menuPlaceholder;
-                      }
+                      e.currentTarget.src = menuPlaceholder;
                     }}
                   />
 
