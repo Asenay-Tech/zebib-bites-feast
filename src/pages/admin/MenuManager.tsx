@@ -358,7 +358,7 @@ export default function MenuManager() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Menu Manager</h1>
           <p className="text-muted-foreground">Manage your restaurant menu</p>
@@ -459,7 +459,7 @@ export default function MenuManager() {
                           </p>
                         )}
                         <p className="text-sm font-medium text-primary mt-2">
-                          {renderPrice(item.price)}
+                          €{typeof item.price === 'number' ? item.price.toFixed(2) : renderPrice(item.price)}
                         </p>
                       </div>
                       <div className="flex gap-2">
