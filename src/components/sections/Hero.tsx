@@ -18,22 +18,11 @@ export function Hero({ onScrollToMenu }: HeroProps) {
       className="relative h-screen flex items-center justify-center overflow-hidden"
     >
       {/* Background Image with Overlay */}
-      <div className="absolute inset-0">
-        <img
-          src="/images/hero-restaurant.jpg"
-          alt="Zebib Restaurant Interior"
-          className="w-full h-full object-cover"
-          loading="eager"
-          fetchPriority="high"
-          onError={(e) => {
-            console.error("Failed to load hero image:", "/images/hero-restaurant.jpg", e.currentTarget?.src);
-          }}
-          onLoad={() => {
-            console.info("Hero image loaded:", "/images/hero-restaurant.jpg");
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background/80" />
-      </div>
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: "url('/images/hero-restaurant.jpg')" }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-background/10 to-background/60" />
 
       {/* Content */}
       <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
