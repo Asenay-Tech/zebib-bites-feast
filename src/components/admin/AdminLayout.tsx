@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Users, ShoppingBag, Calendar, Menu as MenuIcon, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, ShoppingBag, Calendar, Menu as MenuIcon, LogOut, Home } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
@@ -41,6 +41,15 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
       <aside className="w-64 bg-surface border-r border-border">
         <div className="p-6">
           <h1 className="text-2xl font-bold text-primary">ZEBIB Admin</h1>
+        </div>
+        
+        <div className="px-4 mb-4">
+          <Link to="/">
+            <Button variant="outline" className="w-full justify-start gap-3">
+              <Home className="h-5 w-5" />
+              Back to Home
+            </Button>
+          </Link>
         </div>
         
         <nav className="px-4 space-y-2">
