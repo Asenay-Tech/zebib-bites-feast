@@ -23,6 +23,12 @@ export function Hero({ onScrollToMenu }: HeroProps) {
           src={heroImage}
           alt="Zebib Restaurant Interior"
           className="w-full h-full object-cover"
+          onError={(e) => {
+            console.error("Failed to load hero image:", heroImage, e.currentTarget?.src);
+          }}
+          onLoad={() => {
+            console.info("Hero image loaded:", heroImage);
+          }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background/80" />
       </div>
