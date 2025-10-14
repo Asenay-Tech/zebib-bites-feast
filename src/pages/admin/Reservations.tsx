@@ -5,7 +5,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { Trash2, Download } from "lucide-react";
+import { Trash2, Download, FileText } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AdminBreadcrumb } from "@/components/admin/Breadcrumb";
+import { logActivity } from "@/lib/activityLogger";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,6 +19,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface Reservation {
   id: string;
@@ -28,6 +37,7 @@ interface Reservation {
   table_number: number | null;
   event_type: string | null;
   notes: string | null;
+  status: string;
   created_at: string;
 }
 
@@ -52,6 +62,35 @@ export default function Reservations() {
       setReservations(data || []);
     } catch (error) {
       console.error('Error fetching reservations:', error);
+      toast({
+        title: "Error loading reservations",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleStatusUpdate = async (reservationId: string, newStatus: string) => {
+    try {
+      const { error } = await supabase
+        .from('reservations')
+        .update({ status: newStatus })
+        .eq('id', reservationId);
+
+      if (error) throw error;
+
+      await logActivity(`Updated reservation status to ${newStatus}`, 'reservation', reservationId);
+
+      toast({
+        title: "Reservation status updated",
+      });
+      
+      fetchReservations();
+    } catch (error) {
+      console.error('Error updating reservation:', error);
+      toast({
+        title: "Error updating reservation",
+        variant: "destructive",
+      });
     }
   };
 
@@ -71,6 +110,8 @@ export default function Reservations() {
 
       if (error) throw error;
 
+      await logActivity('Deleted reservation', 'reservation', reservationToDelete);
+
       toast({
         title: "Reservation cancelled successfully",
       });
@@ -88,7 +129,7 @@ export default function Reservations() {
   };
 
   const exportToCSV = () => {
-    const headers = ["Name", "Email", "Phone", "Date", "Time", "People", "Table", "Event Type"];
+    const headers = ["Name", "Email", "Phone", "Date", "Time", "People", "Table", "Event Type", "Status"];
     const csvContent = [
       headers.join(","),
       ...reservations.map(r => [
@@ -99,7 +140,8 @@ export default function Reservations() {
         r.time,
         r.people,
         r.table_number || "-",
-        r.event_type || "-"
+        r.event_type || "-",
+        r.status
       ].join(","))
     ].join("\n");
 
@@ -109,6 +151,17 @@ export default function Reservations() {
     a.href = url;
     a.download = `reservations_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
+
+    toast({
+      title: "Reservations exported successfully",
+    });
+  };
+
+  const exportToPDF = async () => {
+    toast({
+      title: "PDF export coming soon",
+      description: "This feature will be available in a future update",
+    });
   };
 
   const checkDoubleBooking = (reservation: Reservation) => {
@@ -118,21 +171,46 @@ export default function Reservations() {
       r.id !== reservation.id &&
       r.date === reservation.date &&
       r.time === reservation.time &&
-      r.table_number === reservation.table_number
+      r.table_number === reservation.table_number &&
+      r.status !== 'canceled'
     );
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <AdminBreadcrumb />
+
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Reservations</h1>
           <p className="text-muted-foreground">Manage table reservations</p>
         </div>
-        <Button onClick={exportToCSV} className="gap-2">
-          <Download className="h-4 w-4" />
-          Export CSV
-        </Button>
+        <TooltipProvider>
+          <div className="flex gap-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button onClick={exportToCSV} variant="outline" className="gap-2">
+                  <Download className="h-4 w-4" />
+                  CSV
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Export to CSV</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button onClick={exportToPDF} className="gap-2">
+                  <FileText className="h-4 w-4" />
+                  PDF
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Export to PDF</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </TooltipProvider>
       </div>
 
       <Card>
@@ -150,13 +228,14 @@ export default function Reservations() {
                 <TableHead>People</TableHead>
                 <TableHead>Table</TableHead>
                 <TableHead>Event Type</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {reservations.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center text-muted-foreground">
+                  <TableCell colSpan={9} className="text-center text-muted-foreground">
                     No reservations found
                   </TableCell>
                 </TableRow>
@@ -180,7 +259,7 @@ export default function Reservations() {
                       <TableCell>{reservation.people}</TableCell>
                       <TableCell>
                         {isDoubleBooked && (
-                          <Badge variant="destructive" className="mr-2">Double Booked</Badge>
+                          <Badge variant="destructive" className="mr-2">Conflict!</Badge>
                         )}
                         {reservation.table_number || "-"}
                       </TableCell>
@@ -189,14 +268,38 @@ export default function Reservations() {
                           <Badge variant="outline">{reservation.event_type}</Badge>
                         ) : "-"}
                       </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteClick(reservation.id)}
+                      <TableCell>
+                        <Select
+                          value={reservation.status || 'pending'}
+                          onValueChange={(value) => handleStatusUpdate(reservation.id, value)}
                         >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
+                          <SelectTrigger className="w-[130px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="confirmed">Confirmed</SelectItem>
+                            <SelectItem value="canceled">Canceled</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDeleteClick(reservation.id)}
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Delete reservation</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </TableCell>
                     </TableRow>
                   );

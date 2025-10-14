@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_log: {
+        Row: {
+          action: string
+          created_at: string | null
+          details: Json | null
+          entity_id: string | null
+          entity_type: string
+          id: string
+          user_email: string | null
+          user_id: string | null
+          user_role: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          details?: Json | null
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          user_email?: string | null
+          user_id?: string | null
+          user_role?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          details?: Json | null
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          user_email?: string | null
+          user_id?: string | null
+          user_role?: string | null
+        }
+        Relationships: []
+      }
       contact_messages: {
         Row: {
           created_at: string | null
@@ -99,6 +135,7 @@ export type Database = {
           name: string
           payment_status: string | null
           phone: string
+          status: string | null
           table_number: number | null
           time: string
           total_amount_cents: number
@@ -113,6 +150,7 @@ export type Database = {
           name: string
           payment_status?: string | null
           phone: string
+          status?: string | null
           table_number?: number | null
           time: string
           total_amount_cents: number
@@ -127,6 +165,7 @@ export type Database = {
           name?: string
           payment_status?: string | null
           phone?: string
+          status?: string | null
           table_number?: number | null
           time?: string
           total_amount_cents?: number
@@ -170,6 +209,7 @@ export type Database = {
           people: number
           phone: string
           services: string[] | null
+          status: string | null
           table_number: number | null
           time: string
           user_id: string
@@ -185,6 +225,7 @@ export type Database = {
           people: number
           phone: string
           services?: string[] | null
+          status?: string | null
           table_number?: number | null
           time: string
           user_id: string
@@ -200,6 +241,7 @@ export type Database = {
           people?: number
           phone?: string
           services?: string[] | null
+          status?: string | null
           table_number?: number | null
           time?: string
           user_id?: string

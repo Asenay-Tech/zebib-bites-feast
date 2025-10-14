@@ -4,9 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Edit, Trash2, Save, X, Search, Upload, Image as ImageIcon } from "lucide-react";
+import { Plus, Edit, Trash2, Save, X, Search, Upload, Download, Copy, Eye, GripVertical } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { AdminBreadcrumb } from "@/components/admin/Breadcrumb";
+import { logActivity } from "@/lib/activityLogger";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   Dialog,
   DialogContent,
@@ -74,6 +82,8 @@ export default function MenuManager() {
   const [imagePreview, setImagePreview] = useState<string>("");
   const [categories, setCategories] = useState<string[]>(DEFAULT_CATEGORIES);
   const [newCategory, setNewCategory] = useState("");
+  const [previewMode, setPreviewMode] = useState(false);
+  const [draggedItem, setDraggedItem] = useState<MenuItem | null>(null);
   const [formData, setFormData] = useState({
     name_de: "",
     name_en: "",
@@ -251,16 +261,22 @@ export default function MenuManager() {
 
         if (error) throw error;
 
+        await logActivity(`Updated menu item: ${formData.name_en}`, 'menu_item', editingItem.id);
+
         toast({
           title: "Success",
           description: "Menu item updated successfully",
         });
       } else {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('menu_items')
-          .insert({ ...itemData, created_by: user.id });
+          .insert({ ...itemData, created_by: user.id })
+          .select()
+          .single();
 
         if (error) throw error;
+
+        await logActivity(`Created menu item: ${formData.name_en}`, 'menu_item', data.id);
 
         toast({
           title: "Success",
@@ -296,6 +312,8 @@ export default function MenuManager() {
 
       if (error) throw error;
 
+      await logActivity(`Deleted menu item: ${itemToDelete.name_en}`, 'menu_item', itemToDelete.id);
+
       toast({
         title: "Success",
         description: "Menu item deleted successfully",
@@ -312,6 +330,183 @@ export default function MenuManager() {
         variant: "destructive",
       });
     }
+  };
+
+  const handleDuplicate = async (item: MenuItem) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const duplicatedItem = {
+        category: item.category,
+        name_de: `${item.name_de} (Copy)`,
+        name_en: `${item.name_en} (Copy)`,
+        description_de: item.description_de,
+        description_en: item.description_en,
+        price: item.price,
+        image_url: item.image_url,
+        created_by: user.id,
+        updated_by: user.id,
+      };
+
+      const { data, error } = await supabase
+        .from('menu_items')
+        .insert(duplicatedItem)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      await logActivity(`Duplicated menu item: ${item.name_en}`, 'menu_item', data.id);
+
+      toast({
+        title: "Success",
+        description: "Menu item duplicated successfully",
+      });
+
+      fetchMenuItems();
+    } catch (error) {
+      console.error('Error duplicating item:', error);
+      toast({
+        title: "Error",
+        description: "Failed to duplicate menu item",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const exportMenuData = () => {
+    const headers = ["Category", "Name (EN)", "Name (DE)", "Description (EN)", "Description (DE)", "Price", "Image URL"];
+    const csvContent = [
+      headers.join(","),
+      ...menuItems.map(item => [
+        item.category,
+        item.name_en,
+        item.name_de,
+        item.description_en || "",
+        item.description_de || "",
+        typeof item.price === 'number' ? item.price.toFixed(2) : JSON.stringify(item.price),
+        item.image_url || ""
+      ].join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `menu_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+
+    toast({
+      title: "Menu exported successfully",
+    });
+  };
+
+  const backupMenuData = async () => {
+    try {
+      const jsonData = JSON.stringify(menuItems, null, 2);
+      const fileName = `menu_backup_${new Date().toISOString()}.json`;
+      
+      const blob = new Blob([jsonData], { type: 'application/json' });
+      const file = new File([blob], fileName);
+
+      const { error } = await supabase.storage
+        .from('menu-images')
+        .upload(`backups/${fileName}`, file);
+
+      if (error) throw error;
+
+      await logActivity('Created menu backup', 'backup');
+
+      toast({
+        title: "Backup created successfully",
+        description: `Backup saved to /backups/${fileName}`,
+      });
+    } catch (error) {
+      console.error('Error creating backup:', error);
+      toast({
+        title: "Error creating backup",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleImportCSV = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const lines = text.split('\n');
+      const headers = lines[0].split(',');
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const items = lines.slice(1).filter(line => line.trim()).map(line => {
+        const values = line.split(',');
+        return {
+          category: values[0]?.trim(),
+          name_en: values[1]?.trim(),
+          name_de: values[2]?.trim(),
+          description_en: values[3]?.trim() || null,
+          description_de: values[4]?.trim() || null,
+          price: parseFloat(values[5]) || 0,
+          image_url: values[6]?.trim() || null,
+          created_by: user.id,
+          updated_by: user.id,
+        };
+      });
+
+      const { error } = await supabase
+        .from('menu_items')
+        .insert(items);
+
+      if (error) throw error;
+
+      await logActivity(`Imported ${items.length} menu items from CSV`, 'menu_item');
+
+      toast({
+        title: "Import successful",
+        description: `Imported ${items.length} menu items`,
+      });
+
+      fetchMenuItems();
+    } catch (error) {
+      console.error('Error importing CSV:', error);
+      toast({
+        title: "Error importing CSV",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDragStart = (item: MenuItem) => {
+    setDraggedItem(item);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = async (targetItem: MenuItem) => {
+    if (!draggedItem || draggedItem.id === targetItem.id) return;
+
+    // Reorder items visually
+    const items = [...menuItems];
+    const dragIndex = items.findIndex(i => i.id === draggedItem.id);
+    const dropIndex = items.findIndex(i => i.id === targetItem.id);
+    
+    items.splice(dragIndex, 1);
+    items.splice(dropIndex, 0, draggedItem);
+    
+    setMenuItems(items);
+    setDraggedItem(null);
+
+    toast({
+      title: "Items reordered",
+      description: "Menu order updated",
+    });
   };
 
   const handleAddCategory = () => {
@@ -358,20 +553,81 @@ export default function MenuManager() {
 
   return (
     <div className="space-y-6">
+      <AdminBreadcrumb />
+      
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Menu Manager</h1>
           <p className="text-muted-foreground">Manage your restaurant menu</p>
         </div>
-        <div className="flex gap-2">
-          <Button onClick={() => setCategoryDialogOpen(true)} variant="outline" className="gap-2">
-            Manage Categories
-          </Button>
-          <Button onClick={handleAddNew} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Add New Item
-          </Button>
-        </div>
+        <TooltipProvider>
+          <div className="flex flex-wrap gap-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button onClick={() => setPreviewMode(!previewMode)} variant="outline" className="gap-2">
+                  <Eye className="h-4 w-4" />
+                  {previewMode ? "Edit Mode" : "Preview"}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Toggle preview mode</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button onClick={exportMenuData} variant="outline" className="gap-2">
+                  <Download className="h-4 w-4" />
+                  Export
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Export menu to CSV</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button onClick={backupMenuData} variant="outline" className="gap-2">
+                  <Download className="h-4 w-4" />
+                  Backup
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Backup menu to storage</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Label htmlFor="csv-import" className="cursor-pointer">
+                  <Button variant="outline" className="gap-2" asChild>
+                    <span>
+                      <Upload className="h-4 w-4" />
+                      Import
+                    </span>
+                  </Button>
+                  <Input
+                    id="csv-import"
+                    type="file"
+                    accept=".csv"
+                    onChange={handleImportCSV}
+                    className="hidden"
+                  />
+                </Label>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Import menu from CSV</p>
+              </TooltipContent>
+            </Tooltip>
+            <Button onClick={() => setCategoryDialogOpen(true)} variant="outline">
+              Manage Categories
+            </Button>
+            {!previewMode && (
+              <Button onClick={handleAddNew} className="gap-2">
+                <Plus className="h-4 w-4" />
+                Add New Item
+              </Button>
+            )}
+          </div>
+        </TooltipProvider>
       </div>
 
       {/* Search and Filters */}
@@ -433,8 +689,19 @@ export default function MenuManager() {
               {paginatedItems.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-start gap-4 p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors"
+                  draggable={!previewMode}
+                  onDragStart={() => handleDragStart(item)}
+                  onDragOver={handleDragOver}
+                  onDrop={() => handleDrop(item)}
+                  className={`flex items-start gap-4 p-4 border border-border rounded-lg transition-colors ${
+                    previewMode ? '' : 'hover:bg-muted/50 cursor-move'
+                  }`}
                 >
+                  {!previewMode && (
+                    <div className="flex items-center">
+                      <GripVertical className="h-5 w-5 text-muted-foreground" />
+                    </div>
+                  )}
                   {item.image_url && (
                     <img
                       src={item.image_url}
@@ -462,22 +729,54 @@ export default function MenuManager() {
                           €{typeof item.price === 'number' ? item.price.toFixed(2) : renderPrice(item.price)}
                         </p>
                       </div>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEdit(item)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteClick(item)}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
+                      {!previewMode && (
+                        <TooltipProvider>
+                          <div className="flex gap-2">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleDuplicate(item)}
+                                >
+                                  <Copy className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Duplicate item</p>
+                              </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleEdit(item)}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Edit item</p>
+                              </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleDeleteClick(item)}
+                                >
+                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Delete item</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                        </TooltipProvider>
+                      )}
                     </div>
                   </div>
                 </div>
