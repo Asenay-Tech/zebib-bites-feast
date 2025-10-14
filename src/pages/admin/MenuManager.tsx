@@ -95,6 +95,27 @@ export default function MenuManager() {
 
   useEffect(() => {
     fetchMenuItems();
+
+    // Real-time subscription for menu items
+    const channel = supabase
+      .channel("menu_items_changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "menu_items",
+        },
+        (payload) => {
+          console.log("Menu item changed:", payload);
+          fetchMenuItems();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {
@@ -112,6 +133,15 @@ export default function MenuManager() {
 
       if (error) throw error;
       setMenuItems(data || []);
+      
+      // Extract unique categories from database
+      const uniqueCategories = Array.from(
+        new Set(data?.map((item) => item.category) || [])
+      ).sort();
+      
+      if (uniqueCategories.length > 0) {
+        setCategories(uniqueCategories);
+      }
     } catch (error) {
       console.error('Error fetching menu items:', error);
       toast({
@@ -511,11 +541,12 @@ export default function MenuManager() {
 
   const handleAddCategory = () => {
     if (newCategory.trim() && !categories.includes(newCategory.trim())) {
-      setCategories([...categories, newCategory.trim()]);
+      setCategories([...categories, newCategory.trim()].sort());
       setNewCategory("");
+      setCategoryDialogOpen(false);
       toast({
         title: "Success",
-        description: "Category added successfully",
+        description: "Category added. Add menu items to this category to save it to the database.",
       });
     }
   };
@@ -726,7 +757,7 @@ export default function MenuManager() {
                           </p>
                         )}
                         <p className="text-sm font-medium text-primary mt-2">
-                          €{typeof item.price === 'number' ? item.price.toFixed(2) : renderPrice(item.price)}
+                          {renderPrice(item.price)}
                         </p>
                       </div>
                       {!previewMode && (
