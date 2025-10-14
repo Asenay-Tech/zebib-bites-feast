@@ -44,6 +44,51 @@ export type Database = {
         }
         Relationships: []
       }
+      menu_items: {
+        Row: {
+          category: string
+          created_at: string | null
+          created_by: string | null
+          description_de: string | null
+          description_en: string | null
+          id: string
+          image_url: string | null
+          name_de: string
+          name_en: string
+          price: Json
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          created_by?: string | null
+          description_de?: string | null
+          description_en?: string | null
+          id?: string
+          image_url?: string | null
+          name_de: string
+          name_en: string
+          price: Json
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          created_by?: string | null
+          description_de?: string | null
+          description_en?: string | null
+          id?: string
+          image_url?: string | null
+          name_de?: string
+          name_en?: string
+          price?: Json
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           created_at: string | null
