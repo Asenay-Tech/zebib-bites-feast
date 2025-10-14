@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/components/ui/language-switcher";
 import menuData from "@/data/menu.json";
-import traditionalPlatterImage from "@/assets/traditional-platter.jpg?url";
+
 
 
 interface MenuItem {
@@ -187,7 +187,7 @@ export function Menu() {
 
             <div className="relative">
               <img
-                src={traditionalPlatterImage}
+                src="/images/traditional-platter.jpg"
                 alt="Traditional Eritrean Platter"
                 className="w-full h-auto rounded-xl shadow-elegant"
               />

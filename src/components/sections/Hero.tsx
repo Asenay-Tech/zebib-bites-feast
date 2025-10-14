@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 import { useLanguage } from "@/components/ui/language-switcher";
-import heroImage from "@/assets/hero-restaurant.jpg?url";
+
 
 interface HeroProps {
   onScrollToMenu: () => void;
@@ -20,14 +20,16 @@ export function Hero({ onScrollToMenu }: HeroProps) {
       {/* Background Image with Overlay */}
       <div className="absolute inset-0">
         <img
-          src={heroImage}
+          src="/images/hero-restaurant.jpg"
           alt="Zebib Restaurant Interior"
           className="w-full h-full object-cover"
+          loading="eager"
+          fetchPriority="high"
           onError={(e) => {
-            console.error("Failed to load hero image:", heroImage, e.currentTarget?.src);
+            console.error("Failed to load hero image:", "/images/hero-restaurant.jpg", e.currentTarget?.src);
           }}
           onLoad={() => {
-            console.info("Hero image loaded:", heroImage);
+            console.info("Hero image loaded:", "/images/hero-restaurant.jpg");
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background/80" />

@@ -1,8 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { ChefHat, Users, Leaf, Calendar } from "lucide-react";
 import { useLanguage } from "@/components/ui/language-switcher";
-import coffeeImage from "@/assets/coffee-ceremony.jpg?url";
-import platterImage from "@/assets/traditional-platter.jpg?url";
+
+
 
 export function WhyChooseUs() {
   const { language, t } = useLanguage();
@@ -106,7 +106,7 @@ export function WhyChooseUs() {
           <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative rounded-xl overflow-hidden group">
               <img
-                src={coffeeImage}
+                src="/images/coffee-ceremony.jpg"
                 alt="Traditional Cooking"
                 className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
               />
@@ -119,7 +119,7 @@ export function WhyChooseUs() {
 
             <div className="relative rounded-xl overflow-hidden group">
               <img
-                src={platterImage}
+                src="/images/traditional-platter.jpg"
                 alt="Modern Presentation"
                 className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
               />

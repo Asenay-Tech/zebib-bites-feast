@@ -31,7 +31,7 @@ import { format } from "date-fns";
 import { de, enUS } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import menuDataRaw from "@/data/menu.json";
-import menuPlaceholder from "@/assets/menu-placeholder.jpg";
+
 
 type Price = number | string | Record<string, number | string> | undefined;
 /** Grab the first number in a string like "€15,90 per person" or "15.90 per person" */
@@ -467,7 +467,7 @@ const Order = () => {
                   <Card key={idx} className="p-4 overflow-hidden">
                     <div className="flex gap-4">
                       <img
-                        src={menuPlaceholder}
+                        src="/images/menu-placeholder.jpg"
                         alt={language === "de" ? item.name_de : item.name_en}
                         className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
                       />
