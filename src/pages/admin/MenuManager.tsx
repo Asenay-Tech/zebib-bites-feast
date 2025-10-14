@@ -46,7 +46,7 @@ interface MenuItem {
 }
 
 const ITEMS_PER_PAGE = 10;
-const CATEGORIES = [
+const DEFAULT_CATEGORIES = [
   "Aperitif",
   "Main Dishes",
   "Vegetarian",
@@ -66,18 +66,21 @@ export default function MenuManager() {
   const [currentPage, setCurrentPage] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [itemToDelete, setItemToDelete] = useState<MenuItem | null>(null);
   const [uploading, setUploading] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
+  const [categories, setCategories] = useState<string[]>(DEFAULT_CATEGORIES);
+  const [newCategory, setNewCategory] = useState("");
   const [formData, setFormData] = useState({
     name_de: "",
     name_en: "",
     description_de: "",
     description_en: "",
     price: "",
-    category: CATEGORIES[0],
+    category: DEFAULT_CATEGORIES[0],
   });
 
   useEffect(() => {
@@ -187,7 +190,7 @@ export default function MenuManager() {
       description_de: "",
       description_en: "",
       price: "",
-      category: CATEGORIES[0],
+      category: categories[0] || "",
     });
     setImageFile(null);
     setImagePreview("");
@@ -227,12 +230,7 @@ export default function MenuManager() {
         if (uploadedUrl) imageUrl = uploadedUrl;
       }
 
-      let priceData;
-      try {
-        priceData = JSON.parse(formData.price);
-      } catch {
-        priceData = parseFloat(formData.price) || 0;
-      }
+      const priceData = parseFloat(formData.price) || 0;
 
       const itemData = {
         category: formData.category,
@@ -316,13 +314,40 @@ export default function MenuManager() {
     }
   };
 
+  const handleAddCategory = () => {
+    if (newCategory.trim() && !categories.includes(newCategory.trim())) {
+      setCategories([...categories, newCategory.trim()]);
+      setNewCategory("");
+      toast({
+        title: "Success",
+        description: "Category added successfully",
+      });
+    }
+  };
+
+  const handleDeleteCategory = (category: string) => {
+    if (categories.length > 1) {
+      setCategories(categories.filter(c => c !== category));
+      toast({
+        title: "Success",
+        description: "Category deleted successfully",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: "Cannot delete the last category",
+        variant: "destructive",
+      });
+    }
+  };
+
   const renderPrice = (price: any) => {
     if (typeof price === 'object') {
       return Object.entries(price)
         .map(([size, p]) => `${size}: €${p}`)
         .join(', ');
     }
-    return `€${price}`;
+    return `€${Number(price).toFixed(2)}`;
   };
 
   const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
@@ -338,10 +363,15 @@ export default function MenuManager() {
           <h1 className="text-3xl font-bold text-foreground">Menu Manager</h1>
           <p className="text-muted-foreground">Manage your restaurant menu</p>
         </div>
-        <Button onClick={handleAddNew} className="gap-2">
-          <Plus className="h-4 w-4" />
-          Add New Item
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => setCategoryDialogOpen(true)} variant="outline" className="gap-2">
+            Manage Categories
+          </Button>
+          <Button onClick={handleAddNew} className="gap-2">
+            <Plus className="h-4 w-4" />
+            Add New Item
+          </Button>
+        </div>
       </div>
 
       {/* Search and Filters */}
@@ -372,7 +402,7 @@ export default function MenuManager() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
-                {CATEGORIES.map((cat) => (
+                {categories.map((cat) => (
                   <SelectItem key={cat} value={cat}>
                     {cat}
                   </SelectItem>
@@ -514,7 +544,7 @@ export default function MenuManager() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {CATEGORIES.map((cat) => (
+                  {categories.map((cat) => (
                     <SelectItem key={cat} value={cat}>
                       {cat}
                     </SelectItem>
@@ -566,12 +596,15 @@ export default function MenuManager() {
             </div>
 
             <div>
-              <Label htmlFor="price">Price (number or JSON object for variants)</Label>
+              <Label htmlFor="price">Price (e.g., 22.90)</Label>
               <Input
                 id="price"
+                type="number"
+                step="0.01"
+                min="0"
                 value={formData.price}
                 onChange={(e) => setFormData({...formData, price: e.target.value})}
-                placeholder='e.g., 12.50 or {"small": 8, "large": 10}'
+                placeholder="e.g., 22.90"
                 required
               />
             </div>
@@ -642,6 +675,47 @@ export default function MenuManager() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Category Management Dialog */}
+      <Dialog open={categoryDialogOpen} onOpenChange={setCategoryDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Manage Categories</DialogTitle>
+            <DialogDescription>
+              Add or remove menu categories
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="flex gap-2">
+              <Input
+                placeholder="New category name"
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleAddCategory()}
+              />
+              <Button onClick={handleAddCategory}>
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <div className="space-y-2">
+              {categories.map((category) => (
+                <div key={category} className="flex items-center justify-between p-2 border border-border rounded-md">
+                  <span>{category}</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDeleteCategory(category)}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
