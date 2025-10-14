@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 import { useLanguage } from "@/components/ui/language-switcher";
-import heroImage from "@/assets/hero-restaurant.jpg?url";
 
 interface HeroProps {
   onScrollToMenu: () => void;
@@ -20,7 +19,7 @@ export function Hero({ onScrollToMenu }: HeroProps) {
       {/* Background Image with Overlay */}
       <div className="absolute inset-0">
         <img
-          src={heroImage}
+          src="/menu-images/hero.jpg"
           alt="Zebib Restaurant Interior"
           className="w-full h-full object-cover"
         />
