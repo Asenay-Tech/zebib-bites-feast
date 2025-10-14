@@ -30,7 +30,6 @@ import {
 import { format } from "date-fns";
 import { de, enUS } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-import menuDataRaw from "@/data/menu.json";
 import menuPlaceholder from "@/assets/menu-placeholder.jpg";
 
 type Price = number | string | Record<string, number | string> | undefined;
@@ -67,13 +66,18 @@ export const formatEUR = (n: number) =>
       }).format(n);
 
 interface MenuItem {
+  id: string;
   name_de: string;
   name_en: string;
-  description_de?: string;
-  description_en?: string;
-  price?: Price;
-  category_de: string;
-  category_en: string;
+  description_de?: string | null;
+  description_en?: string | null;
+  price?: any;
+  category: string;
+  image_url?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  created_by?: string | null;
+  updated_by?: string | null;
 }
 
 interface CartItem {
@@ -85,16 +89,6 @@ interface CartItem {
   quantity: number;
   notes?: string;
 }
-
-const categories: string[] = Object.keys(menuDataRaw as Record<string, any[]>);
-
-const menuData: MenuItem[] = categories.flatMap((cat) =>
-  ((menuDataRaw as Record<string, any[]>)[cat] || []).map((item: any) => ({
-    ...item,
-    category_de: cat,
-    category_en: cat, // plug real translations later if needed
-  }))
-);
 
 const Order = () => {
   const navigate = useNavigate();
@@ -110,6 +104,9 @@ const Order = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [addingToCart, setAddingToCart] = useState<string | null>(null);
+  const [menuData, setMenuData] = useState<MenuItem[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -137,14 +134,62 @@ const Order = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const categories = Array.from(
-    new Set(menuData.map((item) => item.category_de))
-  );
+  useEffect(() => {
+    fetchMenuItems();
+
+    // Real-time subscription
+    const channel = supabase
+      .channel("menu_order_changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "menu_items",
+        },
+        () => {
+          fetchMenuItems();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const fetchMenuItems = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("menu_items")
+        .select("*")
+        .order("category", { ascending: true });
+
+      if (error) throw error;
+
+      setMenuData(data || []);
+      
+      // Extract unique categories
+      const uniqueCategories = Array.from(
+        new Set(data?.map((item) => item.category) || [])
+      ).sort();
+      setCategories(uniqueCategories);
+    } catch (error) {
+      console.error("Error fetching menu items:", error);
+      toast({
+        title: "Error loading menu",
+        description: "Please refresh the page",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredMenu =
     selectedCategory === "all"
       ? menuData
-      : menuData.filter((item) => item.category_de === selectedCategory);
+      : menuData.filter((item) => item.category === selectedCategory);
 
   const addToCart = (item: any, variant?: string) => {
     setAddingToCart(item.name_de);
@@ -443,12 +488,6 @@ const Order = () => {
                 </Button>
 
                 {categories.map((cat) => {
-                  const label =
-                    language === "de"
-                      ? cat
-                      : menuData.find((i) => i.category_de === cat)
-                          ?.category_en || cat;
-
                   return (
                     <Button
                       key={cat}
@@ -456,7 +495,7 @@ const Order = () => {
                       variant={selectedCategory === cat ? "default" : "outline"}
                       onClick={() => setSelectedCategory(cat)}
                     >
-                      {label}
+                      {cat}
                     </Button>
                   );
                 })}
