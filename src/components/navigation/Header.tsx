@@ -16,6 +16,7 @@ export function Header({ currentSection, onSectionChange }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const { language, setLanguage, t } = useLanguage();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -31,6 +32,26 @@ export function Header({ currentSection, onSectionChange }: HeaderProps) {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const checkAdminRole = async () => {
+      if (!user) {
+        setIsAdmin(false);
+        return;
+      }
+
+      const { data: roles } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+
+      setIsAdmin(!!roles);
+    };
+
+    checkAdminRole();
+  }, [user]);
 
   // Handle scroll effect for header
   useEffect(() => {
@@ -133,6 +154,15 @@ export function Header({ currentSection, onSectionChange }: HeaderProps) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48 bg-surface border-border">
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuItem onClick={() => navigate("/admin")} className="cursor-pointer font-medium">
+                        <User className="mr-2 h-4 w-4" />
+                        Admin Dashboard
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </>
+                  )}
                   <DropdownMenuItem onClick={() => navigate("/reserve")} className="cursor-pointer">
                     <Calendar className="mr-2 h-4 w-4" />
                     {t("nav.reserve")}
