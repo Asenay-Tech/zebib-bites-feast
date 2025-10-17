@@ -20,12 +20,38 @@ serve(async (req) => {
     const html = `
       <!DOCTYPE html>
       <html>
-        <body style="font-family: Arial, sans-serif; padding: 20px;">
-          <h1>🍽️ Welcome to Zebib Foods!</h1>
-          <p>Hello ${name},</p>
-          <p>Thank you for joining us. We're excited to serve you authentic East African cuisine.</p>
-          <p>Visit us at zebibfood.de to explore our menu and place your first order!</p>
-          <p>Best regards,<br>The Zebib Foods Team</p>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #f4f4f4;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f4; padding: 20px;">
+            <tr>
+              <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                  <tr>
+                    <td style="padding: 40px 40px 20px; text-align: center; background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%); border-radius: 8px 8px 0 0;">
+                      <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: bold;">ZEBIB RESTAURANT</h1>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 40px;">
+                      <h2 style="margin: 0 0 20px; color: #333333; font-size: 24px;">Welcome to ZEBIB!</h2>
+                      <p style="margin: 0 0 15px; color: #666666; font-size: 16px; line-height: 1.6;">Hello ${name},</p>
+                      <p style="margin: 0 0 15px; color: #666666; font-size: 16px; line-height: 1.6;">Thank you for joining ZEBIB Restaurant. We're excited to have you with us!</p>
+                      <p style="margin: 0 0 15px; color: #666666; font-size: 16px; line-height: 1.6;">You can now make reservations and place orders online through our platform.</p>
+                      <p style="margin: 30px 0 0; color: #666666; font-size: 16px; line-height: 1.6;">Best regards,<br><strong>The ZEBIB Team</strong></p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 20px 40px; background-color: #f8f8f8; border-radius: 0 0 8px 8px; text-align: center;">
+                      <p style="margin: 0; color: #999999; font-size: 14px;">Salzstraße 14, 63450 Hanau | +49 177 4629585</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
         </body>
       </html>
     `;
@@ -37,10 +63,11 @@ serve(async (req) => {
         "Authorization": `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Zebib Foods <mail@zebibfood.de>",
+        from: "ZEBIB Restaurant <noreply@zebibrestaurant.com>",
         to: [email],
-        subject: "Welcome to Zebib Foods! 🎉",
+        subject: "Welcome to ZEBIB Restaurant!",
         html,
+        reply_to: "info@zebibrestaurant.com",
       }),
     });
 

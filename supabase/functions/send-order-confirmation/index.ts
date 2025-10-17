@@ -36,55 +36,63 @@ serve(async (req) => {
       <!DOCTYPE html>
       <html>
         <head>
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background-color: #D97706; color: white; padding: 20px; text-align: center; }
-            .content { padding: 20px; background-color: #f9f9f9; }
-            .order-details { background-color: white; padding: 15px; margin: 20px 0; border-radius: 5px; }
-            .footer { text-align: center; padding: 20px; color: #666; font-size: 14px; }
-            ul { list-style: none; padding: 0; }
-            li { padding: 8px 0; border-bottom: 1px solid #eee; }
-            .total { font-weight: bold; font-size: 18px; margin-top: 15px; padding-top: 15px; border-top: 2px solid #D97706; }
-          </style>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
         </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>🍽️ Zebib Foods</h1>
-              <p>Order Confirmation</p>
-            </div>
-            <div class="content">
-              <h2>Thank you, ${name}!</h2>
-              <p>Your order has been confirmed and payment received.</p>
-              
-              <div class="order-details">
-                <h3>Order Details</h3>
-                <p><strong>Order ID:</strong> ${orderId.slice(0, 8).toUpperCase()}</p>
-                <p><strong>Type:</strong> ${diningType === 'dine-in' ? 'Dine-in' : 'Pickup'}</p>
-                <p><strong>Date:</strong> ${date}</p>
-                <p><strong>Time:</strong> ${time}</p>
-                ${tableNumber ? `<p><strong>Table:</strong> ${tableNumber}</p>` : ''}
-                ${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ''}
-                
-                <h3 style="margin-top: 20px;">Items Ordered</h3>
-                <ul>
-                  ${itemsList}
-                </ul>
-                
-                <div class="total">
-                  Total: €${(totalAmount / 100).toFixed(2)}
-                </div>
-              </div>
-              
-              <p>We're preparing your order and it will be ready at the scheduled time.</p>
-              <p>If you have any questions, please don't hesitate to contact us.</p>
-            </div>
-            <div class="footer">
-              <p>Zebib Foods - Authentic East African Cuisine</p>
-              <p>zebibfood.de</p>
-            </div>
-          </div>
+        <body style="margin: 0; padding: 0; background-color: #f4f4f4;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f4; padding: 20px;">
+            <tr>
+              <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                  <tr>
+                    <td style="padding: 40px 40px 20px; text-align: center; background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%); border-radius: 8px 8px 0 0;">
+                      <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: bold;">ZEBIB RESTAURANT</h1>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 40px;">
+                      <h2 style="margin: 0 0 20px; color: #333333; font-size: 24px;">Order Confirmation</h2>
+                      <p style="margin: 0 0 15px; color: #666666; font-size: 16px; line-height: 1.6;">Hello ${name},</p>
+                      <p style="margin: 0 0 20px; color: #666666; font-size: 16px; line-height: 1.6;">Thank you for your order! We're preparing it now.</p>
+                      
+                      <div style="background-color: #f8f8f8; padding: 25px; border-radius: 6px; border-left: 4px solid #8B0000;">
+                        <h3 style="margin: 0 0 15px; color: #333333; font-size: 18px;">Order Details</h3>
+                        <p style="margin: 5px 0; color: #666666; font-size: 15px;"><strong>Order ID:</strong> ${orderId.slice(0, 8).toUpperCase()}</p>
+                        <p style="margin: 5px 0; color: #666666; font-size: 15px;"><strong>Type:</strong> ${diningType === 'dine-in' ? 'Dine-in' : 'Pickup'}</p>
+                        <p style="margin: 5px 0; color: #666666; font-size: 15px;"><strong>Date:</strong> ${date}</p>
+                        <p style="margin: 5px 0 15px; color: #666666; font-size: 15px;"><strong>Time:</strong> ${time}</p>
+                        ${tableNumber ? `<p style="margin: 5px 0; color: #666666; font-size: 15px;"><strong>Table:</strong> ${tableNumber}</p>` : ''}
+                        ${phone ? `<p style="margin: 5px 0; color: #666666; font-size: 15px;"><strong>Phone:</strong> ${phone}</p>` : ''}
+                        
+                        <h4 style="margin: 20px 0 10px; color: #333333; font-size: 16px;">Items:</h4>
+                        <table width="100%" cellpadding="8" cellspacing="0" style="border-top: 1px solid #ddd;">
+                          ${items.map((item: any) => 
+                            `<tr style="border-bottom: 1px solid #ddd;">
+                              <td style="color: #666666; font-size: 14px;">${item.name}${item.variant ? ` (${item.variant})` : ''}</td>
+                              <td style="color: #666666; font-size: 14px; text-align: center;">${item.quantity}x</td>
+                              <td style="color: #666666; font-size: 14px; text-align: right;">€${((item.price / 100) * item.quantity).toFixed(2)}</td>
+                            </tr>`
+                          ).join('')}
+                          <tr>
+                            <td colspan="2" style="padding-top: 15px; font-weight: bold; color: #333333; font-size: 16px;">Total:</td>
+                            <td style="padding-top: 15px; font-weight: bold; color: #8B0000; font-size: 18px; text-align: right;">€${(totalAmount / 100).toFixed(2)}</td>
+                          </tr>
+                        </table>
+                      </div>
+
+                      <p style="margin: 30px 0 0; color: #666666; font-size: 16px; line-height: 1.6;">We'll have your order ready at the scheduled time!</p>
+                      <p style="margin: 15px 0 0; color: #666666; font-size: 16px; line-height: 1.6;">Best regards,<br><strong>The ZEBIB Team</strong></p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 20px 40px; background-color: #f8f8f8; border-radius: 0 0 8px 8px; text-align: center;">
+                      <p style="margin: 0; color: #999999; font-size: 14px;">Salzstraße 14, 63450 Hanau | +49 177 4629585</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
         </body>
       </html>
     `;
@@ -96,10 +104,11 @@ serve(async (req) => {
         "Authorization": `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Zebib Foods <mail@zebibfood.de>",
+        from: "ZEBIB Restaurant <noreply@zebibrestaurant.com>",
         to: [email],
-        subject: `Order Confirmation #${orderId.slice(0, 8).toUpperCase()} - Zebib Foods`,
+        subject: `Order Confirmation #${orderId.slice(0, 8).toUpperCase()} - ZEBIB Restaurant`,
         html,
+        reply_to: "info@zebibrestaurant.com",
       }),
     });
 

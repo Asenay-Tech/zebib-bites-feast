@@ -3,6 +3,13 @@ import { LayoutDashboard, Users, ShoppingBag, Calendar, Menu as MenuIcon, LogOut
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
+import { useLanguage } from "@/components/ui/language-switcher";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -11,6 +18,14 @@ interface AdminLayoutProps {
 export const AdminLayout = ({ children }: AdminLayoutProps) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { language, setLanguage } = useLanguage();
+
+  const languages = [
+    { code: "de" as const, label: "Deutsch", flag: "🇩🇪" },
+    { code: "en" as const, label: "English", flag: "🇬🇧" },
+  ];
+
+  const currentLanguage = languages.find(lang => lang.code === language) || languages[0];
 
   const handleLogout = async () => {
     try {
@@ -77,8 +92,38 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
-        {/* Header with Logout */}
-        <header className="sticky top-0 z-10 bg-surface border-b border-border px-8 py-4 flex justify-end">
+        {/* Header with Language Switcher and Logout */}
+        <header className="sticky top-0 z-10 bg-surface border-b border-border px-8 py-4 flex justify-end items-center gap-3">
+          {/* Language Switcher */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9 w-9 rounded-full p-0 hover:scale-110 transition-transform"
+              >
+                <span className="text-xl">{currentLanguage.flag}</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48 bg-surface border-border">
+              {languages.map((lang) => (
+                <DropdownMenuItem
+                  key={lang.code}
+                  onClick={() => setLanguage(lang.code)}
+                  className={`cursor-pointer ${
+                    language === lang.code
+                      ? "bg-primary/10 text-primary"
+                      : "hover:bg-muted"
+                  }`}
+                >
+                  <span className="mr-3 text-lg">{lang.flag}</span>
+                  <span className="font-medium">{lang.label}</span>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Logout Button */}
           <Button
             variant="outline"
             size="sm"
