@@ -136,7 +136,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "auth.backToLogin": "Zurück zur Anmeldung",
 
         // Reserve
-        "reserve.title": "Tisch reservieren",
+        "reserve.title": "Reservieren",
         "reserve.description": "Reservieren Sie Ihren Tisch im Zebib Restaurant",
         "reserve.name": "Name",
         "reserve.email": "E-Mail",
@@ -154,7 +154,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "reserve.selectDate": "Datum wählen",
         "reserve.selectEventType": "Wählen Sie einen Veranstaltungstyp",
         "reserve.notesPlaceholder": "Besondere Wünsche oder Allergien...",
-        "reserve.submit": "Reservierung absenden",
+        "reserve.submit": "Reservieren",
         "reserve.success": "Reservierung erfolgreich! Sie werden weitergeleitet...",
         "reserve.tableAlreadyReserved":
           "Dieser Tisch ist zu dieser Zeit bereits reserviert. Bitte wählen Sie einen anderen Tisch oder eine andere Zeit.",
