@@ -10,11 +10,7 @@ interface LanguageSwitcherProps {
   className?: string;
 }
 
-export function LanguageSwitcher({
-  currentLanguage,
-  onLanguageChange,
-  className,
-}: LanguageSwitcherProps) {
+export function LanguageSwitcher({ currentLanguage, onLanguageChange, className }: LanguageSwitcherProps) {
   const languages = [
     { code: "de" as Language, label: "DE", flag: "🇩🇪" },
     { code: "en" as Language, label: "EN", flag: "🇬🇧" },
@@ -52,9 +48,7 @@ interface LanguageContextType {
   t: (key: string) => string;
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(
-  undefined
-);
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 interface LanguageProviderProps {
   children: ReactNode;
@@ -117,10 +111,8 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "auth.password": "Passwort",
         "auth.confirmPassword": "Passwort bestätigen",
         "auth.name": "Name",
-        "auth.loginDescription":
-          "Melden Sie sich an, um Reservierungen vorzunehmen und Bestellungen aufzugeben",
-        "auth.registerDescription":
-          "Erstellen Sie ein Konto, um unsere Services zu nutzen",
+        "auth.loginDescription": "Melden Sie sich an, um Reservierungen vorzunehmen und Bestellungen aufzugeben",
+        "auth.registerDescription": "Erstellen Sie ein Konto, um unsere Services zu nutzen",
         "auth.emailPlaceholder": "ihre@email.de",
         "auth.passwordPlaceholder": "Ihr Passwort",
         "auth.confirmPasswordPlaceholder": "Passwort wiederholen",
@@ -135,21 +127,17 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "auth.reservations": "Reservierungen",
         "auth.forgotPassword": "Passwort vergessen?",
         "auth.sendResetLink": "Link zum Zurücksetzen senden",
-        "auth.resetLinkSent":
-          "Passwort-Zurücksetzungslink gesendet. Bitte prüfen Sie Ihre E-Mails.",
+        "auth.resetLinkSent": "Passwort-Zurücksetzungslink gesendet. Bitte prüfen Sie Ihre E-Mails.",
         "auth.resetPassword": "Passwort zurücksetzen",
-        "auth.resetPasswordDescription":
-          "Legen Sie ein neues Passwort für Ihr Konto fest.",
-        "auth.resetPasswordHelp":
-          "Geben Sie Ihre Konto-E-Mail ein; wir senden Ihnen einen Link zum Zurücksetzen.",
+        "auth.resetPasswordDescription": "Legen Sie ein neues Passwort für Ihr Konto fest.",
+        "auth.resetPasswordHelp": "Geben Sie Ihre Konto-E-Mail ein; wir senden Ihnen einen Link zum Zurücksetzen.",
         "auth.newPassword": "Neues Passwort",
         "auth.updatePassword": "Passwort aktualisieren",
         "auth.backToLogin": "Zurück zur Anmeldung",
 
         // Reserve
         "reserve.title": "Tisch reservieren",
-        "reserve.description":
-          "Reservieren Sie Ihren Tisch im Zebib Restaurant",
+        "reserve.description": "Reservieren Sie Ihren Tisch im Zebib Restaurant",
         "reserve.name": "Name",
         "reserve.email": "E-Mail",
         "reserve.phone": "Telefon",
@@ -167,8 +155,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "reserve.selectEventType": "Wählen Sie einen Veranstaltungstyp",
         "reserve.notesPlaceholder": "Besondere Wünsche oder Allergien...",
         "reserve.submit": "Reservierung absenden",
-        "reserve.success":
-          "Reservierung erfolgreich! Sie werden weitergeleitet...",
+        "reserve.success": "Reservierung erfolgreich! Sie werden weitergeleitet...",
         "reserve.tableAlreadyReserved":
           "Dieser Tisch ist zu dieser Zeit bereits reserviert. Bitte wählen Sie einen anderen Tisch oder eine andere Zeit.",
         "reserve.eventTypes.birthday": "Geburtstag",
@@ -281,8 +268,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "auth.password": "Password",
         "auth.confirmPassword": "Confirm password",
         "auth.name": "Name",
-        "auth.loginDescription":
-          "Sign in to make reservations and place orders",
+        "auth.loginDescription": "Sign in to make reservations and place orders",
         "auth.registerDescription": "Create an account to use our services",
         "auth.emailPlaceholder": "your@email.com",
         "auth.passwordPlaceholder": "Your password",
@@ -298,12 +284,10 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "auth.reservations": "Reservations",
         "auth.forgotPassword": "Forgot password?",
         "auth.sendResetLink": "Send reset link",
-        "auth.resetLinkSent":
-          "Password reset link sent. Please check your email.",
+        "auth.resetLinkSent": "Password reset link sent. Please check your email.",
         "auth.resetPassword": "Reset password",
         "auth.resetPasswordDescription": "Set a new password for your account.",
-        "auth.resetPasswordHelp":
-          "Enter your account email and we’ll email you a reset link.",
+        "auth.resetPasswordHelp": "Enter your account email and we’ll email you a reset link.",
         "auth.newPassword": "New password",
         "auth.updatePassword": "Update password",
         "auth.backToLogin": "Back to login",
@@ -327,7 +311,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "reserve.selectDate": "Select date",
         "reserve.selectEventType": "Choose an event type",
         "reserve.notesPlaceholder": "Special requests or allergies...",
-        "reserve.submit": "Reserve Table",
+        "reserve.submit": "Reserve",
         "reserve.success": "Reservation successful!",
         "reserve.tableAlreadyReserved":
           "This table is already reserved at this time. Please choose another table or time.",
@@ -409,11 +393,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
     return translations[language][key] || key;
   };
 
-  return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
-      {children}
-    </LanguageContext.Provider>
-  );
+  return <LanguageContext.Provider value={{ language, setLanguage, t }}>{children}</LanguageContext.Provider>;
 }
 
 export function useLanguage() {
