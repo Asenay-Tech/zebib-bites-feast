@@ -73,21 +73,23 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
             );
           })}
         </nav>
-
-        <div className="absolute bottom-6 left-4 right-4">
-          <Button
-            variant="outline"
-            className="w-full justify-start gap-3"
-            onClick={handleLogout}
-          >
-            <LogOut className="h-5 w-5" />
-            Logout
-          </Button>
-        </div>
       </aside>
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
+        {/* Header with Logout */}
+        <header className="sticky top-0 z-10 bg-surface border-b border-border px-8 py-4 flex justify-end">
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={handleLogout}
+          >
+            <LogOut className="h-4 w-4" />
+            Logout
+          </Button>
+        </header>
+        
         <div className="p-8">
           {children}
         </div>
