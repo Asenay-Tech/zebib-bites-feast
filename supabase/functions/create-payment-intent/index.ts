@@ -72,7 +72,7 @@ serve(async (req) => {
             name: item.name,
             description: `${diningType} order`,
           },
-          unit_amount: Math.round((item.price || 0)),
+          unit_amount: Math.round((item.price || 0) * 100),
         },
         quantity: item.quantity || 1,
       })),
