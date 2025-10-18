@@ -17,7 +17,7 @@ interface Review {
 export function Reviews() {
   const { language } = useLanguage();
 
-  // Hardcoded reviews (max 10)
+  // ✅ Hardcoded reviews (max 10)
   const reviews: Review[] = [
     {
       id: "1",
@@ -71,10 +71,12 @@ export function Reviews() {
     },
   ];
 
-  const googleReviewUrl = "https://www.google.com/maps/search/zebib+restaurant+hanau"; // update with your exact map link
+  // ✅ Google Reviews Link
+  const googleReviewUrl = "https://www.google.com/maps/search/zebib+restaurant+hanau"; // Replace with your verified Google Maps page
 
+  // ⭐ Star Renderer
   const renderStars = (rating: number) => (
-    <div className="flex gap-1">
+    <div className="flex gap-1 mb-2">
       {Array.from({ length: 5 }, (_, i) => (
         <Star key={i} className={`h-4 w-4 ${i < rating ? "fill-accent text-accent" : "text-muted-foreground"}`} />
       ))}
@@ -84,7 +86,7 @@ export function Reviews() {
   return (
     <section id="reviews" className="py-20 bg-surface">
       <div className="container mx-auto px-4">
-        {/* Section Header */}
+        {/* Header */}
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4 tracking-wide">
             {language === "de" ? "KUNDENBEWERTUNGEN" : "CUSTOMER REVIEWS"}
@@ -100,27 +102,23 @@ export function Reviews() {
           </Button>
         </div>
 
-        {/* Reviews Carousel */}
+        {/* Review Cards Carousel */}
         <Carousel opts={{ align: "start", loop: true }} className="w-full max-w-6xl mx-auto">
           <CarouselContent>
-            {reviews.map((review, index) => (
+            {reviews.map((review) => (
               <CarouselItem key={review.id} className="md:basis-1/2 lg:basis-1/3">
                 <div className="p-4">
                   <Card className="h-full hover:shadow-lg transition-shadow">
                     <CardContent className="p-6 flex flex-col h-full">
-                      <div className="mb-4">{renderStars(review.rating)}</div>
-                      <div className="flex-1 mb-4">
-                        <p className="text-body italic leading-relaxed">“{review.text}”</p>
-                      </div>
-                      <div className="pt-4 border-t border-border">
-                        <div>
-                          <p className="font-semibold text-foreground">{review.name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {format(new Date(review.created_at), "PPP", {
-                              locale: language === "de" ? de : enUS,
-                            })}
-                          </p>
-                        </div>
+                      {renderStars(review.rating)}
+                      <p className="text-body italic mb-4 leading-relaxed">“{review.text}”</p>
+                      <div className="mt-auto pt-4 border-t border-border">
+                        <p className="font-semibold text-foreground">{review.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {format(new Date(review.created_at), "PPP", {
+                            locale: language === "de" ? de : enUS,
+                          })}
+                        </p>
                       </div>
                     </CardContent>
                   </Card>
@@ -128,6 +126,8 @@ export function Reviews() {
               </CarouselItem>
             ))}
           </CarouselContent>
+
+          {/* Carousel Arrows */}
           <CarouselPrevious className="text-accent border-accent hover:bg-accent hover:text-accent-foreground" />
           <CarouselNext className="text-accent border-accent hover:bg-accent hover:text-accent-foreground" />
         </Carousel>
