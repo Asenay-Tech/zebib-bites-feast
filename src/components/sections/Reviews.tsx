@@ -7,9 +7,17 @@ import { Star, ExternalLink } from "lucide-react";
 import { format } from "date-fns";
 import { de, enUS } from "date-fns/locale";
 
+// ✅ Import avatar images
+import mariaAvatar from "@/assets/reviews/maria.jpg";
+import ahmedAvatar from "@/assets/reviews/ahmed.jpg";
+import thomasAvatar from "@/assets/reviews/thomas.jpg";
+import sarahAvatar from "@/assets/reviews/sarah.jpg";
+import jonasAvatar from "@/assets/reviews/jonas.jpg";
+
 interface Review {
   id: string;
   name: string;
+  avatar: string;
   rating: number;
   text: string;
   created_at: string;
@@ -24,6 +32,7 @@ export function Reviews() {
     {
       id: "1",
       name: "Maria Schmidt",
+      avatar: mariaAvatar,
       rating: 5,
       text:
         language === "de"
@@ -34,6 +43,7 @@ export function Reviews() {
     {
       id: "2",
       name: "Ahmed Hassan",
+      avatar: ahmedAvatar,
       rating: 5,
       text:
         language === "de"
@@ -44,6 +54,7 @@ export function Reviews() {
     {
       id: "3",
       name: "Thomas Müller",
+      avatar: thomasAvatar,
       rating: 5,
       text:
         language === "de"
@@ -54,6 +65,7 @@ export function Reviews() {
     {
       id: "4",
       name: "Sarah Klein",
+      avatar: sarahAvatar,
       rating: 5,
       text:
         language === "de"
@@ -64,6 +76,7 @@ export function Reviews() {
     {
       id: "5",
       name: "Jonas Weber",
+      avatar: jonasAvatar,
       rating: 5,
       text:
         language === "de"
@@ -73,8 +86,7 @@ export function Reviews() {
     },
   ];
 
-  // ✅ Google Reviews Link
-  const googleReviewUrl = "https://www.google.com/maps/search/zebib+restaurant+hanau";
+  const googleReviewUrl = "https://www.google.com/maps/place/ZEBIB+-+Hanau/@50.133092,8.9212194,17z";
 
   // ⭐ Star Renderer
   const renderStars = (rating: number) => (
@@ -85,7 +97,7 @@ export function Reviews() {
     </div>
   );
 
-  // 🎞️ Auto Slide Effect (every 5 seconds)
+  // 🎞️ Auto Slide Effect (every 6 seconds)
   useEffect(() => {
     const carousel = carouselRef.current;
     if (!carousel) return;
@@ -94,7 +106,7 @@ export function Reviews() {
 
     const interval = setInterval(() => {
       nextButton?.click();
-    }, 5000); // 5 seconds per slide
+    }, 6000);
 
     return () => clearInterval(interval);
   }, []);
@@ -111,31 +123,37 @@ export function Reviews() {
             {language === "de" ? "Was unsere Gäste über uns sagen" : "What our guests say about us"}
           </p>
 
-          {/* Google Maps Button */}
           <Button variant="outline" onClick={() => window.open(googleReviewUrl, "_blank")}>
             {language === "de" ? "Mehr auf Google lesen" : "Read more on Google"}
             <ExternalLink className="ml-2 h-4 w-4" />
           </Button>
         </div>
 
-        {/* Review Cards Carousel */}
+        {/* Reviews Carousel */}
         <div ref={carouselRef}>
           <Carousel opts={{ align: "start", loop: true }} className="w-full max-w-6xl mx-auto">
             <CarouselContent>
               {reviews.map((review) => (
                 <CarouselItem key={review.id} className="md:basis-1/2 lg:basis-1/3">
                   <div className="p-4">
-                    <Card className="h-full hover:shadow-lg transition-all duration-500 transform hover:scale-[1.02]">
+                    <Card className="h-full hover:shadow-xl transition-all duration-500 transform hover:scale-[1.02]">
                       <CardContent className="p-6 flex flex-col h-full">
                         {renderStars(review.rating)}
-                        <p className="text-body italic mb-4 leading-relaxed">“{review.text}”</p>
-                        <div className="mt-auto pt-4 border-t border-border">
-                          <p className="font-semibold text-foreground">{review.name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {format(new Date(review.created_at), "PPP", {
-                              locale: language === "de" ? de : enUS,
-                            })}
-                          </p>
+                        <p className="text-body italic mb-6 leading-relaxed">“{review.text}”</p>
+                        <div className="mt-auto pt-4 border-t border-border flex items-center gap-3">
+                          <img
+                            src={review.avatar}
+                            alt={review.name}
+                            className="w-10 h-10 rounded-full object-cover border border-accent/40"
+                          />
+                          <div>
+                            <p className="font-semibold text-foreground">{review.name}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {format(new Date(review.created_at), "PPP", {
+                                locale: language === "de" ? de : enUS,
+                              })}
+                            </p>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -143,8 +161,6 @@ export function Reviews() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-
-            {/* Carousel Arrows */}
             <CarouselPrevious
               data-carousel-prev
               className="text-accent border-accent hover:bg-accent hover:text-accent-foreground"
