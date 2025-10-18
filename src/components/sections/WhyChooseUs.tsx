@@ -11,31 +11,28 @@ export function WhyChooseUs() {
     {
       icon: Leaf,
       title: language === "de" ? "Frische Zutaten" : "Fresh Ingredients",
-      description: language === "de" 
-        ? "Wir verwenden nur die frischesten, authentischen Zutaten direkt aus Eritrea und lokale Bio-Produkte."
-        : "We use only the freshest, authentic ingredients directly from Eritrea and local organic produce."
+      description:
+        language === "de"
+          ? "Wir verwenden nur die frischesten, authentischen Zutaten direkt aus Eritrea und lokale Bio-Produkte."
+          : "We use only the freshest, authentic ingredients directly from Eritrea and local organic produce.",
     },
     {
       icon: Users,
       title: language === "de" ? "Einladende Atmosphäre" : "Welcoming Environment",
-      description: language === "de"
-        ? "Unser Restaurant bietet eine warme, familienfreundliche Atmosphäre mit traditioneller eritreischer Gastfreundschaft."
-        : "Our restaurant offers a warm, family-friendly atmosphere with traditional Eritrean hospitality."
+      description:
+        language === "de"
+          ? "Unser Restaurant bietet eine warme, familienfreundliche Atmosphäre mit traditioneller eritreischer Gastfreundschaft."
+          : "Our restaurant offers a warm, family-friendly atmosphere with traditional Eritrean hospitality.",
     },
-    {
-      icon: ChefHat,
-      title: language === "de" ? "Erfahrene Köche" : "Skilled Chefs",
-      description: language === "de"
-        ? "Unsere erfahrenen Köche bringen authentische eritreische Kochtraditionen und Familienrezepte mit."
-        : "Our experienced chefs bring authentic Eritrean cooking traditions and family recipes."
-    },
+
     {
       icon: Calendar,
       title: language === "de" ? "Veranstaltungen & Feiern" : "Events & Party Hosting",
-      description: language === "de"
-        ? "Wir organisieren unvergessliche Feiern und Veranstaltungen mit traditioneller Küche und Service."
-        : "We organize unforgettable celebrations and events with traditional cuisine and service."
-    }
+      description:
+        language === "de"
+          ? "Wir organisieren unvergessliche Feiern und Veranstaltungen mit traditioneller Küche und Service."
+          : "We organize unforgettable celebrations and events with traditional cuisine and service.",
+    },
   ];
 
   return (
@@ -47,10 +44,9 @@ export function WhyChooseUs() {
             {language === "de" ? "WARUM ZEBIB WÄHLEN?" : "WHY CHOOSE ZEBIB?"}
           </h2>
           <p className="text-xl text-body max-w-2xl mx-auto">
-            {language === "de" 
+            {language === "de"
               ? "Entdecken Sie, was uns zu Ihrem bevorzugten eritreischen Restaurant macht"
-              : "Discover what makes us your preferred Eritrean restaurant"
-            }
+              : "Discover what makes us your preferred Eritrean restaurant"}
           </p>
         </div>
 
@@ -58,10 +54,10 @@ export function WhyChooseUs() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => {
             const Icon = feature.icon;
-            
+
             return (
-              <Card 
-                key={index} 
+              <Card
+                key={index}
                 className="bg-background border-border hover:shadow-card-hover transition-all duration-300 group"
               >
                 <CardContent className="p-8 text-center">
@@ -73,14 +69,10 @@ export function WhyChooseUs() {
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-xl font-semibold text-foreground mb-4">
-                    {feature.title}
-                  </h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-4">{feature.title}</h3>
 
                   {/* Description */}
-                  <p className="text-body leading-relaxed">
-                    {feature.description}
-                  </p>
+                  <p className="text-body leading-relaxed">{feature.description}</p>
                 </CardContent>
               </Card>
             );
@@ -97,8 +89,7 @@ export function WhyChooseUs() {
               <p className="text-body leading-relaxed">
                 {language === "de"
                   ? "Wir verbinden jahrhundertealte eritreische Kochtraditionen mit modernen Präsentations- und Servicetechniken."
-                  : "We combine centuries-old Eritrean cooking traditions with modern presentation and service techniques."
-                }
+                  : "We combine centuries-old Eritrean cooking traditions with modern presentation and service techniques."}
               </p>
             </div>
           </div>
