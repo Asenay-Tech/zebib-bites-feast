@@ -36,15 +36,11 @@ serve(async (req) => {
       });
     }
 
-    // Generate token
-    const { data: tokenData, error: tokenError } = await supabase.rpc('generate_verification_token');
-    
-    if (tokenError) {
-      console.error("Error generating token:", tokenError);
-      throw tokenError;
-    }
-
-    const token = tokenData as string;
+    // Generate token locally (base64url)
+    const random = new Uint8Array(32);
+    crypto.getRandomValues(random);
+    const token = btoa(String.fromCharCode(...random))
+      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
     const tokenHash = await crypto.subtle.digest(
       "SHA-256",
       new TextEncoder().encode(token)
