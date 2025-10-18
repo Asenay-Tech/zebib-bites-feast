@@ -80,36 +80,29 @@ export function WhyChooseUs() {
         </div>
 
         {/* Traditional Elements Section */}
-        <div className="mt-20 grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="lg:col-span-1">
-            <div className="bg-gradient-card rounded-xl p-8 h-full flex flex-col justify-center">
-              <h3 className="text-2xl font-bold text-foreground mb-4 tracking-wide">
-                {language === "de" ? "TRADITIONELL & MODERN" : "TRADITIONAL & MODERN"}
-              </h3>
-              <p className="text-body leading-relaxed">
-                {language === "de"
-                  ? "Wir verbinden jahrhundertealte eritreische Kochtraditionen mit modernen Präsentations- und Servicetechniken."
-                  : "We combine centuries-old Eritrean cooking traditions with modern presentation and service techniques."}
-              </p>
-            </div>
-          </div>
+<div className="mt-20 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+  <div className="bg-gradient-card rounded-xl p-8 h-full flex flex-col justify-center">
+    <h3 className="text-2xl font-bold text-foreground mb-4 tracking-wide text-center lg:text-left">
+      {language === "de" ? "TRADITIONELL & MODERN" : "TRADITIONAL & MODERN"}
+    </h3>
+    <p className="text-body leading-relaxed text-center lg:text-left">
+      {language === "de"
+        ? "Wir verbinden jahrhundertealte eritreische Kochtraditionen mit modernen Präsentations- und Servicetechniken."
+        : "We combine centuries-old Eritrean cooking traditions with modern presentation and service techniques."}
+    </p>
+  </div>
 
-          <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="relative rounded-xl overflow-hidden group">
-              <img
-                src={coffeeImage}
-                alt="Traditional Cooking"
-                className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent flex items-end">
-                <p className="text-foreground font-medium p-6">
-                  {language === "de" ? "Traditionelle Zubereitung" : "Traditional Preparation"}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
+  <div className="relative rounded-xl overflow-hidden group mx-auto">
+    <img
+      src={coffeeImage}
+      alt="Traditional Cooking"
+      className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
+    />
+    <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent flex items-end">
+      <p className="text-foreground font-medium p-6">
+        {language === "de" ? "Traditionelle Zubereitung" : "Traditional Preparation"}
+      </p>
+    </div>
+  </div>
+</div>
+
