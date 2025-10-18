@@ -80,7 +80,7 @@ export function WhyChooseUs() {
         </div>
 
         {/* Traditional Elements Section */}
-        <div className="mt-20 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="mt-20 grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="lg:col-span-1">
             <div className="bg-gradient-card rounded-xl p-8 h-full flex flex-col justify-center">
               <h3 className="text-2xl font-bold text-foreground mb-4 tracking-wide">
