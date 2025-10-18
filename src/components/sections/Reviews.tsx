@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
@@ -8,82 +8,39 @@ import { format } from "date-fns";
 import { de, enUS } from "date-fns/locale";
 
 interface Review {
-  id: string;
-  name: string;
+  author_name: string;
+  profile_photo_url: string;
   rating: number;
   text: string;
-  created_at: string;
+  time: number;
 }
 
 export function Reviews() {
   const { language } = useLanguage();
+  const [reviews, setReviews] = useState<Review[]>([]);
   const carouselRef = useRef<HTMLDivElement | null>(null);
 
-  // ✅ Hardcoded reviews (max 10)
-  const reviews: Review[] = [
-    {
-      id: "1",
-      name: "Maria Schmidt",
-      rating: 5,
-      text:
-        language === "de"
-          ? "Authentisches eritreisches Essen! Die Injera war perfekt und die Gewürze exzellent. Sehr freundlicher Service."
-          : "Authentic Eritrean food! The injera was perfect and the spices were excellent. Very friendly service.",
-      created_at: "2025-09-30",
-    },
-    {
-      id: "2",
-      name: "Ahmed Hassan",
-      rating: 5,
-      text:
-        language === "de"
-          ? "Das beste eritreische Restaurant in der Region. Die Atmosphäre ist gemütlich und das Essen schmeckt wie zu Hause."
-          : "The best Eritrean restaurant in the region. The atmosphere is cozy and the food tastes like home.",
-      created_at: "2025-09-30",
-    },
-    {
-      id: "3",
-      name: "Thomas Müller",
-      rating: 5,
-      text:
-        language === "de"
-          ? "Fantastisches Essen und tolle Gastfreundschaft. Die vegetarischen Optionen sind besonders gut!"
-          : "Fantastic food and great hospitality. The vegetarian options are especially good!",
-      created_at: "2025-09-30",
-    },
-    {
-      id: "4",
-      name: "Sarah Klein",
-      rating: 5,
-      text:
-        language === "de"
-          ? "Ich liebe die Atmosphäre! Traditionell, aber modern eingerichtet. Sehr empfehlenswert."
-          : "I love the atmosphere! Traditional yet modern design. Highly recommended.",
-      created_at: "2025-10-01",
-    },
-    {
-      id: "5",
-      name: "Jonas Weber",
-      rating: 5,
-      text:
-        language === "de"
-          ? "Leckeres Essen und exzellenter Service. Ich komme auf jeden Fall wieder!"
-          : "Delicious food and excellent service. I’ll definitely come back!",
-      created_at: "2025-10-02",
-    },
-  ];
+  const googlePlaceId = "ChIJXU9TXkDUl0cRbn_fVfXQyYo"; // ZEBIB - Hanau Place ID
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
-  // ✅ Google Reviews Link
-  const googleReviewUrl = "https://www.google.com/maps/search/zebib+restaurant+hanau";
-
-  // ⭐ Star Renderer
-  const renderStars = (rating: number) => (
-    <div className="flex gap-1 mb-2">
-      {Array.from({ length: 5 }, (_, i) => (
-        <Star key={i} className={`h-4 w-4 ${i < rating ? "fill-accent text-accent" : "text-muted-foreground"}`} />
-      ))}
-    </div>
-  );
+  // ✅ Fetch real Google reviews (top 15, 5-star only)
+  useEffect(() => {
+    async function fetchReviews() {
+      try {
+        const response = await fetch(
+          `https://maps.googleapis.com/maps/api/place/details/json?place_id=${googlePlaceId}&fields=reviews&key=${apiKey}`,
+        );
+        const data = await response.json();
+        if (data.result?.reviews) {
+          const topReviews = data.result.reviews.filter((r: Review) => r.rating === 5).slice(0, 15);
+          setReviews(topReviews);
+        }
+      } catch (err) {
+        console.error("Error fetching reviews:", err);
+      }
+    }
+    fetchReviews();
+  }, []);
 
   // 🎞️ Auto Slide Effect (every 5 seconds)
   useEffect(() => {
@@ -98,6 +55,17 @@ export function Reviews() {
 
     return () => clearInterval(interval);
   }, []);
+
+  // ⭐ Star Renderer
+  const renderStars = (rating: number) => (
+    <div className="flex gap-1 mb-2">
+      {Array.from({ length: 5 }, (_, i) => (
+        <Star key={i} className={`h-4 w-4 ${i < rating ? "fill-accent text-accent" : "text-muted-foreground"}`} />
+      ))}
+    </div>
+  );
+
+  const googleReviewUrl = "https://www.google.com/maps/place/ZEBIB+-+Hanau/@50.1330932,8.9212194,17z";
 
   return (
     <section id="reviews" className="py-20 bg-surface">
@@ -122,20 +90,29 @@ export function Reviews() {
         <div ref={carouselRef}>
           <Carousel opts={{ align: "start", loop: true }} className="w-full max-w-6xl mx-auto">
             <CarouselContent>
-              {reviews.map((review) => (
-                <CarouselItem key={review.id} className="md:basis-1/2 lg:basis-1/3">
+              {reviews.map((review, index) => (
+                <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
                   <div className="p-4">
                     <Card className="h-full hover:shadow-lg transition-all duration-500 transform hover:scale-[1.02]">
                       <CardContent className="p-6 flex flex-col h-full">
-                        {renderStars(review.rating)}
+                        <div className="flex items-center gap-3 mb-3">
+                          <img
+                            src={review.profile_photo_url}
+                            alt={review.author_name}
+                            className="w-10 h-10 rounded-full border border-border"
+                          />
+                          <div>
+                            <p className="font-semibold text-foreground">{review.author_name}</p>
+                            {renderStars(review.rating)}
+                          </div>
+                        </div>
+
                         <p className="text-body italic mb-4 leading-relaxed">“{review.text}”</p>
-                        <div className="mt-auto pt-4 border-t border-border">
-                          <p className="font-semibold text-foreground">{review.name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {format(new Date(review.created_at), "PPP", {
-                              locale: language === "de" ? de : enUS,
-                            })}
-                          </p>
+
+                        <div className="mt-auto pt-4 border-t border-border text-sm text-muted-foreground">
+                          {format(new Date(review.time * 1000), "PPP", {
+                            locale: language === "de" ? de : enUS,
+                          })}
                         </div>
                       </CardContent>
                     </Card>
