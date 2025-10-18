@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
@@ -16,6 +17,7 @@ interface Review {
 
 export function Reviews() {
   const { language } = useLanguage();
+  const carouselRef = useRef<HTMLDivElement | null>(null);
 
   // ✅ Hardcoded reviews (max 10)
   const reviews: Review[] = [
@@ -72,7 +74,7 @@ export function Reviews() {
   ];
 
   // ✅ Google Reviews Link
-  const googleReviewUrl = "https://www.google.com/maps/search/zebib+restaurant+hanau"; // Replace with your verified Google Maps page
+  const googleReviewUrl = "https://www.google.com/maps/search/zebib+restaurant+hanau";
 
   // ⭐ Star Renderer
   const renderStars = (rating: number) => (
@@ -82,6 +84,20 @@ export function Reviews() {
       ))}
     </div>
   );
+
+  // 🎞️ Auto Slide Effect (every 5 seconds)
+  useEffect(() => {
+    const carousel = carouselRef.current;
+    if (!carousel) return;
+
+    const nextButton = carousel.querySelector("[data-carousel-next]") as HTMLButtonElement | null;
+
+    const interval = setInterval(() => {
+      nextButton?.click();
+    }, 5000); // 5 seconds per slide
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <section id="reviews" className="py-20 bg-surface">
@@ -103,34 +119,42 @@ export function Reviews() {
         </div>
 
         {/* Review Cards Carousel */}
-        <Carousel opts={{ align: "start", loop: true }} className="w-full max-w-6xl mx-auto">
-          <CarouselContent>
-            {reviews.map((review) => (
-              <CarouselItem key={review.id} className="md:basis-1/2 lg:basis-1/3">
-                <div className="p-4">
-                  <Card className="h-full hover:shadow-lg transition-shadow">
-                    <CardContent className="p-6 flex flex-col h-full">
-                      {renderStars(review.rating)}
-                      <p className="text-body italic mb-4 leading-relaxed">“{review.text}”</p>
-                      <div className="mt-auto pt-4 border-t border-border">
-                        <p className="font-semibold text-foreground">{review.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {format(new Date(review.created_at), "PPP", {
-                            locale: language === "de" ? de : enUS,
-                          })}
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
+        <div ref={carouselRef}>
+          <Carousel opts={{ align: "start", loop: true }} className="w-full max-w-6xl mx-auto">
+            <CarouselContent>
+              {reviews.map((review) => (
+                <CarouselItem key={review.id} className="md:basis-1/2 lg:basis-1/3">
+                  <div className="p-4">
+                    <Card className="h-full hover:shadow-lg transition-all duration-500 transform hover:scale-[1.02]">
+                      <CardContent className="p-6 flex flex-col h-full">
+                        {renderStars(review.rating)}
+                        <p className="text-body italic mb-4 leading-relaxed">“{review.text}”</p>
+                        <div className="mt-auto pt-4 border-t border-border">
+                          <p className="font-semibold text-foreground">{review.name}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {format(new Date(review.created_at), "PPP", {
+                              locale: language === "de" ? de : enUS,
+                            })}
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
 
-          {/* Carousel Arrows */}
-          <CarouselPrevious className="text-accent border-accent hover:bg-accent hover:text-accent-foreground" />
-          <CarouselNext className="text-accent border-accent hover:bg-accent hover:text-accent-foreground" />
-        </Carousel>
+            {/* Carousel Arrows */}
+            <CarouselPrevious
+              data-carousel-prev
+              className="text-accent border-accent hover:bg-accent hover:text-accent-foreground"
+            />
+            <CarouselNext
+              data-carousel-next
+              className="text-accent border-accent hover:bg-accent hover:text-accent-foreground"
+            />
+          </Carousel>
+        </div>
       </div>
     </section>
   );
