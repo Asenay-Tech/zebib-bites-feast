@@ -36,9 +36,9 @@ serve(async (req) => {
       );
     }
 
-    // Convert euros to cents (amount is in euros, e.g., 0.65 or 7.50)
-    const amountInCents = Math.round(amount * 100);
-    console.log('[stripe-checkout] Amount conversion', { euros: amount, cents: amountInCents });
+    // Amount provided by frontend is already in cents (EUR)
+    const amountInCents = Math.round(Number(amount));
+    console.log('[stripe-checkout] Amount received (cents)', { cents: amountInCents });
 
     // Validate minimum amount (Stripe requires at least 50 cents for EUR)
     if (amountInCents < 50) {
