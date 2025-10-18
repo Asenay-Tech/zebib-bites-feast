@@ -16,25 +16,12 @@ serve(async (req) => {
   }
 
   try {
-    const { email, name } = await req.json();
+    const { email, name, userId } = await req.json();
 
-    console.log("Sending password reset email to:", email);
+    console.log("Sending verification email to:", email);
 
     // Create Supabase client with service role
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
-
-    // Get user by email
-    const { data: userData, error: userError } = await supabase.auth.admin.listUsers();
-    const user = userData?.users.find(u => u.email === email);
-
-    if (userError || !user) {
-      console.error("User not found");
-      // Don't reveal if email exists for security
-      return new Response(JSON.stringify({ success: true }), {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
 
     // Generate token
     const { data: tokenData, error: tokenError } = await supabase.rpc('generate_verification_token');
@@ -59,11 +46,11 @@ serve(async (req) => {
     const { error: insertError } = await supabase
       .from('email_verification_tokens')
       .insert({
-        user_id: user.id,
+        user_id: userId,
         email: email,
         token: token,
         token_hash: tokenHash,
-        type: 'password_reset',
+        type: 'signup',
         expires_at: expiresAt.toISOString()
       });
 
@@ -72,9 +59,7 @@ serve(async (req) => {
       throw insertError;
     }
 
-    const resetLink = `${Deno.env.get('SUPABASE_URL')?.replace('.supabase.co', '.lovableproject.com')}/reset-password?token=${tokenHash}`;
-
-    console.log("Sending password reset email to:", email);
+    const verificationLink = `${Deno.env.get('SUPABASE_URL')?.replace('.supabase.co', '.lovableproject.com')}/verify-email?token=${tokenHash}`;
 
     const html = `
       <!DOCTYPE html>
@@ -125,15 +110,14 @@ serve(async (req) => {
           </div>
           <div class="content">
             <p>Hello ${name || 'there'},</p>
-            <p>We received a request to reset your password for your Zebib Foods account.</p>
-            <p>Click the button below to reset your password:</p>
+            <p>Welcome to Zebib Foods! Please verify your email address to complete your registration.</p>
             <p style="text-align: center;">
-              <a href="${resetLink}" class="button">Reset Password</a>
+              <a href="${verificationLink}" class="button">Verify Email Address</a>
             </p>
             <p>Or copy and paste this link into your browser:</p>
-            <p style="word-break: break-all; color: #666; font-size: 12px;">${resetLink}</p>
+            <p style="word-break: break-all; color: #666; font-size: 12px;">${verificationLink}</p>
             <p><strong>This link will expire in 1 hour.</strong></p>
-            <p>If you didn't request a password reset, you can safely ignore this email.</p>
+            <p>If you didn't create an account with Zebib Foods, you can safely ignore this email.</p>
             <p>Best regards,<br>The Zebib Foods Team</p>
           </div>
           <div class="footer">
@@ -153,7 +137,7 @@ serve(async (req) => {
       body: JSON.stringify({
         from: "Zebib Foods <no-reply@zebibfood.de>",
         to: [email],
-        subject: "Reset Your Password - Zebib Foods",
+        subject: "Verify Your Email - Zebib Foods",
         html,
       }),
     });
@@ -166,14 +150,14 @@ serve(async (req) => {
       throw error;
     }
 
-    console.log("Email sent successfully:", data);
+    console.log("Verification email sent successfully:", data);
 
     return new Response(JSON.stringify({ success: true, data }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error: any) {
-    console.error("Error in send-password-reset function:", error);
+    console.error("Error in send-verification-email function:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
       {

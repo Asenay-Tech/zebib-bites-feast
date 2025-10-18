@@ -45,32 +45,45 @@ const Register = () => {
     setLoading(true);
 
     try {
-      const redirectUrl = `${window.location.origin}/`;
-      
-      const { error: signUpError } = await supabase.auth.signUp({
+      // Create user without email confirmation
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
             name: name,
           },
-          emailRedirectTo: redirectUrl,
+          emailRedirectTo: `${window.location.origin}/`,
         },
       });
 
       if (signUpError) throw signUpError;
 
-      // Send welcome email
-      try {
-        await supabase.functions.invoke("send-welcome-email", {
-          body: {
-            name,
-            email,
-          },
-        });
-      } catch (emailError) {
-        console.error("Failed to send welcome email:", emailError);
-        // Don't block registration if email fails
+      // Send custom verification email
+      if (signUpData.user) {
+        try {
+          await supabase.functions.invoke("send-verification-email", {
+            body: {
+              email,
+              name,
+              userId: signUpData.user.id,
+            },
+          });
+        } catch (emailError) {
+          console.error("Failed to send verification email:", emailError);
+        }
+
+        // Send welcome email
+        try {
+          await supabase.functions.invoke("send-welcome-email", {
+            body: {
+              name,
+              email,
+            },
+          });
+        } catch (emailError) {
+          console.error("Failed to send welcome email:", emailError);
+        }
       }
 
       // Success - navigate to home

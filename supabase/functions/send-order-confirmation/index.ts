@@ -104,11 +104,10 @@ serve(async (req) => {
         "Authorization": `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "ZEBIB Restaurant <noreply@zebibrestaurant.com>",
+        from: "Zebib Foods <no-reply@zebibfood.de>",
         to: [email],
-        subject: `Order Confirmation #${orderId.slice(0, 8).toUpperCase()} - ZEBIB Restaurant`,
+        subject: `Order Confirmation #${orderId.slice(0, 8).toUpperCase()} - Zebib Foods`,
         html,
-        reply_to: "info@zebibrestaurant.com",
       }),
     });
 
