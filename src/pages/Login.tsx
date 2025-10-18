@@ -176,6 +176,7 @@ const Login = () => {
         body: {
           email: resetEmail,
           name: profile?.name || "User",
+          appUrl: window.location.origin,
         },
       });
 

@@ -67,6 +67,7 @@ const Register = () => {
               email,
               name,
               userId: signUpData.user.id,
+              appUrl: window.location.origin,
             },
           });
         } catch (emailError) {

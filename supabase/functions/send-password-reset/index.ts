@@ -16,7 +16,7 @@ serve(async (req) => {
   }
 
   try {
-    const { email, name } = await req.json();
+    const { email, name, appUrl } = await req.json();
 
     console.log("Sending password reset email to:", email);
 
@@ -68,7 +68,7 @@ serve(async (req) => {
       throw insertError;
     }
 
-    const resetLink = `${Deno.env.get('SUPABASE_URL')?.replace('.supabase.co', '.lovableproject.com')}/reset-password?token=${tokenHash}`;
+    const resetLink = `${appUrl || window.location.origin}/reset-password?token=${tokenHash}`;
 
     console.log("Sending password reset email to:", email);
 
