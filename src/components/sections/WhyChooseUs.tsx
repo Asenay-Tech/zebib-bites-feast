@@ -78,8 +78,7 @@ export function WhyChooseUs() {
             );
           })}
         </div>
-
-        {/* Traditional Elements Section */}
+{/* Traditional Elements Section */}
 <div className="mt-20 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
   <div className="bg-gradient-card rounded-xl p-8 h-full flex flex-col justify-center">
     <h3 className="text-2xl font-bold text-foreground mb-4 tracking-wide text-center lg:text-left">
@@ -106,3 +105,8 @@ export function WhyChooseUs() {
   </div>
 </div>
 
+        </div>
+      </div>
+    </section>
+  );
+}
