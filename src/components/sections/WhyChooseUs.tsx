@@ -1,11 +1,11 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { ChefHat, Users, Leaf, Calendar } from "lucide-react";
+import { Users, Leaf, Calendar } from "lucide-react";
 import { useLanguage } from "@/components/ui/language-switcher";
 import coffeeImage from "@/assets/coffee-ceremony.jpg?url";
 import platterImage from "@/assets/traditional-platter.jpg?url";
 
 export function WhyChooseUs() {
-  const { language, t } = useLanguage();
+  const { language } = useLanguage();
 
   const features = [
     {
@@ -24,7 +24,6 @@ export function WhyChooseUs() {
           ? "Unser Restaurant bietet eine warme, familienfreundliche Atmosphäre mit traditioneller eritreischer Gastfreundschaft."
           : "Our restaurant offers a warm, family-friendly atmosphere with traditional Eritrean hospitality.",
     },
-
     {
       icon: Calendar,
       title: language === "de" ? "Veranstaltungen & Feiern" : "Events & Party Hosting",
@@ -45,16 +44,15 @@ export function WhyChooseUs() {
           </h2>
           <p className="text-xl text-body max-w-2xl mx-auto">
             {language === "de"
-              ? "Entdecken Sie, was uns zu Ihrem bevorzugten eritreischen Restaurant macht"
-              : "Discover what makes us your preferred Eritrean restaurant"}
+              ? "Entdecken Sie, was uns zu Ihrem bevorzugten eritreischen Restaurant macht."
+              : "Discover what makes us your preferred Eritrean restaurant."}
           </p>
         </div>
 
         {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {features.map((feature, index) => {
             const Icon = feature.icon;
-
             return (
               <Card
                 key={index}
@@ -78,33 +76,34 @@ export function WhyChooseUs() {
             );
           })}
         </div>
-{/* Traditional Elements Section */}
-<div className="mt-20 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-  <div className="bg-gradient-card rounded-xl p-8 h-full flex flex-col justify-center">
-    <h3 className="text-2xl font-bold text-foreground mb-4 tracking-wide text-center lg:text-left">
-      {language === "de" ? "TRADITIONELL & MODERN" : "TRADITIONAL & MODERN"}
-    </h3>
-    <p className="text-body leading-relaxed text-center lg:text-left">
-      {language === "de"
-        ? "Wir verbinden jahrhundertealte eritreische Kochtraditionen mit modernen Präsentations- und Servicetechniken."
-        : "We combine centuries-old Eritrean cooking traditions with modern presentation and service techniques."}
-    </p>
-  </div>
 
-  <div className="relative rounded-xl overflow-hidden group mx-auto">
-    <img
-      src={coffeeImage}
-      alt="Traditional Cooking"
-      className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
-    />
-    <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent flex items-end">
-      <p className="text-foreground font-medium p-6">
-        {language === "de" ? "Traditionelle Zubereitung" : "Traditional Preparation"}
-      </p>
-    </div>
-  </div>
-</div>
+        {/* Traditional Elements Section */}
+        <div className="mt-20 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          {/* Text Block */}
+          <div className="bg-gradient-card rounded-xl p-8 h-full flex flex-col justify-center text-center lg:text-left">
+            <h3 className="text-2xl font-bold text-foreground mb-4 tracking-wide">
+              {language === "de" ? "TRADITIONELL & MODERN" : "TRADITIONAL & MODERN"}
+            </h3>
+            <p className="text-body leading-relaxed">
+              {language === "de"
+                ? "Wir verbinden jahrhundertealte eritreische Kochtraditionen mit modernen Präsentations- und Servicetechniken."
+                : "We combine centuries-old Eritrean cooking traditions with modern presentation and service techniques."}
+            </p>
+          </div>
 
+          {/* Image Block */}
+          <div className="relative rounded-xl overflow-hidden group mx-auto">
+            <img
+              src={coffeeImage}
+              alt="Traditional Cooking"
+              className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent flex items-end">
+              <p className="text-foreground font-medium p-6">
+                {language === "de" ? "Traditionelle Zubereitung" : "Traditional Preparation"}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
