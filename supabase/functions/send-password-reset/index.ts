@@ -20,13 +20,67 @@ serve(async (req) => {
     const html = `
       <!DOCTYPE html>
       <html>
-        <body style="font-family: Arial, sans-serif; padding: 20px;">
-          <h1>Password Reset - Zebib Foods</h1>
-          <p>Hello ${name || 'there'},</p>
-          <p>You requested to reset your password for your Zebib Foods account.</p>
-          <p style="margin: 30px 0;"><a href="${resetLink}" style="padding: 12px 24px; background-color: #D97706; color: white; text-decoration: none; border-radius: 5px; display: inline-block;">Reset Password</a></p>
-          <p>If you didn't request this, please ignore this email.</p>
-          <p>Best regards,<br>The Zebib Foods Team</p>
+        <head>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              line-height: 1.6;
+              color: #333;
+              max-width: 600px;
+              margin: 0 auto;
+              padding: 20px;
+            }
+            .header {
+              background: linear-gradient(135deg, #D97706 0%, #F59E0B 100%);
+              color: white;
+              padding: 30px;
+              text-align: center;
+              border-radius: 8px 8px 0 0;
+            }
+            .content {
+              background: #f9f9f9;
+              padding: 30px;
+              border-radius: 0 0 8px 8px;
+            }
+            .button {
+              display: inline-block;
+              background: #D97706;
+              color: white;
+              padding: 12px 30px;
+              text-decoration: none;
+              border-radius: 6px;
+              margin: 20px 0;
+              font-weight: bold;
+            }
+            .footer {
+              text-align: center;
+              margin-top: 20px;
+              color: #666;
+              font-size: 12px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>🍽️ Zebib Foods</h1>
+          </div>
+          <div class="content">
+            <p>Hello ${name || 'there'},</p>
+            <p>We received a request to reset your password for your Zebib Foods account.</p>
+            <p>Click the button below to reset your password:</p>
+            <p style="text-align: center;">
+              <a href="${resetLink}" class="button">Reset Password</a>
+            </p>
+            <p>Or copy and paste this link into your browser:</p>
+            <p style="word-break: break-all; color: #666; font-size: 12px;">${resetLink}</p>
+            <p><strong>This link will expire in 1 hour.</strong></p>
+            <p>If you didn't request a password reset, you can safely ignore this email.</p>
+            <p>Best regards,<br>The Zebib Foods Team</p>
+          </div>
+          <div class="footer">
+            <p>Zebib Foods - Authentic East African Cuisine</p>
+            <p>This is an automated email, please do not reply.</p>
+          </div>
         </body>
       </html>
     `;
@@ -38,7 +92,7 @@ serve(async (req) => {
         "Authorization": `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Zebib Foods <noreply@zebibfood.de>",
+        from: "Zebib Foods <mail@zebibfood.de>",
         to: [email],
         subject: "Reset Your Password - Zebib Foods",
         html,
