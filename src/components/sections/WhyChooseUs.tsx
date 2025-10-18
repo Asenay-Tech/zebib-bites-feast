@@ -107,19 +107,6 @@ export function WhyChooseUs() {
                 </p>
               </div>
             </div>
-
-            <div className="relative rounded-xl overflow-hidden group">
-              <img
-                src={platterImage}
-                alt="Modern Presentation"
-                className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent flex items-end">
-                <p className="text-foreground font-medium p-6">
-                  {language === "de" ? "Moderne Präsentation" : "Modern Presentation"}
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </div>
