@@ -300,10 +300,21 @@ const Order = () => {
         ? cart[0].name_en 
         : `Order: ${cart.map(c => c.name_en).join(", ").substring(0, 100)}`;
       
+      // Format date and time for order
+      const orderDate = format(date, "yyyy-MM-dd");
+      const orderTime = `${hour}:${minute}`;
+      
       const { data, error } = await supabase.functions.invoke("stripe-checkout", {
         body: {
           productName,
-          amount: subtotal, // in euros
+          amount: subtotal,
+          customerEmail: user.email,
+          customerName: profile?.name || user.email,
+          customerPhone: profile?.phone || "",
+          items: cart,
+          date: orderDate,
+          time: orderTime,
+          diningType,
           successUrl: `${window.location.origin}/checkout?success=true`,
           cancelUrl: `${window.location.origin}/order?canceled=true`,
         },
