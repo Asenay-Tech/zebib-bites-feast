@@ -85,7 +85,6 @@ export default function MenuManager() {
   const [newCategory, setNewCategory] = useState("");
   const [previewMode, setPreviewMode] = useState(false);
   const [draggedItem, setDraggedItem] = useState<MenuItem | null>(null);
-  const [imageZoom, setImageZoom] = useState<Record<string, number>>({});
   const [dialogImageScale, setDialogImageScale] = useState(1.0);
   const [formData, setFormData] = useState({
     name_de: "",
@@ -321,6 +320,7 @@ export default function MenuManager() {
       }
 
       setDialogOpen(false);
+      setDialogImageScale(1.0); // Reset zoom after save
       fetchMenuItems();
     } catch (error) {
       console.error('Error saving menu item:', error);
@@ -585,26 +585,6 @@ export default function MenuManager() {
     }).format(Number(price));
   };
 
-  const handleZoomIn = (itemId: string) => {
-    setImageZoom(prev => ({
-      ...prev,
-      [itemId]: Math.min((prev[itemId] || 1) + 0.2, 3)
-    }));
-  };
-
-  const handleZoomOut = (itemId: string) => {
-    setImageZoom(prev => ({
-      ...prev,
-      [itemId]: Math.max((prev[itemId] || 1) - 0.2, 0.5)
-    }));
-  };
-
-  const handleResetZoom = (itemId: string) => {
-    setImageZoom(prev => ({
-      ...prev,
-      [itemId]: 1
-    }));
-  };
 
   const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
   const paginatedItems = filteredItems.slice(
@@ -764,48 +744,15 @@ export default function MenuManager() {
                     </div>
                   )}
                   {item.image_url && (
-                    <div className="relative">
-                      <img
-                        src={item.image_url}
-                        alt={item.name_en}
-                        className="w-20 h-20 object-cover rounded-md transition-transform duration-200"
-                        style={{ 
-                          transform: `scale(${item.image_scale || 1})`,
-                          transformOrigin: 'center'
-                        }}
-                      />
-                      {!previewMode && (
-                        <div className="absolute -bottom-2 -right-2 flex gap-1 bg-background border border-border rounded-md p-1 shadow-sm">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-6 w-6 p-0"
-                            onClick={() => handleZoomOut(item.id)}
-                            title="Zoom Out"
-                          >
-                            <ZoomOut className="h-3 w-3" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-6 w-6 p-0"
-                            onClick={() => handleResetZoom(item.id)}
-                            title="Reset Zoom"
-                          >
-                            <RotateCcw className="h-3 w-3" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-6 w-6 p-0"
-                            onClick={() => handleZoomIn(item.id)}
-                            title="Zoom In"
-                          >
-                            <ZoomIn className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      )}
-                    </div>
+                    <img
+                      src={item.image_url}
+                      alt={item.name_en}
+                      className="w-20 h-20 object-cover rounded-md"
+                      style={{ 
+                        transform: `scale(${item.image_scale || 1})`,
+                        transformOrigin: 'center'
+                      }}
+                    />
                   )}
                   <div className="flex-1">
                     <div className="flex items-start justify-between">
