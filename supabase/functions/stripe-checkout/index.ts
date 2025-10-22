@@ -26,7 +26,6 @@ serve(async (req) => {
 
     // Stripe expects amount in cents (EUR)
     const amountInCents = Math.round(Number(amount) * 100);
-
     console.log("[stripe-checkout] Creating Stripe checkout session…", { productName, amountInCents });
 
     const stripeResponse = await fetch("https://api.stripe.com/v1/checkout/sessions", {
@@ -61,8 +60,11 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
-    console.error("[stripe-checkout] Error:", err);
-    return new Response(JSON.stringify({ error: err.message }), {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+
+    console.error("[stripe-checkout] Error:", message);
+
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
