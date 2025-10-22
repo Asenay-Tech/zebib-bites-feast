@@ -15,6 +15,7 @@ interface MenuItem {
   description_en?: string | null;
   price: any;
   image_url?: string | null;
+  image_scale?: number;
   category: string;
 }
 
@@ -195,15 +196,21 @@ export function Menu() {
                 >
                   <CardContent className="p-0">
                     {getItemImageSrc(item) && (
-                      <img
-                        src={getItemImageSrc(item)!}
-                        alt={getItemName(item)}
-                        className="w-full h-48 object-cover"
-                        loading="lazy"
-                        onError={(e) => {
-                          e.currentTarget.style.display = "none";
-                        }}
-                      />
+                      <div className="w-full h-48 overflow-hidden">
+                        <img
+                          src={getItemImageSrc(item)!}
+                          alt={getItemName(item)}
+                          className="w-full h-full object-cover transition-transform duration-200"
+                          style={{ 
+                            transform: `scale(${item.image_scale || 1})`,
+                            transformOrigin: 'center'
+                          }}
+                          loading="lazy"
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                          }}
+                        />
+                      </div>
                     )}
 
                     <div className="p-6">
