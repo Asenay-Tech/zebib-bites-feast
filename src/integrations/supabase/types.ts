@@ -326,6 +326,48 @@ export type Database = {
         }
         Relationships: []
       }
+      specialties: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description_de: string | null
+          description_en: string | null
+          display_order: number
+          id: string
+          image_url: string | null
+          title_de: string
+          title_en: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description_de?: string | null
+          description_en?: string | null
+          display_order?: number
+          id?: string
+          image_url?: string | null
+          title_de: string
+          title_en: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description_de?: string | null
+          description_en?: string | null
+          display_order?: number
+          id?: string
+          image_url?: string | null
+          title_de?: string
+          title_en?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       tickets: {
         Row: {
           created_at: string | null

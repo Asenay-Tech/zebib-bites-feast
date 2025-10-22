@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Users, ShoppingBag, Calendar, Menu as MenuIcon, LogOut, Home } from "lucide-react";
+import { LayoutDashboard, Users, ShoppingBag, Calendar, Menu as MenuIcon, LogOut, Home, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
@@ -48,6 +48,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
     { icon: ShoppingBag, label: "Orders", path: "/admin/orders" },
     { icon: Calendar, label: "Reservations", path: "/admin/reservations" },
     { icon: MenuIcon, label: "Menu Manager", path: "/admin/menu" },
+    { icon: Star, label: "Specialties", path: "/admin/specialties" },
   ];
 
   return (
