@@ -501,50 +501,55 @@ const Order = () => {
                 })}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {filteredMenu.map((item, idx) => (
-                  <Card key={idx} className="p-4 overflow-hidden">
-                    <div className="flex gap-4">
-                      <img
-                        src={menuPlaceholder}
-                        alt={language === "de" ? item.name_de : item.name_en}
-                        className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold truncate">
-                          {language === "de" ? item.name_de : item.name_en}
-                        </h3>
-                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                          {language === "de"
-                            ? item.description_de
-                            : item.description_en}
-                        </p>
-                        <div className="flex justify-between items-center">
-                          {/* <span className="font-bold text-accent">
-                            {typeof item.price === "object"
-                              ? `€${Object.values(item.price)[0]}`
-                              : `€${item.price}`}
-                          </span> */}
-                          <span className="font-bold text-accent">
-                            {formatEUR(getUnitPrice(item.price))}
-                          </span>
-                          <Button
-                            size="sm"
-                            onClick={() => addToCart(item)}
-                            disabled={addingToCart === item.name_de}
-                          >
-                            {addingToCart === item.name_de ? (
-                              <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                            ) : (
-                              <Plus className="h-4 w-4" />
-                            )}
-                          </Button>
+              {loading ? (
+                <div className="flex justify-center py-12">
+                  <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : filteredMenu.length === 0 ? (
+                <p className="text-center text-muted-foreground py-12">
+                  {t("menu.noItems")}
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {filteredMenu.map((item) => (
+                    <Card key={item.id} className="p-4 overflow-hidden">
+                      <div className="flex gap-4">
+                        <img
+                          src={item.image_url || menuPlaceholder}
+                          alt={language === "de" ? item.name_de : item.name_en}
+                          className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold truncate">
+                            {language === "de" ? item.name_de : item.name_en}
+                          </h3>
+                          <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                            {language === "de"
+                              ? item.description_de
+                              : item.description_en}
+                          </p>
+                          <div className="flex justify-between items-center">
+                            <span className="font-bold text-accent">
+                              {formatEUR(getUnitPrice(item.price))}
+                            </span>
+                            <Button
+                              size="sm"
+                              onClick={() => addToCart(item)}
+                              disabled={addingToCart === item.name_de}
+                            >
+                              {addingToCart === item.name_de ? (
+                                <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                              ) : (
+                                <Plus className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </Card>
           </div>
 

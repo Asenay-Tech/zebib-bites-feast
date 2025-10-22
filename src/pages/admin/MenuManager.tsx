@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Edit, Trash2, Save, X, Search, Upload, Download, Copy, Eye, GripVertical } from "lucide-react";
+import { Plus, Edit, Trash2, Save, X, Search, Upload, Download, Copy, Eye, GripVertical, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminBreadcrumb } from "@/components/admin/Breadcrumb";
@@ -84,6 +84,7 @@ export default function MenuManager() {
   const [newCategory, setNewCategory] = useState("");
   const [previewMode, setPreviewMode] = useState(false);
   const [draggedItem, setDraggedItem] = useState<MenuItem | null>(null);
+  const [imageZoom, setImageZoom] = useState<Record<string, number>>({});
   const [formData, setFormData] = useState({
     name_de: "",
     name_en: "",
@@ -573,7 +574,31 @@ export default function MenuManager() {
         .map(([size, p]) => `${size}: €${p}`)
         .join(', ');
     }
-    return `€${Number(price).toFixed(2)}`;
+    return new Intl.NumberFormat("de-DE", {
+      style: "currency",
+      currency: "EUR",
+    }).format(Number(price));
+  };
+
+  const handleZoomIn = (itemId: string) => {
+    setImageZoom(prev => ({
+      ...prev,
+      [itemId]: Math.min((prev[itemId] || 1) + 0.2, 3)
+    }));
+  };
+
+  const handleZoomOut = (itemId: string) => {
+    setImageZoom(prev => ({
+      ...prev,
+      [itemId]: Math.max((prev[itemId] || 1) - 0.2, 0.5)
+    }));
+  };
+
+  const handleResetZoom = (itemId: string) => {
+    setImageZoom(prev => ({
+      ...prev,
+      [itemId]: 1
+    }));
   };
 
   const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
@@ -734,11 +759,48 @@ export default function MenuManager() {
                     </div>
                   )}
                   {item.image_url && (
-                    <img
-                      src={item.image_url}
-                      alt={item.name_en}
-                      className="w-20 h-20 object-cover rounded-md"
-                    />
+                    <div className="relative">
+                      <img
+                        src={item.image_url}
+                        alt={item.name_en}
+                        className="w-20 h-20 object-cover rounded-md transition-transform duration-200"
+                        style={{ 
+                          transform: `scale(${imageZoom[item.id] || 1})`,
+                          transformOrigin: 'center'
+                        }}
+                      />
+                      {!previewMode && (
+                        <div className="absolute -bottom-2 -right-2 flex gap-1 bg-background border border-border rounded-md p-1 shadow-sm">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 w-6 p-0"
+                            onClick={() => handleZoomOut(item.id)}
+                            title="Zoom Out"
+                          >
+                            <ZoomOut className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 w-6 p-0"
+                            onClick={() => handleResetZoom(item.id)}
+                            title="Reset Zoom"
+                          >
+                            <RotateCcw className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 w-6 p-0"
+                            onClick={() => handleZoomIn(item.id)}
+                            title="Zoom In"
+                          >
+                            <ZoomIn className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   )}
                   <div className="flex-1">
                     <div className="flex items-start justify-between">
