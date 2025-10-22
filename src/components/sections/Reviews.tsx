@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
@@ -18,39 +19,28 @@ interface Review {
 export function Reviews() {
   const { language } = useLanguage();
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(true);
   const carouselRef = useRef<HTMLDivElement | null>(null);
 
-  const googlePlaceId = "ChIJXU9TXkDUl0cRbn_fVfXQyYo"; // ZEBIB - Hanau Place ID
-  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-
-  // ✅ Fetch real Google reviews (mix of top, random, recent - 5-6 reviews)
+  // ✅ Fetch reviews from backend edge function
   useEffect(() => {
     async function fetchReviews() {
       try {
-        const response = await fetch(
-          `https://maps.googleapis.com/maps/api/place/details/json?place_id=${googlePlaceId}&fields=reviews&key=${apiKey}`,
-        );
-        const data = await response.json();
-        if (data.result?.reviews) {
-          const allReviews = data.result.reviews;
-          
-          // Get top-rated (5 stars)
-          const topRated = allReviews.filter((r: Review) => r.rating === 5).slice(0, 2);
-          
-          // Get recent reviews (sorted by time)
-          const recent = [...allReviews].sort((a, b) => b.time - a.time).slice(0, 2);
-          
-          // Get random reviews
-          const random = allReviews.sort(() => Math.random() - 0.5).slice(0, 2);
-          
-          // Combine and remove duplicates
-          const combined = [...topRated, ...recent, ...random];
-          const uniqueReviews = Array.from(new Map(combined.map(r => [r.time, r])).values()).slice(0, 6);
-          
-          setReviews(uniqueReviews);
+        setLoading(true);
+        const { data, error } = await supabase.functions.invoke('fetch-google-reviews');
+        
+        if (error) {
+          console.error("Error fetching reviews:", error);
+          return;
+        }
+        
+        if (data?.reviews && Array.isArray(data.reviews)) {
+          setReviews(data.reviews);
         }
       } catch (err) {
         console.error("Error fetching reviews:", err);
+      } finally {
+        setLoading(false);
       }
     }
     fetchReviews();
@@ -101,9 +91,18 @@ export function Reviews() {
         </div>
 
         {/* Review Cards Carousel */}
-        <div ref={carouselRef}>
-          <Carousel opts={{ align: "start", loop: true }} className="w-full max-w-6xl mx-auto">
-            <CarouselContent>
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-body">{language === "de" ? "Bewertungen werden geladen..." : "Loading reviews..."}</p>
+          </div>
+        ) : reviews.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-body">{language === "de" ? "Keine Bewertungen verfügbar" : "No reviews available"}</p>
+          </div>
+        ) : (
+          <div ref={carouselRef}>
+            <Carousel opts={{ align: "start", loop: true }} className="w-full max-w-6xl mx-auto">
+              <CarouselContent>
               {reviews.map((review, index) => (
                 <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
                   <div className="p-4">
@@ -144,8 +143,9 @@ export function Reviews() {
               data-carousel-next
               className="text-accent border-accent hover:bg-accent hover:text-accent-foreground"
             />
-          </Carousel>
-        </div>
+            </Carousel>
+          </div>
+        )}
       </div>
     </section>
   );
