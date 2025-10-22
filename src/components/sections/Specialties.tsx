@@ -5,17 +5,23 @@ import { useLanguage } from "@/components/ui/language-switcher";
 
 interface Specialty {
   id: string;
-  title_de: string;
-  title_en: string;
+  menu_item_id: string;
+  display_order: number;
+}
+
+interface MenuItem {
+  id: string;
+  name_de: string;
+  name_en: string;
   description_de: string | null;
   description_en: string | null;
+  category: string;
   image_url: string | null;
-  display_order: number;
 }
 
 export function Specialties() {
   const { language } = useLanguage();
-  const [specialties, setSpecialties] = useState<Specialty[]>([]);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
 
   useEffect(() => {
     fetchSpecialties();
@@ -23,19 +29,40 @@ export function Specialties() {
 
   const fetchSpecialties = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch specialties with their associated menu items
+      const { data: specialtiesData, error: specialtiesError } = await supabase
         .from('specialties')
-        .select('*')
+        .select('menu_item_id, display_order')
         .order('display_order', { ascending: true });
 
-      if (error) throw error;
-      setSpecialties(data || []);
+      if (specialtiesError) throw specialtiesError;
+
+      if (!specialtiesData || specialtiesData.length === 0) {
+        setMenuItems([]);
+        return;
+      }
+
+      // Fetch the actual menu items
+      const menuItemIds = specialtiesData.map(s => s.menu_item_id);
+      const { data: menuItemsData, error: menuItemsError } = await supabase
+        .from('menu_items')
+        .select('*')
+        .in('id', menuItemIds);
+
+      if (menuItemsError) throw menuItemsError;
+
+      // Sort menu items by the specialty display order
+      const sortedMenuItems = specialtiesData
+        .map(s => menuItemsData?.find(m => m.id === s.menu_item_id))
+        .filter(Boolean) as MenuItem[];
+
+      setMenuItems(sortedMenuItems);
     } catch (error) {
       console.error('Error fetching specialties:', error);
     }
   };
 
-  if (specialties.length === 0) return null;
+  if (menuItems.length === 0) return null;
 
   return (
     <section className="py-20 bg-background">
@@ -54,16 +81,16 @@ export function Specialties() {
 
         {/* Specialties Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {specialties.map((specialty) => (
+          {menuItems.map((item) => (
             <Card
-              key={specialty.id}
+              key={item.id}
               className="overflow-hidden bg-card border-border/50 hover:shadow-elegant transition-all duration-500 group rounded-2xl"
             >
-              {specialty.image_url && (
+              {item.image_url && (
                 <div className="relative h-64 overflow-hidden">
                   <img
-                    src={specialty.image_url}
-                    alt={language === "de" ? specialty.title_de : specialty.title_en}
+                    src={item.image_url}
+                    alt={language === "de" ? item.name_de : item.name_en}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent" />
@@ -72,12 +99,12 @@ export function Specialties() {
               
               <CardContent className="p-6">
                 <h3 className="text-2xl font-bold text-foreground mb-3">
-                  {language === "de" ? specialty.title_de : specialty.title_en}
+                  {language === "de" ? item.name_de : item.name_en}
                 </h3>
                 
-                {(language === "de" ? specialty.description_de : specialty.description_en) && (
+                {(language === "de" ? item.description_de : item.description_en) && (
                   <p className="text-body leading-relaxed">
-                    {language === "de" ? specialty.description_de : specialty.description_en}
+                    {language === "de" ? item.description_de : item.description_en}
                   </p>
                 )}
               </CardContent>

@@ -330,43 +330,39 @@ export type Database = {
         Row: {
           created_at: string | null
           created_by: string | null
-          description_de: string | null
-          description_en: string | null
           display_order: number
           id: string
-          image_url: string | null
-          title_de: string
-          title_en: string
+          menu_item_id: string | null
           updated_at: string | null
           updated_by: string | null
         }
         Insert: {
           created_at?: string | null
           created_by?: string | null
-          description_de?: string | null
-          description_en?: string | null
           display_order?: number
           id?: string
-          image_url?: string | null
-          title_de: string
-          title_en: string
+          menu_item_id?: string | null
           updated_at?: string | null
           updated_by?: string | null
         }
         Update: {
           created_at?: string | null
           created_by?: string | null
-          description_de?: string | null
-          description_en?: string | null
           display_order?: number
           id?: string
-          image_url?: string | null
-          title_de?: string
-          title_en?: string
+          menu_item_id?: string | null
           updated_at?: string | null
           updated_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "specialties_menu_item_id_fkey"
+            columns: ["menu_item_id"]
+            isOneToOne: true
+            referencedRelation: "menu_items"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tickets: {
         Row: {
