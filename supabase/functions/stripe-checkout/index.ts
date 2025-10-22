@@ -169,7 +169,7 @@ serve(async (req) => {
       ...params,
       amount: amountInCents,
       currency: "EUR",
-      orderId
+      orderUuid
     });
 
     console.log("[stripe-checkout] Calling Stripe API...");
@@ -196,8 +196,8 @@ serve(async (req) => {
         fullResponse: session
       });
       const errorMsg = session.error?.message || `Stripe API error (${stripeResponse.status})`;
-      return new Response(JSON.stringify({ error: errorMsg, details: session.error }), {
-        status: stripeResponse.status >= 400 && stripeResponse.status < 500 ? 400 : 500,
+      return new Response(JSON.stringify({ success: false, error: errorMsg, details: session.error }), {
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -207,13 +207,14 @@ serve(async (req) => {
       url: session.url,
       mode: session.mode,
       currency: session.currency,
-      orderId,
+      orderUuid,
       receiptEmail: customerEmail || "none"
     });
 
     return new Response(JSON.stringify({ 
+      success: true,
       url: session.url, 
-      orderId,
+      orderId: orderUuid,
       sessionId: session.id 
     }), {
       status: 200,
@@ -226,10 +227,11 @@ serve(async (req) => {
     console.error("[stripe-checkout] Fatal error", { message, stack });
 
     return new Response(JSON.stringify({ 
+      success: false,
       error: message,
       type: err instanceof Error ? err.name : "UnknownError"
     }), {
-      status: 500,
+      status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }

@@ -330,6 +330,17 @@ const Order = () => {
         return;
       }
 
+      // Check if the function returned an error in the response data
+      if (data && !data.success && data.error) {
+        console.error("Checkout error from function:", data.error);
+        toast({ 
+          title: "Checkout failed", 
+          description: data.error || "Payment setup failed, please try again", 
+          variant: "destructive" 
+        });
+        return;
+      }
+
       if (data?.url) {
         // Open Stripe Checkout in new tab
         window.open(data.url, "_blank");
