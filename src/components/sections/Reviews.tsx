@@ -157,9 +157,9 @@ export function Reviews() {
 
                 return (
                   <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
-                    <div className="p-2">
+                    <div className="p-2 h-full">
                       <Card className="h-full hover:shadow-elegant transition-all duration-500 transform hover:scale-[1.02] bg-card border-border/50 rounded-2xl">
-                        <CardContent className="p-6 flex flex-col h-full min-h-[280px]">
+                        <CardContent className="p-6 flex flex-col">
                           <div className="flex items-start gap-3 mb-4">
                             {review.profile_photo_url && (
                               <img
@@ -179,9 +179,11 @@ export function Reviews() {
                             </div>
                           </div>
 
-                          <p className="text-body italic leading-relaxed flex-1 text-sm mb-4">
-                            "{displayText}"
-                          </p>
+                          <div className="flex-1 mb-4">
+                            <p className="text-body italic leading-relaxed text-sm">
+                              "{displayText}"
+                            </p>
+                          </div>
 
                           {needsTruncation && (
                             <button
@@ -195,7 +197,7 @@ export function Reviews() {
                             </button>
                           )}
 
-                          <div className="mt-auto pt-4 border-t border-border text-xs text-muted-foreground">
+                          <div className="pt-4 border-t border-border text-xs text-muted-foreground">
                             {format(new Date(review.time * 1000), "PPP", {
                               locale: language === "de" ? de : enUS,
                             })}
