@@ -30,6 +30,15 @@ export default function Checkout() {
         return;
       }
 
+      // Handle generic success (e.g., stripe-checkout test without order tracking)
+      if (isSuccess && !orderId) {
+        setSuccess(true);
+        setOrderDetails(null);
+        setLoading(false);
+        toast({ title: "Payment successful", description: "Stripe test payment completed." });
+        return;
+      }
+
       if (isSuccess && orderId) {
         try {
           // Confirm payment and send email
