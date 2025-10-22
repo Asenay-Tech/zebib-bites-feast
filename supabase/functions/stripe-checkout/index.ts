@@ -17,7 +17,7 @@ function generateOrderId(): string {
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     console.log("[stripe-checkout] CORS preflight request");
-    return new Response(null, { headers: corsHeaders });
+    return new Response("ok", { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 
   try {
@@ -31,16 +31,23 @@ serve(async (req) => {
     }
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Get authenticated user
+    // Get authenticated user (required for order creation)
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      throw new Error("Missing authorization header");
+      console.error("[stripe-checkout] Missing authorization header");
+      return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
     const token = authHeader.replace("Bearer ", "");
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     if (authError || !user) {
       console.error("[stripe-checkout] Auth error:", authError);
-      throw new Error("Unauthorized");
+      return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
     console.log("[stripe-checkout] User authenticated:", user.id);
 
@@ -64,24 +71,21 @@ serve(async (req) => {
     
     if (!productName || amount === undefined || !successUrl || !cancelUrl) {
       console.error("[stripe-checkout] Missing required fields", { productName, amount, successUrl, cancelUrl });
-      return new Response(JSON.stringify({ error: "Missing required fields: productName, amount, successUrl, cancelUrl" }), {
-        status: 400,
+      return new Response(JSON.stringify({ success: false, error: "Missing required fields: productName, amount, successUrl, cancelUrl" }), {
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Validate required order fields (phone is optional)
-    if (!customerName || !items || !date || !time || !diningType) {
-      console.error("[stripe-checkout] Missing order fields", { 
-        hasName: !!customerName, 
+    // Determine if we can create an order record (phone optional)
+    const canInsertOrder = !!(customerName && items && date && time && diningType);
+    if (!canInsertOrder) {
+      console.log("[stripe-checkout] Order fields incomplete - will skip DB insert", {
+        hasName: !!customerName,
         hasItems: !!items,
         hasDate: !!date,
         hasTime: !!time,
-        hasDiningType: !!diningType
-      });
-      return new Response(JSON.stringify({ error: "Missing required order fields" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        hasDiningType: !!diningType,
       });
     }
 
@@ -96,43 +100,49 @@ serve(async (req) => {
     // Validate minimum amount (€0.50 = 50 cents)
     if (amountInCents < 50) {
       console.error("[stripe-checkout] Amount too low:", amountInCents);
-      return new Response(JSON.stringify({ error: "Minimum charge is €0.50" }), {
-        status: 400,
+      return new Response(JSON.stringify({ success: false, error: "Minimum charge is €0.50" }), {
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Generate unique order ID
-    const orderId = generateOrderId();
-    console.log("[stripe-checkout] Generated order ID:", orderId);
+    // Generate human-friendly code (not DB id)
+    const orderCode = generateOrderId();
+    console.log("[stripe-checkout] Generated order code:", orderCode);
 
-    // Create order record in database
-    const { data: orderData, error: orderError } = await supabase
-      .from("orders")
-      .insert({
-        id: orderId,
-        user_id: user.id,
-        name: customerName,
-        phone: customerPhone,
-        date,
-        time,
-        dining_type: diningType,
-        items,
-        total_amount_cents: amountInCents,
-        payment_status: "pending",
-        status: "pending"
-      })
-      .select()
-      .single();
+    // Create order record in database when possible
+    let orderUuid: string | null = null;
+    if (canInsertOrder) {
+      try {
+        const { data: orderData, error: orderError } = await supabase
+          .from("orders")
+          .insert({
+            user_id: user.id,
+            name: customerName,
+            phone: customerPhone || "",
+            date,
+            time,
+            dining_type: diningType,
+            items,
+            total_amount_cents: amountInCents,
+            payment_status: "pending",
+            status: "pending",
+          })
+          .select("id")
+          .maybeSingle();
 
-    if (orderError) {
-      console.error("[stripe-checkout] Order creation error:", orderError);
-      return new Response(JSON.stringify({ error: "Failed to create order", details: orderError.message }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+        if (orderError) {
+          console.error("[stripe-checkout] Order creation error:", orderError);
+        } else {
+          orderUuid = orderData?.id || null;
+          console.log("[stripe-checkout] Order created", { orderUuid });
+        }
+      } catch (dbErr) {
+        console.error("[stripe-checkout] Exception during order insert", dbErr);
+      }
+    } else {
+      console.log("[stripe-checkout] Skipping order insert due to incomplete fields");
     }
-    console.log("[stripe-checkout] Order created:", orderId);
 
     // Build Stripe checkout session params
     const params: Record<string, string> = {
@@ -142,8 +152,8 @@ serve(async (req) => {
       "line_items[0][price_data][product_data][name]": productName,
       "line_items[0][price_data][unit_amount]": amountInCents.toString(),
       "line_items[0][quantity]": "1",
-      success_url: `${successUrl}?order_id=${orderId}`,
-      cancel_url: `${cancelUrl}?order_id=${orderId}`,
+      success_url: orderUuid ? `${successUrl}?order_id=${orderUuid}` : successUrl,
+      cancel_url: orderUuid ? `${cancelUrl}?order_id=${orderUuid}` : cancelUrl,
     };
 
     // Add customer email for Stripe receipts if provided
