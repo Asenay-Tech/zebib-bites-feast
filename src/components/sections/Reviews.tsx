@@ -34,8 +34,31 @@ export function Reviews() {
           return;
         }
         
-        if (data?.reviews && Array.isArray(data.reviews)) {
-          setReviews(data.reviews);
+        if (data?.reviews && Array.isArray(data.reviews) && data.reviews.length > 0) {
+          setReviews(data.reviews.map((r: any) => ({
+            author_name: r.author_name || r.authorAttribution?.displayName || "Guest",
+            profile_photo_url: r.profile_photo_url || r.authorAttribution?.photoUri || "",
+            rating: r.rating,
+            text: r.text?.text || r.text || "",
+            time: r.time || (r.publishTime ? Math.floor(new Date(r.publishTime).getTime() / 1000) : Date.now()/1000),
+          })));
+        } else {
+          // Fallback to local reviews in DB if Google returns none
+          const { data: local, error: localErr } = await supabase
+            .from('reviews_local')
+            .select('*')
+            .eq('language', language)
+            .order('created_at', { ascending: false })
+            .limit(6);
+          if (!localErr && local) {
+            setReviews(local.map((r: any) => ({
+              author_name: r.name,
+              profile_photo_url: '',
+              rating: r.rating,
+              text: r.text,
+              time: Math.floor(new Date(r.created_at).getTime() / 1000),
+            })) as Review[]);
+          }
         }
       } catch (err) {
         console.error("Error fetching reviews:", err);
@@ -68,6 +91,12 @@ export function Reviews() {
       ))}
     </div>
   );
+
+  const displayName = (name: string) => {
+    if (!name) return "Guest";
+    const parts = name.split(" ").filter(Boolean);
+    return parts.length > 1 ? `${parts[0]} ${parts[1][0]}.` : parts[0];
+  };
 
   const googleReviewUrl = "https://www.google.com/maps/place/ZEBIB+-+Hanau/@50.1330932,8.9212194,17z";
 
@@ -111,11 +140,11 @@ export function Reviews() {
                         <div className="flex items-center gap-3 mb-3">
                           <img
                             src={review.profile_photo_url}
-                            alt={review.author_name}
+                            alt={displayName(review.author_name)}
                             className="w-10 h-10 rounded-full border border-border"
                           />
                           <div>
-                            <p className="font-semibold text-foreground">{review.author_name}</p>
+                            <p className="font-semibold text-foreground">{displayName(review.author_name)}</p>
                             {renderStars(review.rating)}
                           </div>
                         </div>

@@ -13,11 +13,19 @@ serve(async (req) => {
 
   try {
     const apiKey = Deno.env.get('VITE_GOOGLE_MAPS_API_KEY');
-    const placeId = "ChIJXU9TXkDUl0cRbn_fVfXQyYo"; // ZEBIB - Hanau Place ID
+    const placeQuery = "ZEBIB - Hanau, Salzstraße 14, 63450 Hanau, Germany";
 
     if (!apiKey) {
       throw new Error('Google Maps API key not configured');
     }
+
+    // Resolve a fresh Place ID from text to avoid stale IDs
+    const findResp = await fetch(
+      `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(placeQuery)}&inputtype=textquery&fields=place_id&key=${apiKey}`
+    );
+    const findData = await findResp.json();
+    const placeId = findData?.candidates?.[0]?.place_id as string | undefined;
+    if (!placeId) throw new Error('Could not resolve Place ID for the business');
 
     console.log('Fetching Google reviews for place:', placeId);
 
