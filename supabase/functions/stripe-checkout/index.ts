@@ -59,7 +59,16 @@ serve(async (req) => {
       console.error("[stripe-checkout] STRIPE_SECRET_KEY not configured");
       throw new Error("STRIPE_SECRET_KEY not found");
     }
-    console.log("[stripe-checkout] Stripe key found");
+    
+    // Detect and log Stripe mode
+    if (stripeKey.startsWith("sk_test_")) {
+      console.warn("[stripe-checkout] WARNING: Running in TEST mode");
+    } else if (stripeKey.startsWith("sk_live_")) {
+      console.log("[stripe-checkout] ✓ Stripe LIVE Mode active");
+    } else {
+      console.warn("[stripe-checkout] WARNING: Unrecognized Stripe key format");
+    }
+    console.log("[stripe-checkout] Stripe key validated");
 
     const body = await req.json();
     console.log("[stripe-checkout] Request body parsed", {
