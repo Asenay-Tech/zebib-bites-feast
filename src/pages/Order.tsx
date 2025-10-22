@@ -295,21 +295,17 @@ const Order = () => {
     try {
       toast({ title: "Creating checkout session...", description: "Please wait" });
       
-      const { data, error } = await supabase.functions.invoke("create-payment-intent", {
+      // Build a product name from cart items
+      const productName = cart.length === 1 
+        ? cart[0].name_en 
+        : `Order: ${cart.map(c => c.name_en).join(", ").substring(0, 100)}`;
+      
+      const { data, error } = await supabase.functions.invoke("stripe-checkout", {
         body: {
-          amount: subtotal, // Send in euros (e.g., 7.51)
-          items: cart.map((c) => ({
-            name: c.name_en,
-            price: c.price, // Send in euros, backend will convert to cents
-            quantity: c.quantity,
-            variant: c.variant,
-          })),
-          date: when.toISOString().split('T')[0], // YYYY-MM-DD
-          time: `${hour}:${minute}`,
-          diningType,
-          tableNumber: diningType === "dine-in" ? selectedTable : null,
-          name: profile?.name || user.email,
-          phone: profile?.phone || "",
+          productName,
+          amount: subtotal, // in euros
+          successUrl: `${window.location.origin}/checkout?success=true`,
+          cancelUrl: `${window.location.origin}/order?canceled=true`,
         },
       });
 
@@ -323,9 +319,9 @@ const Order = () => {
         return;
       }
 
-      if (data?.sessionUrl) {
+      if (data?.url) {
         // Open Stripe Checkout in new tab
-        window.open(data.sessionUrl, "_blank");
+        window.open(data.url, "_blank");
         toast({ 
           title: "Redirecting to payment", 
           description: "Opening Stripe Checkout in new tab" 
