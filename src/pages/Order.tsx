@@ -96,9 +96,18 @@ const Order = () => {
   const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [diningType, setDiningType] = useState<"pickup" | "dine-in">("pickup");
-  const [date, setDate] = useState<Date>();
-  const [hour, setHour] = useState("18");
-  const [minute, setMinute] = useState("00");
+  const [date, setDate] = useState<Date>(new Date());
+  const [hour, setHour] = useState(() => {
+    const now = new Date();
+    return now.getHours().toString().padStart(2, "0");
+  });
+  const [minute, setMinute] = useState(() => {
+    const now = new Date();
+    const mins = now.getMinutes();
+    // Round to nearest 15-minute interval
+    const rounded = Math.ceil(mins / 15) * 15;
+    return (rounded === 60 ? 0 : rounded).toString().padStart(2, "0");
+  });
   const [selectedTable, setSelectedTable] = useState<number | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -287,10 +296,10 @@ const Order = () => {
       
       const { data, error } = await supabase.functions.invoke("create-payment-intent", {
         body: {
-          amount: subtotal,
+          amount: subtotal, // Send in euros (e.g., 7.51)
           items: cart.map((c) => ({
             name: c.name_en,
-            price: Math.round(c.price * 100), // Convert to cents
+            price: c.price, // Send in euros, backend will convert to cents
             quantity: c.quantity,
             variant: c.variant,
           })),
@@ -399,13 +408,18 @@ const Order = () => {
                             : t("reserve.selectDate")}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
+                      <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
                           mode="single"
                           selected={date}
                           onSelect={setDate}
-                          disabled={(date) => date < new Date()}
-                          className="pointer-events-auto"
+                          disabled={(date) => {
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            return date < today;
+                          }}
+                          initialFocus
+                          className="p-3 pointer-events-auto"
                         />
                       </PopoverContent>
                     </Popover>

@@ -39,13 +39,17 @@ serve(async (req) => {
 
     console.log("Creating Stripe checkout session:", { amount, user: user.id, diningType });
 
+    // Convert amount from euros to cents (e.g., 7.51 → 751)
+    const amountInCents = Math.round(amount * 100);
+    console.log("Amount conversion:", { euros: amount, cents: amountInCents });
+
     // Create order in database
     const { data: order, error: orderError } = await supabaseClient
       .from("orders")
       .insert({
         user_id: user.id,
         items,
-        total_amount_cents: Math.round(amount * 100),
+        total_amount_cents: amountInCents,
         date,
         time,
         dining_type: diningType,
@@ -65,17 +69,22 @@ serve(async (req) => {
     // Create Stripe Checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      line_items: items.map((item: any) => ({
-        price_data: {
-          currency: 'eur',
-          product_data: {
-            name: item.name,
-            description: `${diningType} order`,
+      line_items: items.map((item: any) => {
+        // item.price is in euros (e.g., 8.50), convert to cents
+        const priceInCents = Math.round((item.price || 0) * 100);
+        console.log("Line item:", { name: item.name, euros: item.price, cents: priceInCents });
+        return {
+          price_data: {
+            currency: 'eur',
+            product_data: {
+              name: item.name,
+              description: `${diningType} order`,
+            },
+            unit_amount: priceInCents,
           },
-          unit_amount: Math.round((item.price || 0) * 100),
-        },
-        quantity: item.quantity || 1,
-      })),
+          quantity: item.quantity || 1,
+        };
+      }),
       mode: 'payment',
       success_url: `${req.headers.get("origin")}/checkout?success=true&order_id=${order.id}`,
       cancel_url: `${req.headers.get("origin")}/checkout?canceled=true`,
