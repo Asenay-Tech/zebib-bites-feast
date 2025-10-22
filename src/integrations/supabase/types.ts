@@ -420,18 +420,9 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      cleanup_expired_tokens: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      generate_ticket_code: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      generate_verification_token: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      cleanup_expired_tokens: { Args: never; Returns: undefined }
+      generate_ticket_code: { Args: never; Returns: string }
+      generate_verification_token: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
