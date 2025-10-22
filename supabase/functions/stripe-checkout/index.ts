@@ -144,32 +144,68 @@ serve(async (req) => {
       console.log("[stripe-checkout] Skipping order insert due to incomplete fields");
     }
 
-    // Build Stripe checkout session params
-    const params: Record<string, string> = {
-      "payment_method_types[0]": "card",
-      mode: "payment",
-      "line_items[0][price_data][currency]": "eur",
-      "line_items[0][price_data][product_data][name]": productName,
-      "line_items[0][price_data][unit_amount]": amountInCents.toString(),
-      "line_items[0][quantity]": "1",
+    // Helper function to properly encode nested objects for Stripe API
+    function toFormData(obj: Record<string, any>, prefix = ''): URLSearchParams {
+      const form = new URLSearchParams();
+      for (const [key, value] of Object.entries(obj)) {
+        if (value === undefined || value === null) continue;
+        
+        const path = prefix ? `${prefix}[${key}]` : key;
+        
+        if (Array.isArray(value)) {
+          value.forEach((item, index) => {
+            if (typeof item === 'object' && item !== null) {
+              const nestedForm = toFormData(item, `${path}[${index}]`);
+              nestedForm.forEach((val, nestedKey) => form.append(nestedKey, val));
+            } else {
+              form.append(`${path}[${index}]`, item.toString());
+            }
+          });
+        } else if (typeof value === 'object' && value !== null) {
+          const nestedForm = toFormData(value, path);
+          nestedForm.forEach((val, nestedKey) => form.append(nestedKey, val));
+        } else {
+          form.append(path, value.toString());
+        }
+      }
+      return form;
+    }
+
+    // Build Stripe checkout session params with proper structure
+    const checkoutData: Record<string, any> = {
+      payment_method_types: ['card'],
+      mode: 'payment',
+      line_items: [{
+        price_data: {
+          currency: 'eur',
+          product_data: {
+            name: productName
+          },
+          unit_amount: amountInCents
+        },
+        quantity: 1
+      }],
       success_url: orderUuid ? `${successUrl}?order_id=${orderUuid}` : successUrl,
       cancel_url: orderUuid ? `${cancelUrl}?order_id=${orderUuid}` : cancelUrl,
     };
 
     // Add customer email for Stripe receipts if provided
     if (customerEmail) {
-      params["customer_email"] = customerEmail;
-      params["payment_intent_data[receipt_email]"] = customerEmail;
+      checkoutData.customer_email = customerEmail;
+      checkoutData.payment_intent_data = {
+        receipt_email: customerEmail
+      };
       console.log("[stripe-checkout] Email receipt enabled for:", customerEmail);
     } else {
       console.log("[stripe-checkout] No email – redirect only");
     }
 
     console.log("[stripe-checkout] Stripe API parameters prepared", {
-      ...params,
+      productName,
       amount: amountInCents,
       currency: "EUR",
-      orderUuid
+      orderUuid,
+      hasEmail: !!customerEmail
     });
 
     console.log("[stripe-checkout] Calling Stripe API...");
@@ -179,7 +215,7 @@ serve(async (req) => {
         Authorization: `Bearer ${stripeKey}`,
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: new URLSearchParams(params),
+      body: toFormData(checkoutData),
     });
 
     console.log("[stripe-checkout] Stripe API responded", { 
@@ -207,6 +243,7 @@ serve(async (req) => {
       url: session.url,
       mode: session.mode,
       currency: session.currency,
+      amount_total: session.amount_total,
       orderUuid,
       receiptEmail: customerEmail || "none"
     });
