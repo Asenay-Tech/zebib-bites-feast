@@ -10,7 +10,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/components/ui/language-switcher";
-import { CalendarIcon, Clock, Users, MapPin, PartyPopper, Minus, Plus } from "lucide-react";
+import { CalendarIcon, Clock, Users, MapPin, PartyPopper, Minus, Plus, X } from "lucide-react";
 import { format } from "date-fns";
 import { de, enUS } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -168,7 +168,15 @@ const Reserve = () => {
           <CardContent>
             {success && (
               <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
-                <Card className="max-w-md mx-4">
+                <Card className="max-w-md mx-4 relative">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-2 h-8 w-8"
+                    onClick={() => setSuccess(false)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
                   <CardHeader>
                     <CardTitle className="text-2xl text-accent">{t("reserve.success")}</CardTitle>
                   </CardHeader>
