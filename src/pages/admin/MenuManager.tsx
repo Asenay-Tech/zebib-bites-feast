@@ -1119,7 +1119,7 @@ export default function MenuManager() {
                               type="button"
                               variant="outline"
                               size="sm"
-                              onClick={() => setDialogImageScale(prev => Math.max(prev - 0.2, 0.5))}
+                              onClick={() => setDialogImageScale(prev => Math.max(prev - 0.1, 0.1))}
                             >
                               <ZoomOut className="h-4 w-4 mr-1" />
                               Zoom Out
