@@ -124,6 +124,7 @@ export type Database = {
           description_de: string | null
           description_en: string | null
           id: string
+          image_scale: number | null
           image_url: string | null
           name_de: string
           name_en: string
@@ -138,6 +139,7 @@ export type Database = {
           description_de?: string | null
           description_en?: string | null
           id?: string
+          image_scale?: number | null
           image_url?: string | null
           name_de: string
           name_en: string
@@ -152,6 +154,7 @@ export type Database = {
           description_de?: string | null
           description_en?: string | null
           id?: string
+          image_scale?: number | null
           image_url?: string | null
           name_de?: string
           name_en?: string

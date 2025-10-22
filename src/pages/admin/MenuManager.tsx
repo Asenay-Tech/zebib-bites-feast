@@ -49,6 +49,7 @@ interface MenuItem {
   description_en?: string;
   price: any;
   image_url?: string;
+  image_scale?: number;
   created_by?: string;
   updated_by?: string;
 }
@@ -85,6 +86,7 @@ export default function MenuManager() {
   const [previewMode, setPreviewMode] = useState(false);
   const [draggedItem, setDraggedItem] = useState<MenuItem | null>(null);
   const [imageZoom, setImageZoom] = useState<Record<string, number>>({});
+  const [dialogImageScale, setDialogImageScale] = useState(1.0);
   const [formData, setFormData] = useState({
     name_de: "",
     name_en: "",
@@ -235,6 +237,7 @@ export default function MenuManager() {
     });
     setImageFile(null);
     setImagePreview("");
+    setDialogImageScale(1.0);
     setDialogOpen(true);
   };
 
@@ -250,6 +253,7 @@ export default function MenuManager() {
     });
     setImagePreview(item.image_url || "");
     setImageFile(null);
+    setDialogImageScale(item.image_scale || 1.0);
     setDialogOpen(true);
   };
 
@@ -281,6 +285,7 @@ export default function MenuManager() {
         description_en: formData.description_en || null,
         price: priceData,
         image_url: imageUrl || null,
+        image_scale: dialogImageScale,
         updated_by: user.id,
       };
 
@@ -765,7 +770,7 @@ export default function MenuManager() {
                         alt={item.name_en}
                         className="w-20 h-20 object-cover rounded-md transition-transform duration-200"
                         style={{ 
-                          transform: `scale(${imageZoom[item.id] || 1})`,
+                          transform: `scale(${item.image_scale || 1})`,
                           transformOrigin: 'center'
                         }}
                       />
@@ -1005,12 +1010,73 @@ export default function MenuManager() {
               <Label htmlFor="image">Menu Item Image</Label>
               <div className="mt-2 space-y-4">
                 {imagePreview && (
-                  <div className="relative w-32 h-32">
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="w-full h-full object-cover rounded-md"
-                    />
+                  <div className="space-y-2">
+                    <div className="relative w-32 h-32 overflow-hidden rounded-md border border-border">
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="w-full h-full object-cover transition-transform duration-200"
+                        style={{ 
+                          transform: `scale(${dialogImageScale})`,
+                          transformOrigin: 'center'
+                        }}
+                      />
+                    </div>
+                    <TooltipProvider>
+                      <div className="flex gap-2">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setDialogImageScale(prev => Math.max(prev - 0.2, 0.5))}
+                            >
+                              <ZoomOut className="h-4 w-4 mr-1" />
+                              Zoom Out
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Decrease image scale</p>
+                          </TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setDialogImageScale(1.0)}
+                            >
+                              <RotateCcw className="h-4 w-4 mr-1" />
+                              Reset View
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Reset to default scale</p>
+                          </TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setDialogImageScale(prev => Math.min(prev + 0.2, 3.0))}
+                            >
+                              <ZoomIn className="h-4 w-4 mr-1" />
+                              Zoom In
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Increase image scale</p>
+                          </TooltipContent>
+                        </Tooltip>
+                        <span className="text-sm text-muted-foreground flex items-center ml-2">
+                          Scale: {dialogImageScale.toFixed(1)}x
+                        </span>
+                      </div>
+                    </TooltipProvider>
                   </div>
                 )}
                 <div className="flex items-center gap-2">

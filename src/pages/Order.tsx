@@ -74,6 +74,7 @@ interface MenuItem {
   price?: any;
   category: string;
   image_url?: string | null;
+  image_scale?: number | null;
   created_at?: string;
   updated_at?: string;
   created_by?: string | null;
@@ -528,11 +529,17 @@ const Order = () => {
                   {filteredMenu.map((item) => (
                     <Card key={item.id} className="p-4 overflow-hidden">
                       <div className="flex gap-4">
-                        <img
-                          src={item.image_url || menuPlaceholder}
-                          alt={language === "de" ? item.name_de : item.name_en}
-                          className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
-                        />
+                        <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                          <img
+                            src={item.image_url || menuPlaceholder}
+                            alt={language === "de" ? item.name_de : item.name_en}
+                            className="w-full h-full object-cover transition-transform duration-200"
+                            style={{ 
+                              transform: `scale(${item.image_scale || 1})`,
+                              transformOrigin: 'center'
+                            }}
+                          />
+                        </div>
                         <div className="flex-1 min-w-0">
                           <h3 className="font-semibold truncate">
                             {language === "de" ? item.name_de : item.name_en}
