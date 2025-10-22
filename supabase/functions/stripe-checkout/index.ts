@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@18.5.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -7,7 +6,6 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -15,64 +13,46 @@ serve(async (req) => {
   try {
     console.log("[stripe-checkout] Function started");
 
-    // Validate Stripe secret key
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeKey) {
-      throw new Error("STRIPE_SECRET_KEY is not configured");
-    }
+    if (!stripeKey) throw new Error("STRIPE_SECRET_KEY not found");
 
-    // Parse request body
     const { productName, amount, successUrl, cancelUrl } = await req.json();
-    console.log("[stripe-checkout] Request received", { productName, amount });
-
-    // Validate required fields
     if (!productName || amount === undefined || !successUrl || !cancelUrl) {
-      return new Response(
-        JSON.stringify({ error: "Missing required fields: productName, amount, successUrl, cancelUrl" }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        },
-      );
-    }
-
-    // Amount provided by frontend is already in cents (EUR)
-    const amountInCents = Math.round(Number(amount));
-    console.log("[stripe-checkout] Amount received (cents)", { cents: amountInCents });
-
-    // Validate minimum amount (Stripe requires at least 50 cents for EUR)
-    if (amountInCents < 50) {
-      return new Response(JSON.stringify({ error: "Amount must be at least €0.50" }), {
+      return new Response(JSON.stringify({ error: "Missing required fields" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Initialize Stripe
-    const stripe = new Stripe(stripeKey, {
-      //apiVersion: '2025-08-27.basil',
-      apiVersion: "2023-10-16",
+    // Stripe expects amount in cents (EUR)
+    const amountInCents = Math.round(Number(amount) * 100);
+
+    console.log("[stripe-checkout] Creating Stripe checkout session…", { productName, amountInCents });
+
+    const stripeResponse = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${stripeKey}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        "payment_method_types[0]": "card",
+        mode: "payment",
+        "line_items[0][price_data][currency]": "eur",
+        "line_items[0][price_data][product_data][name]": productName,
+        "line_items[0][price_data][unit_amount]": amountInCents.toString(),
+        "line_items[0][quantity]": "1",
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+      }),
     });
 
-    // Create Checkout Session
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items: [
-        {
-          price_data: {
-            currency: "eur", // Force EUR currency
-            product_data: {
-              name: productName,
-            },
-            unit_amount: amountInCents, // Amount in cents
-          },
-          quantity: 1,
-        },
-      ],
-      mode: "payment", // One-time payment
-      success_url: successUrl,
-      cancel_url: cancelUrl,
-    });
+    const session = await stripeResponse.json();
+
+    if (stripeResponse.status !== 200) {
+      console.error("[stripe-checkout] Stripe API error", session);
+      throw new Error(session.error?.message || "Stripe session creation failed");
+    }
 
     console.log("[stripe-checkout] Session created successfully", { sessionId: session.id });
 
@@ -80,11 +60,9 @@ serve(async (req) => {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-    console.error("[stripe-checkout] Error:", errorMessage);
-
-    return new Response(JSON.stringify({ error: errorMessage }), {
+  } catch (err) {
+    console.error("[stripe-checkout] Error:", err);
+    return new Response(JSON.stringify({ error: err.message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
