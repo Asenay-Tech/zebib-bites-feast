@@ -202,8 +202,9 @@ export function Menu() {
                           alt={getItemName(item)}
                           className="w-full h-full object-cover transition-transform duration-200"
                           style={{ 
-                            transform: `scale(${item.image_scale || 1})`,
-                            transformOrigin: 'center'
+                            transform: `scale(${Number(item.image_scale ?? 1) || 1})`,
+                            transformOrigin: 'center',
+                            willChange: 'transform'
                           }}
                           loading="lazy"
                           onError={(e) => {
