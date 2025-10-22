@@ -30,9 +30,9 @@ const Reserve = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [date, setDate] = useState<Date>();
-  const [hour, setHour] = useState("18");
-  const [minute, setMinute] = useState("00");
+  const [date, setDate] = useState<Date>(new Date());
+  const [hour, setHour] = useState(new Date().getHours().toString().padStart(2, '0'));
+  const [minute, setMinute] = useState(Math.floor(new Date().getMinutes() / 15) * 15 === 0 ? "00" : (Math.floor(new Date().getMinutes() / 15) * 15).toString());
   const [people, setPeople] = useState(2);
   const [tableNumber, setTableNumber] = useState("1");
   const [eventType, setEventType] = useState("");
@@ -136,7 +136,6 @@ const Reserve = () => {
       if (reservationError) throw reservationError;
 
       setSuccess(true);
-      setTimeout(() => navigate("/"), 2000);
     } catch (err: any) {
       setError(err.message || t("common.error"));
     } finally {
@@ -168,8 +167,18 @@ const Reserve = () => {
           </CardHeader>
           <CardContent>
             {success && (
-              <div className="bg-accent/10 text-accent p-4 rounded-md mb-6">
-                {t("reserve.success")}
+              <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
+                <Card className="max-w-md mx-4">
+                  <CardHeader>
+                    <CardTitle className="text-2xl text-accent">{t("reserve.success")}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <p className="text-body">{t("reserve.successMessage")}</p>
+                    <Button onClick={() => navigate("/")} className="w-full">
+                      {t("reserve.backToHome")}
+                    </Button>
+                  </CardContent>
+                </Card>
               </div>
             )}
             {error && (

@@ -155,7 +155,9 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "reserve.selectEventType": "Wählen Sie einen Veranstaltungstyp",
         "reserve.notesPlaceholder": "Besondere Wünsche oder Allergien...",
         "reserve.submit": "Reservieren",
-        "reserve.success": "Reservierung erfolgreich! Sie werden weitergeleitet...",
+        "reserve.success": "Reservierung erfolgreich!",
+        "reserve.successMessage": "Ihre Reservierung wurde erfolgreich erstellt. Wir freuen uns auf Ihren Besuch!",
+        "reserve.backToHome": "Zurück zur Startseite",
         "reserve.tableAlreadyReserved":
           "Dieser Tisch ist zu dieser Zeit bereits reserviert. Bitte wählen Sie einen anderen Tisch oder eine andere Zeit.",
         "reserve.eventTypes.birthday": "Geburtstag",
@@ -313,6 +315,8 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "reserve.notesPlaceholder": "Special requests or allergies...",
         "reserve.submit": "Reserve",
         "reserve.success": "Reservation successful!",
+        "reserve.successMessage": "Your reservation has been created successfully. We look forward to your visit!",
+        "reserve.backToHome": "Back to Home",
         "reserve.tableAlreadyReserved":
           "This table is already reserved at this time. Please choose another table or time.",
         "reserve.eventTypes.birthday": "Birthday",

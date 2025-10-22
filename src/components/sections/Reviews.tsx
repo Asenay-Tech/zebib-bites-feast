@@ -23,7 +23,7 @@ export function Reviews() {
   const googlePlaceId = "ChIJXU9TXkDUl0cRbn_fVfXQyYo"; // ZEBIB - Hanau Place ID
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
-  // ✅ Fetch real Google reviews (top 15, 5-star only)
+  // ✅ Fetch real Google reviews (mix of top, random, recent - 5-6 reviews)
   useEffect(() => {
     async function fetchReviews() {
       try {
@@ -32,8 +32,22 @@ export function Reviews() {
         );
         const data = await response.json();
         if (data.result?.reviews) {
-          const topReviews = data.result.reviews.filter((r: Review) => r.rating === 5).slice(0, 15);
-          setReviews(topReviews);
+          const allReviews = data.result.reviews;
+          
+          // Get top-rated (5 stars)
+          const topRated = allReviews.filter((r: Review) => r.rating === 5).slice(0, 2);
+          
+          // Get recent reviews (sorted by time)
+          const recent = [...allReviews].sort((a, b) => b.time - a.time).slice(0, 2);
+          
+          // Get random reviews
+          const random = allReviews.sort(() => Math.random() - 0.5).slice(0, 2);
+          
+          // Combine and remove duplicates
+          const combined = [...topRated, ...recent, ...random];
+          const uniqueReviews = Array.from(new Map(combined.map(r => [r.time, r])).values()).slice(0, 6);
+          
+          setReviews(uniqueReviews);
         }
       } catch (err) {
         console.error("Error fetching reviews:", err);

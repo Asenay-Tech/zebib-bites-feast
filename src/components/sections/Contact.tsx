@@ -112,21 +112,13 @@ export function Contact() {
                 </div>
               </div>
 
-              <div className="pt-6 border-t border-border space-y-3">
+              <div className="pt-6 border-t border-border">
                 <Button
                   className="w-full"
                   onClick={() => window.open("https://maps.google.com/?q=Salzstraße+14,+63450+Hanau", "_blank")}
                 >
                   <Navigation className="mr-2 h-4 w-4" />
                   {t("contact.getDirections")}
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => document.getElementById("menu")?.scrollIntoView({ behavior: "smooth" })}
-                >
-                  <MenuIcon className="mr-2 h-4 w-4" />
-                  {t("contact.viewMenu")}
                 </Button>
               </div>
             </CardContent>

@@ -78,13 +78,13 @@ export function WhyChooseUs() {
         </div>
 
         {/* Traditional Elements Section */}
-        <div className="mt-20 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+        <div className="mt-20 grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
           {/* Text Block */}
-          <div className="bg-gradient-card rounded-xl p-8 h-full flex flex-col justify-center text-center lg:text-left">
-            <h3 className="text-2xl font-bold text-foreground mb-4 tracking-wide">
+          <div className="bg-gradient-to-br from-surface via-surface-elevated to-surface rounded-2xl p-10 flex flex-col justify-center text-center lg:text-left shadow-elegant border border-border/50">
+            <h3 className="text-3xl font-bold text-foreground mb-6 tracking-wide">
               {language === "de" ? "TRADITIONELL & MODERN" : "TRADITIONAL & MODERN"}
             </h3>
-            <p className="text-body leading-relaxed">
+            <p className="text-body leading-relaxed text-lg">
               {language === "de"
                 ? "Wir verbinden jahrhundertealte eritreische Kochtraditionen mit modernen Präsentations- und Servicetechniken."
                 : "We combine centuries-old Eritrean cooking traditions with modern presentation and service techniques."}
@@ -92,14 +92,14 @@ export function WhyChooseUs() {
           </div>
 
           {/* Image Block */}
-          <div className="relative rounded-xl overflow-hidden group mx-auto">
+          <div className="relative rounded-2xl overflow-hidden group shadow-elegant hover:shadow-card-hover transition-all duration-500 border border-border/50">
             <img
               src={coffeeImage}
               alt="Traditional Cooking"
-              className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
+              className="w-full h-full min-h-[300px] object-cover group-hover:scale-110 transition-transform duration-700"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent flex items-end">
-              <p className="text-foreground font-medium p-6">
+            <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/30 to-transparent flex items-end">
+              <p className="text-foreground font-semibold text-lg p-8">
                 {language === "de" ? "Traditionelle Zubereitung" : "Traditional Preparation"}
               </p>
             </div>
