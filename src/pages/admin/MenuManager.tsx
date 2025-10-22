@@ -256,10 +256,19 @@ export default function MenuManager() {
           canvas.width = displaySize;
           canvas.height = displaySize;
 
+          // Fill with transparent background
+          ctx.clearRect(0, 0, displaySize, displaySize);
+
           // Calculate scaled dimensions
           const scale = dialogImageScale;
           const scaledWidth = img.width * scale;
           const scaledHeight = img.height * scale;
+
+          // Ensure minimum dimensions for very small scales
+          const minDimension = 10; // Minimum 10px to ensure valid image
+          if (scaledWidth < minDimension || scaledHeight < minDimension) {
+            console.warn('Scaled image too small, using minimum dimensions');
+          }
 
           // Apply offset
           const offsetX = imageOffsetX;
@@ -269,13 +278,23 @@ export default function MenuManager() {
           const x = (displaySize - scaledWidth) / 2 + offsetX;
           const y = (displaySize - scaledHeight) / 2 + offsetY;
 
+          // Use high quality image smoothing for small scales
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+
           // Draw the transformed image
           ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
 
-          // Convert to blob
+          // Convert to blob with quality settings
           canvas.toBlob(async (blob) => {
             if (!blob) {
               reject(new Error('Failed to create blob'));
+              return;
+            }
+
+            // Ensure blob has minimum size (at least 100 bytes)
+            if (blob.size < 100) {
+              reject(new Error('Generated image is too small'));
               return;
             }
 
@@ -289,6 +308,7 @@ export default function MenuManager() {
               .upload(filePath, blob);
 
             if (uploadError) {
+              console.error('Upload error:', uploadError);
               reject(uploadError);
               return;
             }
@@ -298,7 +318,7 @@ export default function MenuManager() {
               .getPublicUrl(filePath);
 
             resolve(data.publicUrl);
-          }, 'image/png');
+          }, 'image/png', 0.95); // High quality PNG
         };
 
         img.onerror = () => reject(new Error('Failed to load image'));
