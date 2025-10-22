@@ -70,9 +70,15 @@ serve(async (req) => {
       });
     }
 
-    // Validate required order fields
-    if (!customerName || !customerPhone || !items || !date || !time || !diningType) {
-      console.error("[stripe-checkout] Missing order fields");
+    // Validate required order fields (phone is optional)
+    if (!customerName || !items || !date || !time || !diningType) {
+      console.error("[stripe-checkout] Missing order fields", { 
+        hasName: !!customerName, 
+        hasItems: !!items,
+        hasDate: !!date,
+        hasTime: !!time,
+        hasDiningType: !!diningType
+      });
       return new Response(JSON.stringify({ error: "Missing required order fields" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
