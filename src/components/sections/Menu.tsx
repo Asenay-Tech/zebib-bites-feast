@@ -54,7 +54,7 @@ export function Menu() {
     try {
       const { data, error } = await supabase
         .from("menu_items")
-        .select("*")
+        .select("id, name_de, name_en, description_de, description_en, price, image_url, image_scale, category")
         .order("category", { ascending: true });
 
       if (error) throw error;
