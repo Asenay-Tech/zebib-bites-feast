@@ -9,7 +9,7 @@ const corsHeaders = {
 // Generate order ID: ZB-{YYYYMMDD}-{XXXX}
 function generateOrderId(): string {
   const date = new Date();
-  const datePart = date.toISOString().slice(0, 10).replace(/-/g, '');
+  const datePart = date.toISOString().slice(0, 10).replace(/-/g, "");
   const randomPart = Math.floor(1000 + Math.random() * 9000);
   return `ZB-${datePart}-${randomPart}`;
 }
@@ -36,16 +36,19 @@ serve(async (req) => {
     if (!authHeader) {
       console.error("[stripe-checkout] Missing authorization header");
       return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
-        status: 200,
+        status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
     const token = authHeader.replace("Bearer ", "");
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
     if (authError || !user) {
       console.error("[stripe-checkout] Auth error:", authError);
       return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
-        status: 200,
+        status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -59,22 +62,40 @@ serve(async (req) => {
     console.log("[stripe-checkout] Stripe key found");
 
     const body = await req.json();
-    console.log("[stripe-checkout] Request body parsed", { 
-      hasProductName: !!body.productName, 
+    console.log("[stripe-checkout] Request body parsed", {
+      hasProductName: !!body.productName,
       amount: body.amount,
       hasCustomerEmail: !!body.customerEmail,
       hasSuccessUrl: !!body.successUrl,
-      hasCancelUrl: !!body.cancelUrl
+      hasCancelUrl: !!body.cancelUrl,
     });
 
-    const { productName, amount, customerEmail, customerName, customerPhone, items, date, time, diningType, successUrl, cancelUrl } = body;
-    
+    const {
+      productName,
+      amount,
+      customerEmail,
+      customerName,
+      customerPhone,
+      items,
+      date,
+      time,
+      diningType,
+      successUrl,
+      cancelUrl,
+    } = body;
+
     if (!productName || amount === undefined || !successUrl || !cancelUrl) {
       console.error("[stripe-checkout] Missing required fields", { productName, amount, successUrl, cancelUrl });
-      return new Response(JSON.stringify({ success: false, error: "Missing required fields: productName, amount, successUrl, cancelUrl" }), {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Missing required fields: productName, amount, successUrl, cancelUrl",
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
     }
 
     // Determine if we can create an order record (phone optional)
@@ -91,17 +112,17 @@ serve(async (req) => {
 
     // Stripe expects amount in cents (EUR)
     const amountInCents = Math.round(Number(amount) * 100);
-    console.log("[stripe-checkout] Amount conversion", { 
-      originalAmount: amount, 
+    console.log("[stripe-checkout] Amount conversion", {
+      originalAmount: amount,
       amountInCents,
-      currency: "EUR"
+      currency: "EUR",
     });
 
     // Validate minimum amount (€0.50 = 50 cents)
     if (amountInCents < 50) {
       console.error("[stripe-checkout] Amount too low:", amountInCents);
       return new Response(JSON.stringify({ success: false, error: "Minimum charge is €0.50" }), {
-        status: 200,
+        status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -145,23 +166,23 @@ serve(async (req) => {
     }
 
     // Helper function to properly encode nested objects for Stripe API
-    function toFormData(obj: Record<string, any>, prefix = ''): URLSearchParams {
+    function toFormData(obj: Record<string, any>, prefix = ""): URLSearchParams {
       const form = new URLSearchParams();
       for (const [key, value] of Object.entries(obj)) {
         if (value === undefined || value === null) continue;
-        
+
         const path = prefix ? `${prefix}[${key}]` : key;
-        
+
         if (Array.isArray(value)) {
           value.forEach((item, index) => {
-            if (typeof item === 'object' && item !== null) {
+            if (typeof item === "object" && item !== null) {
               const nestedForm = toFormData(item, `${path}[${index}]`);
               nestedForm.forEach((val, nestedKey) => form.append(nestedKey, val));
             } else {
               form.append(`${path}[${index}]`, item.toString());
             }
           });
-        } else if (typeof value === 'object' && value !== null) {
+        } else if (typeof value === "object" && value !== null) {
           const nestedForm = toFormData(value, path);
           nestedForm.forEach((val, nestedKey) => form.append(nestedKey, val));
         } else {
@@ -173,18 +194,20 @@ serve(async (req) => {
 
     // Build Stripe checkout session params with proper structure
     const checkoutData: Record<string, any> = {
-      payment_method_types: ['card'],
-      mode: 'payment',
-      line_items: [{
-        price_data: {
-          currency: 'eur',
-          product_data: {
-            name: productName
+      payment_method_types: ["card"],
+      mode: "payment",
+      line_items: [
+        {
+          price_data: {
+            currency: "eur",
+            product_data: {
+              name: productName,
+            },
+            unit_amount: amountInCents,
           },
-          unit_amount: amountInCents
+          quantity: 1,
         },
-        quantity: 1
-      }],
+      ],
       success_url: orderUuid ? `${successUrl}?order_id=${orderUuid}` : successUrl,
       cancel_url: orderUuid ? `${cancelUrl}?order_id=${orderUuid}` : cancelUrl,
     };
@@ -192,10 +215,7 @@ serve(async (req) => {
     // Add customer email for Stripe receipts if provided
     if (customerEmail) {
       checkoutData.customer_email = customerEmail;
-      checkoutData.payment_intent_data = {
-        receipt_email: customerEmail
-      };
-      console.log("[stripe-checkout] Email receipt enabled for:", customerEmail);
+      console.log("[stripe-checkout] Customer email set:", customerEmail);
     } else {
       console.log("[stripe-checkout] No email – redirect only");
     }
@@ -205,7 +225,7 @@ serve(async (req) => {
       amount: amountInCents,
       currency: "EUR",
       orderUuid,
-      hasEmail: !!customerEmail
+      hasEmail: !!customerEmail,
     });
 
     console.log("[stripe-checkout] Calling Stripe API...");
@@ -218,58 +238,64 @@ serve(async (req) => {
       body: toFormData(checkoutData),
     });
 
-    console.log("[stripe-checkout] Stripe API responded", { 
+    console.log("[stripe-checkout] Stripe API responded", {
       status: stripeResponse.status,
-      statusText: stripeResponse.statusText 
+      statusText: stripeResponse.statusText,
     });
 
     const session = await stripeResponse.json();
 
     if (stripeResponse.status !== 200) {
-      console.error("[stripe-checkout] Stripe API error", { 
+      console.error("[stripe-checkout] Stripe API error", {
         status: stripeResponse.status,
         error: session.error,
-        fullResponse: session
+        fullResponse: session,
       });
       const errorMsg = session.error?.message || `Stripe API error (${stripeResponse.status})`;
       return new Response(JSON.stringify({ success: false, error: errorMsg, details: session.error }), {
-        status: 200,
+        status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    console.log("[stripe-checkout] Session created successfully", { 
+    console.log("[stripe-checkout] Session created successfully", {
       sessionId: session.id,
       url: session.url,
       mode: session.mode,
       currency: session.currency,
       amount_total: session.amount_total,
       orderUuid,
-      receiptEmail: customerEmail || "none"
+      receiptEmail: customerEmail || "none",
     });
 
-    return new Response(JSON.stringify({ 
-      success: true,
-      url: session.url, 
-      orderId: orderUuid,
-      sessionId: session.id 
-    }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({
+        success: true,
+        url: session.url,
+        orderId: orderUuid,
+        sessionId: session.id,
+      }),
+      {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error occurred";
     const stack = err instanceof Error ? err.stack : undefined;
 
     console.error("[stripe-checkout] Fatal error", { message, stack });
 
-    return new Response(JSON.stringify({ 
-      success: false,
-      error: message,
-      type: err instanceof Error ? err.name : "UnknownError"
-    }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: message,
+        type: err instanceof Error ? err.name : "UnknownError",
+      }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
   }
 });
