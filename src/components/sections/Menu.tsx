@@ -54,7 +54,7 @@ export function Menu() {
     try {
       const { data, error } = await supabase
         .from("menu_items")
-        .select("id, name_de, name_en, description_de, description_en, price, image_url, image_scale, category")
+        .select("*")
         .order("category", { ascending: true });
 
       if (error) throw error;
@@ -200,12 +200,7 @@ export function Menu() {
                         <img
                           src={getItemImageSrc(item)!}
                           alt={getItemName(item)}
-                          className="w-full h-full object-cover transition-transform duration-200"
-                          style={{ 
-                            transform: `scale(${Number(item.image_scale ?? 1) || 1})`,
-                            transformOrigin: 'center',
-                            willChange: 'transform'
-                          }}
+                          className="w-full h-full object-cover"
                           loading="lazy"
                           onError={(e) => {
                             e.currentTarget.style.display = "none";

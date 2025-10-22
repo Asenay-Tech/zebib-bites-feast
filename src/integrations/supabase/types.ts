@@ -123,11 +123,15 @@ export type Database = {
           created_by: string | null
           description_de: string | null
           description_en: string | null
+          edited_image_url: string | null
           id: string
+          image_offset_x: number | null
+          image_offset_y: number | null
           image_scale: number | null
           image_url: string | null
           name_de: string
           name_en: string
+          original_image_url: string | null
           price: Json
           updated_at: string | null
           updated_by: string | null
@@ -138,11 +142,15 @@ export type Database = {
           created_by?: string | null
           description_de?: string | null
           description_en?: string | null
+          edited_image_url?: string | null
           id?: string
+          image_offset_x?: number | null
+          image_offset_y?: number | null
           image_scale?: number | null
           image_url?: string | null
           name_de: string
           name_en: string
+          original_image_url?: string | null
           price: Json
           updated_at?: string | null
           updated_by?: string | null
@@ -153,11 +161,15 @@ export type Database = {
           created_by?: string | null
           description_de?: string | null
           description_en?: string | null
+          edited_image_url?: string | null
           id?: string
+          image_offset_x?: number | null
+          image_offset_y?: number | null
           image_scale?: number | null
           image_url?: string | null
           name_de?: string
           name_en?: string
+          original_image_url?: string | null
           price?: Json
           updated_at?: string | null
           updated_by?: string | null

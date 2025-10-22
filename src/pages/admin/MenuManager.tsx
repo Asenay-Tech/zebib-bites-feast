@@ -50,6 +50,10 @@ interface MenuItem {
   price: any;
   image_url?: string;
   image_scale?: number;
+  original_image_url?: string;
+  edited_image_url?: string;
+  image_offset_x?: number;
+  image_offset_y?: number;
   created_by?: string;
   updated_by?: string;
 }
@@ -86,6 +90,10 @@ export default function MenuManager() {
   const [previewMode, setPreviewMode] = useState(false);
   const [draggedItem, setDraggedItem] = useState<MenuItem | null>(null);
   const [dialogImageScale, setDialogImageScale] = useState(1.0);
+  const [imageOffsetX, setImageOffsetX] = useState(0);
+  const [imageOffsetY, setImageOffsetY] = useState(0);
+  const [isDraggingImage, setIsDraggingImage] = useState(false);
+  const [dragStartPos, setDragStartPos] = useState({ x: 0, y: 0 });
   const [formData, setFormData] = useState({
     name_de: "",
     name_en: "",
@@ -186,6 +194,10 @@ export default function MenuManager() {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
+        // Reset zoom and offset for new image
+        setDialogImageScale(1.0);
+        setImageOffsetX(0);
+        setImageOffsetY(0);
       };
       reader.readAsDataURL(file);
     }
@@ -224,6 +236,80 @@ export default function MenuManager() {
     }
   };
 
+  const generateEditedImage = async (originalUrl: string): Promise<string | null> => {
+    try {
+      // Create a canvas to apply transformations
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      
+      return new Promise((resolve, reject) => {
+        img.onload = async () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('Could not get canvas context'));
+            return;
+          }
+
+          // Set canvas size to the final display size
+          const displaySize = 400;
+          canvas.width = displaySize;
+          canvas.height = displaySize;
+
+          // Calculate scaled dimensions
+          const scale = dialogImageScale;
+          const scaledWidth = img.width * scale;
+          const scaledHeight = img.height * scale;
+
+          // Apply offset
+          const offsetX = imageOffsetX;
+          const offsetY = imageOffsetY;
+
+          // Center the image and apply transformations
+          const x = (displaySize - scaledWidth) / 2 + offsetX;
+          const y = (displaySize - scaledHeight) / 2 + offsetY;
+
+          // Draw the transformed image
+          ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
+
+          // Convert to blob
+          canvas.toBlob(async (blob) => {
+            if (!blob) {
+              reject(new Error('Failed to create blob'));
+              return;
+            }
+
+            // Upload edited image
+            const fileExt = 'png';
+            const fileName = `edited_${Math.random().toString(36).substring(2)}.${fileExt}`;
+            const filePath = `${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+              .from('menu-images')
+              .upload(filePath, blob);
+
+            if (uploadError) {
+              reject(uploadError);
+              return;
+            }
+
+            const { data } = supabase.storage
+              .from('menu-images')
+              .getPublicUrl(filePath);
+
+            resolve(data.publicUrl);
+          }, 'image/png');
+        };
+
+        img.onerror = () => reject(new Error('Failed to load image'));
+        img.src = originalUrl;
+      });
+    } catch (error) {
+      console.error('Error generating edited image:', error);
+      return null;
+    }
+  };
+
   const handleAddNew = () => {
     setEditingItem(null);
     setFormData({
@@ -237,6 +323,8 @@ export default function MenuManager() {
     setImageFile(null);
     setImagePreview("");
     setDialogImageScale(1.0);
+    setImageOffsetX(0);
+    setImageOffsetY(0);
     setDialogOpen(true);
   };
 
@@ -250,9 +338,12 @@ export default function MenuManager() {
       price: typeof item.price === 'object' ? JSON.stringify(item.price) : String(item.price),
       category: item.category,
     });
-    setImagePreview(item.image_url || "");
+    // Load original image for editing, not the edited version
+    setImagePreview(item.original_image_url || item.image_url || "");
     setImageFile(null);
     setDialogImageScale(item.image_scale || 1.0);
+    setImageOffsetX(item.image_offset_x || 0);
+    setImageOffsetY(item.image_offset_y || 0);
     setDialogOpen(true);
   };
 
@@ -268,10 +359,22 @@ export default function MenuManager() {
         return;
       }
 
-      let imageUrl = editingItem?.image_url || "";
+      let originalImageUrl = editingItem?.original_image_url || editingItem?.image_url || "";
+      let editedImageUrl = editingItem?.edited_image_url || "";
+
+      // If new image uploaded
       if (imageFile) {
         const uploadedUrl = await uploadImage();
-        if (uploadedUrl) imageUrl = uploadedUrl;
+        if (uploadedUrl) {
+          originalImageUrl = uploadedUrl;
+          // Generate edited version
+          const edited = await generateEditedImage(uploadedUrl);
+          if (edited) editedImageUrl = edited;
+        }
+      } else if (imagePreview && (dialogImageScale !== 1.0 || imageOffsetX !== 0 || imageOffsetY !== 0)) {
+        // If existing image with transformations, regenerate edited version
+        const edited = await generateEditedImage(originalImageUrl);
+        if (edited) editedImageUrl = edited;
       }
 
       const priceData = parseFloat(formData.price) || 0;
@@ -283,8 +386,12 @@ export default function MenuManager() {
         description_de: formData.description_de || null,
         description_en: formData.description_en || null,
         price: priceData,
-        image_url: imageUrl || null,
+        image_url: editedImageUrl || originalImageUrl || null, // Use edited if available
+        original_image_url: originalImageUrl || null,
+        edited_image_url: editedImageUrl || null,
         image_scale: dialogImageScale,
+        image_offset_x: imageOffsetX,
+        image_offset_y: imageOffsetY,
         updated_by: user.id,
       };
 
@@ -320,7 +427,10 @@ export default function MenuManager() {
       }
 
       setDialogOpen(false);
-      setDialogImageScale(1.0); // Reset zoom after save
+      // Reset all transformations after save
+      setDialogImageScale(1.0);
+      setImageOffsetX(0);
+      setImageOffsetY(0);
       fetchMenuItems();
     } catch (error) {
       console.error('Error saving menu item:', error);
@@ -748,10 +858,6 @@ export default function MenuManager() {
                       src={item.image_url}
                       alt={item.name_en}
                       className="w-20 h-20 object-cover rounded-md"
-                      style={{ 
-                        transform: `scale(${item.image_scale || 1})`,
-                        transformOrigin: 'center'
-                      }}
                     />
                   )}
                   <div className="flex-1">
@@ -958,17 +1064,53 @@ export default function MenuManager() {
               <div className="mt-2 space-y-4">
                 {imagePreview && (
                   <div className="space-y-2">
-                    <div className="relative w-32 h-32 overflow-hidden rounded-md border border-border">
+                    <div 
+                      className="relative w-64 h-64 overflow-hidden rounded-md border border-border cursor-move"
+                      onMouseDown={(e) => {
+                        if (dialogImageScale > 1.0) {
+                          setIsDraggingImage(true);
+                          setDragStartPos({ x: e.clientX - imageOffsetX, y: e.clientY - imageOffsetY });
+                        }
+                      }}
+                      onMouseMove={(e) => {
+                        if (isDraggingImage) {
+                          setImageOffsetX(e.clientX - dragStartPos.x);
+                          setImageOffsetY(e.clientY - dragStartPos.y);
+                        }
+                      }}
+                      onMouseUp={() => setIsDraggingImage(false)}
+                      onMouseLeave={() => setIsDraggingImage(false)}
+                      onTouchStart={(e) => {
+                        if (dialogImageScale > 1.0) {
+                          const touch = e.touches[0];
+                          setIsDraggingImage(true);
+                          setDragStartPos({ x: touch.clientX - imageOffsetX, y: touch.clientY - imageOffsetY });
+                        }
+                      }}
+                      onTouchMove={(e) => {
+                        if (isDraggingImage) {
+                          const touch = e.touches[0];
+                          setImageOffsetX(touch.clientX - dragStartPos.x);
+                          setImageOffsetY(touch.clientY - dragStartPos.y);
+                        }
+                      }}
+                      onTouchEnd={() => setIsDraggingImage(false)}
+                    >
                       <img
                         src={imagePreview}
                         alt="Preview"
-                        className="w-full h-full object-cover transition-transform duration-200"
+                        className="absolute top-1/2 left-1/2 w-full h-full object-cover transition-transform duration-100"
                         style={{ 
-                          transform: `scale(${dialogImageScale})`,
-                          transformOrigin: 'center'
+                          transform: `translate(-50%, -50%) translate(${imageOffsetX}px, ${imageOffsetY}px) scale(${dialogImageScale})`,
+                          transformOrigin: 'center',
+                          pointerEvents: 'none'
                         }}
+                        draggable={false}
                       />
                     </div>
+                    <p className="text-xs text-muted-foreground">
+                      {dialogImageScale > 1.0 ? "Click and drag to reposition the zoomed image" : "Zoom in to enable dragging"}
+                    </p>
                     <TooltipProvider>
                       <div className="flex gap-2">
                         <Tooltip>
@@ -993,14 +1135,18 @@ export default function MenuManager() {
                               type="button"
                               variant="outline"
                               size="sm"
-                              onClick={() => setDialogImageScale(1.0)}
+                              onClick={() => {
+                                setDialogImageScale(1.0);
+                                setImageOffsetX(0);
+                                setImageOffsetY(0);
+                              }}
                             >
                               <RotateCcw className="h-4 w-4 mr-1" />
                               Reset View
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Reset to default scale</p>
+                            <p>Reset to default scale and position</p>
                           </TooltipContent>
                         </Tooltip>
                         <Tooltip>
