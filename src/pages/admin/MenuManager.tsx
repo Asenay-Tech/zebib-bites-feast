@@ -292,11 +292,8 @@ export default function MenuManager() {
               return;
             }
 
-            // Ensure blob has minimum size (at least 100 bytes)
-            if (blob.size < 100) {
-              reject(new Error('Generated image is too small'));
-              return;
-            }
+            // Proceed without enforcing a minimum blob size
+
 
             // Upload edited image
             const fileExt = 'png';
