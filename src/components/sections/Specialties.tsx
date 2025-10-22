@@ -3,25 +3,27 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/components/ui/language-switcher";
 
-interface Specialty {
-  id: string;
-  menu_item_id: string;
-  display_order: number;
-}
-
 interface MenuItem {
   id: string;
+  category: string;
   name_de: string;
   name_en: string;
   description_de: string | null;
   description_en: string | null;
-  category: string;
   image_url: string | null;
+  price: any;
+}
+
+interface Specialty {
+  id: string;
+  menu_item_id: string;
+  display_order: number;
+  menu_items: MenuItem;
 }
 
 export function Specialties() {
   const { language } = useLanguage();
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [specialties, setSpecialties] = useState<Specialty[]>([]);
 
   useEffect(() => {
     fetchSpecialties();
@@ -29,40 +31,33 @@ export function Specialties() {
 
   const fetchSpecialties = async () => {
     try {
-      // Fetch specialties with their associated menu items
-      const { data: specialtiesData, error: specialtiesError } = await supabase
+      const { data, error } = await supabase
         .from('specialties')
-        .select('menu_item_id, display_order')
+        .select(`
+          id,
+          menu_item_id,
+          display_order,
+          menu_items (
+            id,
+            category,
+            name_de,
+            name_en,
+            description_de,
+            description_en,
+            image_url,
+            price
+          )
+        `)
         .order('display_order', { ascending: true });
 
-      if (specialtiesError) throw specialtiesError;
-
-      if (!specialtiesData || specialtiesData.length === 0) {
-        setMenuItems([]);
-        return;
-      }
-
-      // Fetch the actual menu items
-      const menuItemIds = specialtiesData.map(s => s.menu_item_id);
-      const { data: menuItemsData, error: menuItemsError } = await supabase
-        .from('menu_items')
-        .select('*')
-        .in('id', menuItemIds);
-
-      if (menuItemsError) throw menuItemsError;
-
-      // Sort menu items by the specialty display order
-      const sortedMenuItems = specialtiesData
-        .map(s => menuItemsData?.find(m => m.id === s.menu_item_id))
-        .filter(Boolean) as MenuItem[];
-
-      setMenuItems(sortedMenuItems);
+      if (error) throw error;
+      setSpecialties(data || []);
     } catch (error) {
       console.error('Error fetching specialties:', error);
     }
   };
 
-  if (menuItems.length === 0) return null;
+  if (specialties.length === 0) return null;
 
   return (
     <section className="py-20 bg-background">
@@ -81,35 +76,39 @@ export function Specialties() {
 
         {/* Specialties Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {menuItems.map((item) => (
-            <Card
-              key={item.id}
-              className="overflow-hidden bg-card border-border/50 hover:shadow-elegant transition-all duration-500 group rounded-2xl"
-            >
-              {item.image_url && (
-                <div className="relative h-64 overflow-hidden">
-                  <img
-                    src={item.image_url}
-                    alt={language === "de" ? item.name_de : item.name_en}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent" />
-                </div>
-              )}
-              
-              <CardContent className="p-6">
-                <h3 className="text-2xl font-bold text-foreground mb-3">
-                  {language === "de" ? item.name_de : item.name_en}
-                </h3>
-                
-                {(language === "de" ? item.description_de : item.description_en) && (
-                  <p className="text-body leading-relaxed">
-                    {language === "de" ? item.description_de : item.description_en}
-                  </p>
+          {specialties.map((specialty) => {
+            const item = specialty.menu_items;
+            
+            return (
+              <Card
+                key={specialty.id}
+                className="overflow-hidden bg-card border-border/50 hover:shadow-elegant transition-all duration-500 group rounded-2xl"
+              >
+                {item.image_url && (
+                  <div className="relative h-64 overflow-hidden">
+                    <img
+                      src={item.image_url}
+                      alt={language === "de" ? item.name_de : item.name_en}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent" />
+                  </div>
                 )}
-              </CardContent>
-            </Card>
-          ))}
+                
+                <CardContent className="p-6">
+                  <h3 className="text-2xl font-bold text-foreground mb-3">
+                    {language === "de" ? item.name_de : item.name_en}
+                  </h3>
+                  
+                  {(language === "de" ? item.description_de : item.description_en) && (
+                    <p className="text-body leading-relaxed">
+                      {language === "de" ? item.description_de : item.description_en}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </div>
     </section>
