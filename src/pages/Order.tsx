@@ -282,7 +282,10 @@ const Order = () => {
         return;
       }
 
-      toast({ title: "Creating checkout session...", description: "Please wait" });
+      toast({
+        title: "Creating checkout session...",
+        description: "Please wait",
+      });
 
       // Build a product name from cart items
       const productName =
