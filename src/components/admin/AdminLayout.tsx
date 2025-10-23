@@ -48,7 +48,6 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
     { icon: ShoppingBag, label: "Orders", path: "/admin/orders" },
     { icon: Calendar, label: "Reservations", path: "/admin/reservations" },
     { icon: MenuIcon, label: "Menu Manager", path: "/admin/menu" },
-    { icon: Star, label: "Specialties", path: "/admin/specialties" },
   ];
 
   return (

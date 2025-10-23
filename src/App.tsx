@@ -17,7 +17,6 @@ import Customers from "./pages/admin/Customers";
 import Orders from "./pages/admin/Orders";
 import Reservations from "./pages/admin/Reservations";
 import MenuManager from "./pages/admin/MenuManager";
-import Specialties from "./pages/admin/Specialties";
 import Checkout from "./pages/Checkout";
 import CallbackHandler from "./pages/CallbackHandler";
 import VerifyEmail from "./pages/VerifyEmail";
@@ -90,16 +89,6 @@ const App = () => (
                 <ProtectedAdminRoute>
                   <AdminLayout>
                     <MenuManager />
-                  </AdminLayout>
-                </ProtectedAdminRoute>
-              }
-            />
-            <Route
-              path="/admin/specialties"
-              element={
-                <ProtectedAdminRoute>
-                  <AdminLayout>
-                    <Specialties />
                   </AdminLayout>
                 </ProtectedAdminRoute>
               }

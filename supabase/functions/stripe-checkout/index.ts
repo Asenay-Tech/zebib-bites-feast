@@ -56,8 +56,8 @@ serve(async (req) => {
 
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY_LIVE");
     if (!stripeKey) {
-      console.error("[stripe-checkout] STRIPE_SECRET_KEY not configured");
-      throw new Error("STRIPE_SECRET_KEY not found");
+      console.error("[stripe-checkout] STRIPE_SECRET_KEY_LIVE not configured");
+      throw new Error("STRIPE_SECRET_KEY_LIVE not found");
     }
 
     // Detect and log Stripe mode
@@ -142,6 +142,7 @@ serve(async (req) => {
 
     // Create order record in database when possible
     let orderUuid: string | null = null;
+    let emailSent = false;
     if (canInsertOrder) {
       try {
         const { data: orderData, error: orderError } = await supabase
@@ -166,6 +167,35 @@ serve(async (req) => {
         } else {
           orderUuid = orderData?.id || null;
           console.log("[stripe-checkout] Order created", { orderUuid });
+          
+          // Send order confirmation email after successful payment
+          if (orderUuid && customerEmail) {
+            console.log("[stripe-checkout] Sending order confirmation email");
+            try {
+              const emailResponse = await supabase.functions.invoke("send-order-confirmation", {
+                body: {
+                  name: customerName,
+                  email: customerEmail,
+                  orderId: orderCode,
+                  items,
+                  totalAmount: amountInCents,
+                  diningType,
+                  date,
+                  time,
+                  phone: customerPhone,
+                },
+              });
+
+              if (emailResponse.error) {
+                console.error("[stripe-checkout] Email error:", emailResponse.error);
+              } else {
+                console.log("[stripe-checkout] Order confirmation email sent successfully");
+                emailSent = true;
+              }
+            } catch (emailErr) {
+              console.error("[stripe-checkout] Exception sending email:", emailErr);
+            }
+          }
         }
       } catch (dbErr) {
         console.error("[stripe-checkout] Exception during order insert", dbErr);
@@ -282,7 +312,9 @@ serve(async (req) => {
         success: true,
         url: session.url,
         orderId: orderUuid,
+        orderCode,
         sessionId: session.id,
+        emailSent,
       }),
       {
         status: 200,
