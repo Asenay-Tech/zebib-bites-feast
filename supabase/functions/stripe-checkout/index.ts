@@ -23,9 +23,9 @@ serve(async (req) => {
   try {
     console.log("[stripe-checkout] Function invoked", { method: req.method });
 
-    // Initialize Supabase client
+    // Initialize Supabase client with SERVICE_ROLE_KEY for privileged operations
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY");
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     if (!supabaseUrl || !supabaseKey) {
       throw new Error("Missing Supabase configuration");
     }

@@ -31,6 +31,14 @@ import { format } from "date-fns";
 import { de, enUS } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import menuPlaceholder from "@/assets/menu-placeholder.jpg";
+import { z } from "zod";
+
+const checkoutSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
+  phone: z.string().trim().min(1, "Phone is required").max(20, "Phone must be less than 20 characters"),
+  notes: z.string().max(500, "Notes must be less than 500 characters").optional(),
+  cartItems: z.array(z.any()).min(1, "Cart cannot be empty")
+});
 
 type Price = number | string | Record<string, number | string> | undefined;
 /** Grab the first number in a string like "€15,90 per person" or "15.90 per person" */
@@ -293,6 +301,23 @@ const Order = () => {
       .maybeSingle();
 
     try {
+      // Validate input before checkout
+      const result = checkoutSchema.safeParse({
+        name: profile?.name || user.email,
+        phone: profile?.phone || "",
+        notes: "",
+        cartItems: cart
+      });
+
+      if (!result.success) {
+        toast({ 
+          title: "Validation Error", 
+          description: result.error.errors[0].message,
+          variant: "destructive" 
+        });
+        return;
+      }
+
       toast({ title: "Creating checkout session...", description: "Please wait" });
       
       // Build a product name from cart items

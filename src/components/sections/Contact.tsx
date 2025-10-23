@@ -7,6 +7,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/components/ui/language-switcher";
 import { MapPin, Phone, Mail, Clock, Navigation, Menu as MenuIcon } from "lucide-react";
+import { z } from "zod";
+
+const contactSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
+  email: z.string().trim().email("Invalid email address").max(255, "Email must be less than 255 characters"),
+  phone: z.string().max(20, "Phone must be less than 20 characters").optional(),
+  subject: z.string().trim().min(1, "Subject is required").max(200, "Subject must be less than 200 characters"),
+  message: z.string().trim().min(1, "Message is required").max(2000, "Message must be less than 2000 characters")
+});
 
 export function Contact() {
   const { t } = useLanguage();
@@ -26,14 +35,29 @@ export function Contact() {
     setLoading(true);
 
     try {
+      // Validate input
+      const result = contactSchema.safeParse({
+        name,
+        email,
+        phone: phone || undefined,
+        subject,
+        message,
+      });
+
+      if (!result.success) {
+        setError(result.error.errors[0].message);
+        setLoading(false);
+        return;
+      }
+
       const { error: submitError } = await supabase
         .from("contact_messages")
         .insert({
-          name,
-          email,
-          phone: phone || null,
-          subject,
-          message,
+          name: result.data.name,
+          email: result.data.email,
+          phone: result.data.phone || null,
+          subject: result.data.subject,
+          message: result.data.message,
         });
 
       if (submitError) throw submitError;

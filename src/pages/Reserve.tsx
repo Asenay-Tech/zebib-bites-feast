@@ -14,6 +14,18 @@ import { CalendarIcon, Clock, Users, MapPin, PartyPopper, Minus, Plus, X } from 
 import { format } from "date-fns";
 import { de, enUS } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { z } from "zod";
+
+const reservationSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
+  email: z.string().trim().email("Invalid email address").max(255, "Email must be less than 255 characters"),
+  phone: z.string().trim().min(1, "Phone is required").max(20, "Phone must be less than 20 characters"),
+  people: z.number().int().min(1, "At least 1 person required").max(20, "Maximum 20 people"),
+  tableNumber: z.number().int().min(1).max(15),
+  eventType: z.string().max(100).optional(),
+  services: z.array(z.string()).max(10, "Too many services selected"),
+  notes: z.string().max(500, "Notes must be less than 500 characters").optional()
+});
 
 const services = ["Catering", "Decorations", "DJ", "Drinks", "Venue", "Delivery"];
 const eventTypes = ["Birthday", "Wedding", "Christening", "Other"];
@@ -116,21 +128,39 @@ const Reserve = () => {
         setLoading(false);
         return;
       }
+
+      // Validate input
+      const result = reservationSchema.safeParse({
+        name,
+        email,
+        phone,
+        people,
+        tableNumber: selectedTableNum,
+        eventType: eventType || undefined,
+        services: selectedServices,
+        notes: notes || undefined
+      });
+
+      if (!result.success) {
+        setError(result.error.errors[0].message);
+        setLoading(false);
+        return;
+      }
       
       const { error: reservationError } = await supabase
         .from("reservations")
         .insert({
           user_id: user.id,
-          name,
-          email,
-          phone,
+          name: result.data.name,
+          email: result.data.email,
+          phone: result.data.phone,
           date: dateString,
           time: timeString,
-          people,
-          table_number: selectedTableNum,
-          event_type: eventType || null,
-          services: selectedServices.length > 0 ? selectedServices : null,
-          notes: notes || null,
+          people: result.data.people,
+          table_number: result.data.tableNumber,
+          event_type: result.data.eventType || null,
+          services: result.data.services.length > 0 ? result.data.services : null,
+          notes: result.data.notes || null,
         });
 
       if (reservationError) throw reservationError;

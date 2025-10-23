@@ -17,9 +17,65 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
+    // Authenticate user
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      console.error("Missing authorization header");
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 401,
+        }
+      );
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token);
+    
+    if (authError || !user) {
+      console.error("Auth error:", authError);
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 401,
+        }
+      );
+    }
+
     const { orderId } = await req.json();
 
     console.log("Confirming payment for order:", orderId);
+
+    // Verify order ownership before updating
+    const { data: existingOrder, error: fetchError } = await supabaseClient
+      .from("orders")
+      .select("user_id")
+      .eq("id", orderId)
+      .single();
+
+    if (fetchError || !existingOrder) {
+      console.error("Order not found:", fetchError);
+      return new Response(
+        JSON.stringify({ error: "Order not found" }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 404,
+        }
+      );
+    }
+
+    if (existingOrder.user_id !== user.id) {
+      console.error("User does not own this order");
+      return new Response(
+        JSON.stringify({ error: "Unauthorized - not your order" }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 403,
+        }
+      );
+    }
 
     // Update order payment status
     const { data: order, error: updateError } = await supabaseClient
