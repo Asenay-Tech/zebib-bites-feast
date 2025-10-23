@@ -5,28 +5,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/components/ui/language-switcher";
-import {
-  CalendarIcon,
-  ShoppingCart,
-  Truck,
-  UtensilsCrossed,
-  Plus,
-  Minus,
-  Trash2,
-} from "lucide-react";
+import { CalendarIcon, ShoppingCart, Truck, UtensilsCrossed, Plus, Minus, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { de, enUS } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -35,9 +17,9 @@ import { z } from "zod";
 
 const checkoutSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
-  phone: z.string().trim().min(1, "Phone is required").max(20, "Phone must be less than 20 characters"),
+  //phone: z.string().trim().min(1, "Phone is required").max(20, "Phone must be less than 20 characters"),
   notes: z.string().max(500, "Notes must be less than 500 characters").optional(),
-  cartItems: z.array(z.any()).min(1, "Cart cannot be empty")
+  cartItems: z.array(z.any()).min(1, "Cart cannot be empty"),
 });
 
 type Price = number | string | Record<string, number | string> | undefined;
@@ -167,7 +149,7 @@ const Order = () => {
         },
         () => {
           fetchMenuItems();
-        }
+        },
       )
       .subscribe();
 
@@ -178,19 +160,14 @@ const Order = () => {
 
   const fetchMenuItems = async () => {
     try {
-      const { data, error } = await supabase
-        .from("menu_items")
-        .select("*")
-        .order("category", { ascending: true });
+      const { data, error } = await supabase.from("menu_items").select("*").order("category", { ascending: true });
 
       if (error) throw error;
 
       setMenuData(data || []);
-      
+
       // Extract unique categories
-      const uniqueCategories = Array.from(
-        new Set(data?.map((item) => item.category) || [])
-      ).sort();
+      const uniqueCategories = Array.from(new Set(data?.map((item) => item.category) || [])).sort();
       setCategories(uniqueCategories);
     } catch (error) {
       console.error("Error fetching menu items:", error);
@@ -205,9 +182,7 @@ const Order = () => {
   };
 
   const filteredMenu =
-    selectedCategory === "all"
-      ? menuData
-      : menuData.filter((item) => item.category === selectedCategory);
+    selectedCategory === "all" ? menuData : menuData.filter((item) => item.category === selectedCategory);
 
   const addToCart = (item: any, variant?: string) => {
     setAddingToCart(item.name_de);
@@ -230,9 +205,7 @@ const Order = () => {
     setCart((prev) => {
       const existing = prev.find((c) => c.id === cartItemId);
       if (existing) {
-        return prev.map((c) =>
-          c.id === cartItemId ? { ...c, quantity: c.quantity + 1 } : c
-        );
+        return prev.map((c) => (c.id === cartItemId ? { ...c, quantity: c.quantity + 1 } : c));
       }
       return [
         ...prev,
@@ -253,12 +226,8 @@ const Order = () => {
   const updateQuantity = (id: string, delta: number) => {
     setCart(
       cart
-        .map((item) =>
-          item.id === id
-            ? { ...item, quantity: Math.max(0, item.quantity + delta) }
-            : item
-        )
-        .filter((item) => item.quantity > 0)
+        .map((item) => (item.id === id ? { ...item, quantity: Math.max(0, item.quantity + delta) } : item))
+        .filter((item) => item.quantity > 0),
     );
   };
 
@@ -294,11 +263,7 @@ const Order = () => {
     when.setHours(Number(hour), Number(minute), 0, 0);
 
     // Get profile info for name and phone
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("name, phone")
-      .eq("id", user.id)
-      .maybeSingle();
+    const { data: profile } = await supabase.from("profiles").select("name, phone").eq("id", user.id).maybeSingle();
 
     try {
       // Validate input before checkout
@@ -306,29 +271,33 @@ const Order = () => {
         name: profile?.name || user.email,
         phone: profile?.phone || "",
         notes: "",
-        cartItems: cart
+        cartItems: cart,
       });
 
       if (!result.success) {
-        toast({ 
-          title: "Validation Error", 
+        toast({
+          title: "Validation Error",
           description: result.error.errors[0].message,
-          variant: "destructive" 
+          variant: "destructive",
         });
         return;
       }
 
       toast({ title: "Creating checkout session...", description: "Please wait" });
-      
+
       // Build a product name from cart items
-      const productName = cart.length === 1 
-        ? cart[0].name_en 
-        : `Order: ${cart.map(c => c.name_en).join(", ").substring(0, 100)}`;
-      
+      const productName =
+        cart.length === 1
+          ? cart[0].name_en
+          : `Order: ${cart
+              .map((c) => c.name_en)
+              .join(", ")
+              .substring(0, 100)}`;
+
       // Format date and time for order
       const orderDate = format(date, "yyyy-MM-dd");
       const orderTime = `${hour}:${minute}`;
-      
+
       const { data, error } = await supabase.functions.invoke("stripe-checkout", {
         body: {
           productName,
@@ -347,10 +316,10 @@ const Order = () => {
 
       if (error) {
         console.error("Checkout error:", error);
-        toast({ 
-          title: "Checkout failed", 
-          description: error.message || "Please try again", 
-          variant: "destructive" 
+        toast({
+          title: "Checkout failed",
+          description: error.message || "Please try again",
+          variant: "destructive",
         });
         return;
       }
@@ -358,10 +327,10 @@ const Order = () => {
       // Check if the function returned an error in the response data
       if (data && !data.success && data.error) {
         console.error("Checkout error from function:", data.error);
-        toast({ 
-          title: "Checkout failed", 
-          description: data.error || "Payment setup failed, please try again", 
-          variant: "destructive" 
+        toast({
+          title: "Checkout failed",
+          description: data.error || "Payment setup failed, please try again",
+          variant: "destructive",
         });
         return;
       }
@@ -369,23 +338,23 @@ const Order = () => {
       if (data?.url) {
         // Open Stripe Checkout in new tab
         window.open(data.url, "_blank");
-        toast({ 
-          title: "Redirecting to payment", 
-          description: "Opening Stripe Checkout in new tab" 
+        toast({
+          title: "Redirecting to payment",
+          description: "Opening Stripe Checkout in new tab",
         });
       } else {
-        toast({ 
-          title: "Error", 
-          description: "No checkout URL received", 
-          variant: "destructive" 
+        toast({
+          title: "Error",
+          description: "No checkout URL received",
+          variant: "destructive",
         });
       }
     } catch (err) {
       console.error("Checkout error:", err);
-      toast({ 
-        title: "Checkout failed", 
-        description: "An unexpected error occurred", 
-        variant: "destructive" 
+      toast({
+        title: "Checkout failed",
+        description: "An unexpected error occurred",
+        variant: "destructive",
       });
     }
   };
@@ -432,17 +401,12 @@ const Order = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">
-                      {t("reserve.date")}
-                    </label>
+                    <label className="text-sm font-medium">{t("reserve.date")}</label>
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button
                           variant="outline"
-                          className={cn(
-                            "w-full justify-start text-left",
-                            !date && "text-muted-foreground"
-                          )}
+                          className={cn("w-full justify-start text-left", !date && "text-muted-foreground")}
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
                           {date
@@ -470,25 +434,18 @@ const Order = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">
-                      {t("reserve.time")}
-                    </label>
+                    <label className="text-sm font-medium">{t("reserve.time")}</label>
                     <div className="flex gap-2">
                       <Select value={hour} onValueChange={setHour}>
                         <SelectTrigger className="flex-1">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {Array.from({ length: 13 }, (_, i) => i + 11).map(
-                            (h) => (
-                              <SelectItem
-                                key={h}
-                                value={h.toString().padStart(2, "0")}
-                              >
-                                {h.toString().padStart(2, "0")}
-                              </SelectItem>
-                            )
-                          )}
+                          {Array.from({ length: 13 }, (_, i) => i + 11).map((h) => (
+                            <SelectItem key={h} value={h.toString().padStart(2, "0")}>
+                              {h.toString().padStart(2, "0")}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       <span className="flex items-center">:</span>
@@ -510,24 +467,18 @@ const Order = () => {
 
                 {diningType === "dine-in" && (
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">
-                      {t("reserve.table")}
-                    </label>
+                    <label className="text-sm font-medium">{t("reserve.table")}</label>
                     <div className="grid grid-cols-5 gap-2">
-                      {Array.from({ length: 15 }, (_, i) => i + 1).map(
-                        (table) => (
-                          <Button
-                            key={table}
-                            variant={
-                              selectedTable === table ? "default" : "outline"
-                            }
-                            onClick={() => setSelectedTable(table)}
-                            className="aspect-square"
-                          >
-                            {table}
-                          </Button>
-                        )
-                      )}
+                      {Array.from({ length: 15 }, (_, i) => i + 1).map((table) => (
+                        <Button
+                          key={table}
+                          variant={selectedTable === table ? "default" : "outline"}
+                          onClick={() => setSelectedTable(table)}
+                          className="aspect-square"
+                        >
+                          {table}
+                        </Button>
+                      ))}
                     </div>
                   </div>
                 )}
@@ -564,9 +515,7 @@ const Order = () => {
                   <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : filteredMenu.length === 0 ? (
-                <p className="text-center text-muted-foreground py-12">
-                  {t("menu.noItems")}
-                </p>
+                <p className="text-center text-muted-foreground py-12">{t("menu.noItems")}</p>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {filteredMenu.map((item) => (
@@ -577,30 +526,20 @@ const Order = () => {
                             src={item.image_url || menuPlaceholder}
                             alt={language === "de" ? item.name_de : item.name_en}
                             className="w-full h-full object-cover transition-transform duration-200"
-                            style={{ 
+                            style={{
                               transform: `scale(${item.image_scale || 1})`,
-                              transformOrigin: 'center'
+                              transformOrigin: "center",
                             }}
                           />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold truncate">
-                            {language === "de" ? item.name_de : item.name_en}
-                          </h3>
+                          <h3 className="font-semibold truncate">{language === "de" ? item.name_de : item.name_en}</h3>
                           <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                            {language === "de"
-                              ? item.description_de
-                              : item.description_en}
+                            {language === "de" ? item.description_de : item.description_en}
                           </p>
                           <div className="flex justify-between items-center">
-                            <span className="font-bold text-accent">
-                              {formatEUR(getUnitPrice(item.price))}
-                            </span>
-                            <Button
-                              size="sm"
-                              onClick={() => addToCart(item)}
-                              disabled={addingToCart === item.name_de}
-                            >
+                            <span className="font-bold text-accent">{formatEUR(getUnitPrice(item.price))}</span>
+                            <Button size="sm" onClick={() => addToCart(item)} disabled={addingToCart === item.name_de}>
                               {addingToCart === item.name_de ? (
                                 <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                               ) : (
@@ -625,55 +564,31 @@ const Order = () => {
               </h3>
 
               {cart.length === 0 ? (
-                <p className="text-muted-foreground text-center py-8">
-                  {t("order.emptyCart")}
-                </p>
+                <p className="text-muted-foreground text-center py-8">{t("order.emptyCart")}</p>
               ) : (
                 <>
                   <div className="space-y-4 mb-6">
                     {cart.map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex justify-between items-start"
-                      >
+                      <div key={item.id} className="flex justify-between items-start">
                         <div className="flex-1">
                           <p className="font-medium text-sm">
                             {language === "de" ? item.name_de : item.name_en}
-                            {item.variant && (
-                              <span className="text-muted-foreground">
-                                {" "}
-                                ({item.variant})
-                              </span>
-                            )}
+                            {item.variant && <span className="text-muted-foreground"> ({item.variant})</span>}
                           </p>
                           <div className="flex items-center gap-2 mt-1">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => updateQuantity(item.id, -1)}
-                            >
+                            <Button size="sm" variant="outline" onClick={() => updateQuantity(item.id, -1)}>
                               <Minus className="h-3 w-3" />
                             </Button>
                             <span className="text-sm">{item.quantity}</span>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => updateQuantity(item.id, 1)}
-                            >
+                            <Button size="sm" variant="outline" onClick={() => updateQuantity(item.id, 1)}>
                               <Plus className="h-3 w-3" />
                             </Button>
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="font-semibold">
-                            {formatEUR(item.price * item.quantity)}
-                          </p>
+                          <p className="font-semibold">{formatEUR(item.price * item.quantity)}</p>
 
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => removeItem(item.id)}
-                          >
+                          <Button size="sm" variant="ghost" onClick={() => removeItem(item.id)}>
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
@@ -689,9 +604,7 @@ const Order = () => {
                     <Button
                       className="w-full"
                       onClick={handleCheckout}
-                      disabled={
-                        !date || (diningType === "dine-in" && !selectedTable)
-                      }
+                      disabled={!date || (diningType === "dine-in" && !selectedTable)}
                     >
                       {t("order.checkout")}
                     </Button>
