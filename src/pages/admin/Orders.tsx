@@ -249,7 +249,7 @@ export default function Orders() {
         total_amount_cents: Math.round(parseFloat(formAmount) * 100),
         payment_status: formPaymentStatus,
         status: formStatus,
-        user_id: (await supabase.auth.getUser()).data.user?.id,
+        user_id: null, // Admin-created orders don't belong to a specific user account
       };
 
       if (editingOrder) {

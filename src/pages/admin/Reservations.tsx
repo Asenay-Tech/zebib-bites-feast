@@ -254,7 +254,7 @@ export default function Reservations() {
         event_type: formEventType || null,
         notes: formNotes || null,
         status: formStatus,
-        user_id: (await supabase.auth.getUser()).data.user?.id,
+        user_id: null, // Admin-created reservations don't belong to a specific user account
       };
 
       if (editingReservation) {

@@ -190,7 +190,7 @@ export type Database = {
           table_number: number | null
           time: string
           total_amount_cents: number
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string | null
@@ -205,7 +205,7 @@ export type Database = {
           table_number?: number | null
           time: string
           total_amount_cents: number
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string | null
@@ -220,7 +220,7 @@ export type Database = {
           table_number?: number | null
           time?: string
           total_amount_cents?: number
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -263,7 +263,7 @@ export type Database = {
           status: string | null
           table_number: number | null
           time: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string | null
@@ -279,7 +279,7 @@ export type Database = {
           status?: string | null
           table_number?: number | null
           time: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string | null
@@ -295,7 +295,7 @@ export type Database = {
           status?: string | null
           table_number?: number | null
           time?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
