@@ -27,7 +27,8 @@ serve(async (req) => {
       phone,
     } = await req.json();
 
-    console.log("Sending reservation confirmation email to:", email);
+    // Log reservation ID for debugging, not email
+    console.log("Sending reservation confirmation for:", reservationId?.slice(0, 8));
 
     const html = `
       <!DOCTYPE html>

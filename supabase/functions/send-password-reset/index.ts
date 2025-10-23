@@ -18,7 +18,9 @@ serve(async (req) => {
   try {
     const { email, name, appUrl } = await req.json();
 
-    console.log("Sending password reset email to:", email);
+    // Log anonymized email domain for debugging
+    const emailDomain = email.split('@')[1];
+    console.log("Sending password reset email to domain:", emailDomain);
 
     // Create Supabase client with service role
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
@@ -69,8 +71,6 @@ serve(async (req) => {
     }
 
     const resetLink = `${appUrl || window.location.origin}/reset-password?token=${tokenHash}`;
-
-    console.log("Sending password reset email to:", email);
 
     const html = `
       <!DOCTYPE html>

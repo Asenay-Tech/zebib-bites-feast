@@ -18,7 +18,8 @@ serve(async (req) => {
   try {
     const { email, name, userId, appUrl } = await req.json();
 
-    console.log("Sending verification email to:", email);
+    // Log user ID for debugging, not email
+    console.log("Sending verification email for user:", userId);
 
     // Create Supabase client with service role
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);

@@ -26,7 +26,8 @@ serve(async (req) => {
       phone,
     } = await req.json();
 
-    console.log("Sending order confirmation email to:", email);
+    // Log order ID for debugging, not email
+    console.log("Sending order confirmation for order ID:", orderId?.slice(0, 8));
 
     const itemsList = items.map((item: any) => 
       `<li>${item.name} ${item.variant ? `(${item.variant})` : ''} × ${item.quantity} = €${((item.price / 100) * item.quantity).toFixed(2)}</li>`
