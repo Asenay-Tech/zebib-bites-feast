@@ -17,7 +17,7 @@ import { z } from "zod";
 
 const checkoutSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
-  //phone: z.string().trim().min(1, "Phone is required").max(20, "Phone must be less than 20 characters"),
+  phone: z.string().trim().min(1, "Phone is required").max(20, "Phone must be less than 20 characters"),
   notes: z.string().max(500, "Notes must be less than 500 characters").optional(),
   cartItems: z.array(z.any()).min(1, "Cart cannot be empty"),
 });
