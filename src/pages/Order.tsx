@@ -14,9 +14,11 @@ import { de, enUS } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import menuPlaceholder from "@/assets/menu-placeholder.jpg";
 import { z } from "zod";
+import { PhoneInputDialog } from "@/components/ui/phone-input-dialog";
 
 const checkoutSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
+  phone: z.string().trim().min(5, "Phone number is required").max(20, "Phone number must be less than 20 characters"),
   notes: z.string().max(500, "Notes must be less than 500 characters").optional(),
   cartItems: z.array(z.any()).min(1, "Cart cannot be empty"),
 });
@@ -106,6 +108,8 @@ const Order = () => {
   const [menuData, setMenuData] = useState<MenuItem[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [phoneDialogOpen, setPhoneDialogOpen] = useState(false);
+  const [pendingCheckout, setPendingCheckout] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -264,10 +268,52 @@ const Order = () => {
     // Get profile info for name and phone
     const { data: profile } = await supabase.from("profiles").select("name, phone").eq("id", user.id).maybeSingle();
 
+    // Check if phone number exists
+    if (!profile?.phone) {
+      // Show phone input dialog
+      setPhoneDialogOpen(true);
+      setPendingCheckout(true);
+      return;
+    }
+
+    // Continue with checkout
+    await processCheckout(profile);
+  };
+
+  const handlePhoneSubmit = async (phone: string) => {
+    try {
+      // Update profile with phone number
+      const { error } = await supabase
+        .from("profiles")
+        .update({ phone })
+        .eq("id", user!.id);
+
+      if (error) throw error;
+
+      setPhoneDialogOpen(false);
+      
+      // Refetch profile and continue checkout
+      const { data: profile } = await supabase.from("profiles").select("name, phone").eq("id", user!.id).maybeSingle();
+      
+      if (pendingCheckout && profile) {
+        await processCheckout(profile);
+        setPendingCheckout(false);
+      }
+    } catch (error) {
+      console.error("Error updating phone:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update phone number",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const processCheckout = async (profile: { name?: string; phone?: string } | null) => {
     try {
       // Validate input before checkout
       const result = checkoutSchema.safeParse({
-        name: profile?.name || user.email,
+        name: profile?.name || user!.email,
         phone: profile?.phone || "",
         notes: "",
         cartItems: cart,
@@ -612,11 +658,17 @@ const Order = () => {
                     </Button>
                   </div>
                 </>
-              )}
+                  )}
             </Card>
           </div>
         </div>
       </div>
+
+      <PhoneInputDialog
+        open={phoneDialogOpen}
+        onOpenChange={setPhoneDialogOpen}
+        onSubmit={handlePhoneSubmit}
+      />
     </div>
   );
 };

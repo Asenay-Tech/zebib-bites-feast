@@ -59,10 +59,19 @@ export default function Checkout() {
 
           setSuccess(true);
           setOrderDetails(data?.order);
-          toast({ 
-            title: "Order confirmed!", 
-            description: "Check your email for confirmation" 
-          });
+          
+          // Only show email confirmation message if email was sent successfully
+          if (data?.emailSent) {
+            toast({ 
+              title: "Order confirmed!", 
+              description: "Check your email for confirmation" 
+            });
+          } else {
+            toast({ 
+              title: "Order confirmed!", 
+              description: "Your payment was successful" 
+            });
+          }
         } catch (err) {
           console.error("Error:", err);
           toast({ 
@@ -117,7 +126,7 @@ export default function Checkout() {
           <div className="space-y-2 border-t pt-4">
             <div className="flex justify-between text-sm">
               <span className="font-medium">Order ID:</span>
-              <span className="text-muted-foreground">{orderDetails.id.slice(0, 8)}</span>
+              <span className="text-muted-foreground">{orderDetails.order_code || orderDetails.id.slice(0, 8)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="font-medium">Date:</span>

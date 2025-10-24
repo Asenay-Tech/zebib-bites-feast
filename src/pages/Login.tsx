@@ -112,15 +112,23 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      if (signInError) throw signInError;
-
-      const redirectTo = searchParams.get("redirect") || "/";
-      navigate(redirectTo);
+      
+      if (signInError) {
+        setError(signInError.message);
+        setLoading(false);
+        return;
+      }
+      
+      if (data.session) {
+        const redirectTo = searchParams.get("redirect") || "/";
+        navigate(redirectTo);
+      }
     } catch (err: any) {
+      console.error("Login error:", err);
       setError(err.message || t("common.error"));
     } finally {
       setLoading(false);
@@ -129,15 +137,14 @@ const Login = () => {
 
   const handleGoogleLogin = async () => {
     setError("");
+    setLoading(true);
+    
     try {
       // Preserve intended redirect after OAuth
       const intended = searchParams.get("redirect") || "/";
       localStorage.setItem("post_oauth_redirect", intended);
 
-      const hostname = window.location.hostname;
-      let redirectUrl;
-
-      redirectUrl = `${window.location.origin}/auth/v1/callback`;
+      const redirectUrl = `${window.location.origin}/auth/v1/callback`;
 
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: "google",
@@ -155,6 +162,8 @@ const Login = () => {
     } catch (err: any) {
       console.error("Google OAuth error:", err);
       setError(err.message || t("common.error"));
+    } finally {
+      setLoading(false);
     }
   };
 

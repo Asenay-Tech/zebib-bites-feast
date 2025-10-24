@@ -28,6 +28,7 @@ interface Order {
   payment_status: string;
   status: string;
   created_at: string;
+  order_code?: string;
 }
 
 const ITEMS_PER_PAGE = 10;
@@ -478,11 +479,16 @@ export default function Orders() {
               ) : (
                 paginatedOrders.map((order) => (
                   <TableRow key={order.id}>
-                    <TableCell className="font-medium">{order.name}</TableCell>
+                     <TableCell>
+                      <div className="font-medium">{order.name}</div>
+                      {order.order_code && (
+                        <div className="text-xs text-muted-foreground">ID: {order.order_code}</div>
+                      )}
+                    </TableCell>
                     <TableCell>{order.phone}</TableCell>
                     <TableCell>
                       <div className="max-w-xs truncate">
-                        {order.items.map((item: any) => item.name).join(", ")}
+                        {order.items.map((item: any) => item.name || item.name_en || item.name_de).join(", ")}
                       </div>
                     </TableCell>
                     <TableCell>

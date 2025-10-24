@@ -80,7 +80,7 @@ serve(async (req) => {
     // Update order payment status
     const { data: order, error: updateError } = await supabaseClient
       .from("orders")
-      .update({ payment_status: "paid" })
+      .update({ payment_status: "paid", status: "confirmed" })
       .eq("id", orderId)
       .select()
       .single();
@@ -108,7 +108,7 @@ serve(async (req) => {
       body: {
         name: order.name,
         email: userEmail,
-        orderId: order.id,
+        orderId: order.order_code || order.id.slice(0, 8),
         items: order.items,
         totalAmount: order.total_amount_cents,
         diningType: order.dining_type,
@@ -121,13 +121,25 @@ serve(async (req) => {
 
     if (emailResponse.error) {
       console.error("Error sending confirmation email:", emailResponse.error);
-      // Don't throw - payment is confirmed, email is nice to have
-    } else {
-      console.log("Confirmation email sent successfully");
+      // Return success anyway - payment is confirmed, email is nice to have
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          order,
+          emailSent: false,
+          emailError: emailResponse.error.message
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        }
+      );
     }
+    
+    console.log("Confirmation email sent successfully");
 
     return new Response(
-      JSON.stringify({ success: true, order }),
+      JSON.stringify({ success: true, order, emailSent: true }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,

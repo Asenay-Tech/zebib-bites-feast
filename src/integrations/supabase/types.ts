@@ -184,6 +184,7 @@ export type Database = {
           id: string
           items: Json
           name: string
+          order_code: string | null
           payment_status: string | null
           phone: string
           status: string | null
@@ -199,6 +200,7 @@ export type Database = {
           id?: string
           items: Json
           name: string
+          order_code?: string | null
           payment_status?: string | null
           phone: string
           status?: string | null
@@ -214,6 +216,7 @@ export type Database = {
           id?: string
           items?: Json
           name?: string
+          order_code?: string | null
           payment_status?: string | null
           phone?: string
           status?: string | null

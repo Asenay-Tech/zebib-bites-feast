@@ -142,7 +142,6 @@ serve(async (req) => {
 
     // Create order record in database when possible
     let orderUuid: string | null = null;
-    let emailSent = false;
     if (canInsertOrder) {
       try {
         const { data: orderData, error: orderError } = await supabase
@@ -158,6 +157,7 @@ serve(async (req) => {
             total_amount_cents: amountInCents,
             payment_status: "pending",
             status: "pending",
+            order_code: orderCode,
           })
           .select("id")
           .maybeSingle();
@@ -166,36 +166,7 @@ serve(async (req) => {
           console.error("[stripe-checkout] Order creation error:", orderError);
         } else {
           orderUuid = orderData?.id || null;
-          console.log("[stripe-checkout] Order created", { orderUuid });
-          
-          // Send order confirmation email after successful payment
-          if (orderUuid && customerEmail) {
-            console.log("[stripe-checkout] Sending order confirmation email");
-            try {
-              const emailResponse = await supabase.functions.invoke("send-order-confirmation", {
-                body: {
-                  name: customerName,
-                  email: customerEmail,
-                  orderId: orderCode,
-                  items,
-                  totalAmount: amountInCents,
-                  diningType,
-                  date,
-                  time,
-                  phone: customerPhone,
-                },
-              });
-
-              if (emailResponse.error) {
-                console.error("[stripe-checkout] Email error:", emailResponse.error);
-              } else {
-                console.log("[stripe-checkout] Order confirmation email sent successfully");
-                emailSent = true;
-              }
-            } catch (emailErr) {
-              console.error("[stripe-checkout] Exception sending email:", emailErr);
-            }
-          }
+          console.log("[stripe-checkout] Order created", { orderUuid, orderCode });
         }
       } catch (dbErr) {
         console.error("[stripe-checkout] Exception during order insert", dbErr);
@@ -314,7 +285,6 @@ serve(async (req) => {
         orderId: orderUuid,
         orderCode,
         sessionId: session.id,
-        emailSent,
       }),
       {
         status: 200,
