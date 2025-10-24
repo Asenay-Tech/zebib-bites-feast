@@ -110,6 +110,7 @@ const Order = () => {
   const [loading, setLoading] = useState(true);
   const [phoneDialogOpen, setPhoneDialogOpen] = useState(false);
   const [pendingCheckout, setPendingCheckout] = useState(false);
+  const [processingPhone, setProcessingPhone] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -280,38 +281,93 @@ const Order = () => {
     await processCheckout(profile);
   };
 
+  /**
+   * FIXED: Handle phone number submission with proper error handling and state management
+   * Uses .select() to get the updated profile immediately, eliminating race conditions
+   */
   const handlePhoneSubmit = async (phone: string) => {
+    // Prevent duplicate submissions
+    if (processingPhone) {
+      console.warn("Phone submission already in progress");
+      return;
+    }
+
+    setProcessingPhone(true);
+
     try {
-      // Update profile with phone number
-      const { error } = await supabase
+      console.log("Starting phone submission for user:", user?.id);
+
+      // Step 1: Update profile with phone number AND get the updated record immediately
+      // This prevents race conditions by returning the updated data directly from Supabase
+      const { data, error } = await supabase
         .from("profiles")
         .update({ phone })
-        .eq("id", user!.id);
+        .eq("id", user!.id)
+        .select("id, name, phone, email"); // Return updated profile fields
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase update error:", error);
+        throw new Error(`Failed to save phone number: ${error.message}`);
+      }
 
-      // Close dialog immediately
+      if (!data || data.length === 0) {
+        console.error("No data returned from update operation");
+        throw new Error("Profile update failed - no data returned from server");
+      }
+
+      // Step 2: Use the updated profile directly from response
+      const updatedProfile = data[0];
+      console.log("Profile updated successfully:", updatedProfile);
+
+      // Step 3: Validate that phone was actually saved correctly
+      if (!updatedProfile?.phone || updatedProfile.phone.trim().length === 0) {
+        console.error("Phone not saved in response:", updatedProfile);
+        throw new Error("Phone number was not saved properly");
+      }
+
+      // Step 4: Verify phone meets validation requirements
+      if (updatedProfile.phone.trim().length < 5) {
+        throw new Error("Phone number must be at least 5 characters");
+      }
+
+      console.log("Phone validated successfully, closing dialog");
+
+      // Step 5: Close dialog
       setPhoneDialogOpen(false);
-      
-      // Continue checkout with the phone we just saved
+
+      // Step 6: Continue checkout with the verified profile data
       if (pendingCheckout) {
-        const { data: profile } = await supabase.from("profiles").select("name, phone").eq("id", user!.id).maybeSingle();
-        if (profile) {
-          await processCheckout(profile);
-        }
+        console.log("Processing pending checkout with updated profile");
+        await processCheckout(updatedProfile);
         setPendingCheckout(false);
       }
-    } catch (error) {
-      console.error("Error updating phone:", error);
+
       toast({
-        title: "Error",
-        description: "Failed to update phone number",
+        title: "Success",
+        description: "Phone number saved and checkout proceeding",
+      });
+    } catch (error) {
+      console.error("Error in handlePhoneSubmit:", error);
+
+      // Always reset the pending checkout flag on error
+      setPendingCheckout(false);
+
+      // Provide detailed error message to user
+      const errorMessage =
+        error instanceof Error ? error.message : "An unexpected error occurred while saving your phone number";
+
+      toast({
+        title: "Phone Number Error",
+        description: errorMessage,
         variant: "destructive",
       });
+    } finally {
+      // Always reset processing flag
+      setProcessingPhone(false);
     }
   };
 
-  const processCheckout = async (profile: { name?: string; phone?: string } | null) => {
+  const processCheckout = async (profile: { name?: string; phone?: string; id?: string; email?: string } | null) => {
     try {
       // Validate input before checkout
       const result = checkoutSchema.safeParse({
@@ -322,9 +378,10 @@ const Order = () => {
       });
 
       if (!result.success) {
+        const errorMessages = result.error.errors.map((e) => e.message).join(", ");
         toast({
           title: "Validation Error",
-          description: result.error.errors[0].message,
+          description: errorMessages,
           variant: "destructive",
         });
         return;
@@ -395,7 +452,7 @@ const Order = () => {
       } else {
         toast({
           title: "Error",
-          description: "No checkout URL received",
+          description: "No checkout URL received from server",
           variant: "destructive",
         });
       }
@@ -660,7 +717,7 @@ const Order = () => {
                     </Button>
                   </div>
                 </>
-                  )}
+              )}
             </Card>
           </div>
         </div>
@@ -670,6 +727,7 @@ const Order = () => {
         open={phoneDialogOpen}
         onOpenChange={setPhoneDialogOpen}
         onSubmit={handlePhoneSubmit}
+        disabled={processingPhone}
       />
     </div>
   );
