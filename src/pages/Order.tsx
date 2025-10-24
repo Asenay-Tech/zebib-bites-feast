@@ -290,13 +290,15 @@ const Order = () => {
 
       if (error) throw error;
 
+      // Close dialog immediately
       setPhoneDialogOpen(false);
       
-      // Refetch profile and continue checkout
-      const { data: profile } = await supabase.from("profiles").select("name, phone").eq("id", user!.id).maybeSingle();
-      
-      if (pendingCheckout && profile) {
-        await processCheckout(profile);
+      // Continue checkout with the phone we just saved
+      if (pendingCheckout) {
+        const { data: profile } = await supabase.from("profiles").select("name, phone").eq("id", user!.id).maybeSingle();
+        if (profile) {
+          await processCheckout(profile);
+        }
         setPendingCheckout(false);
       }
     } catch (error) {
