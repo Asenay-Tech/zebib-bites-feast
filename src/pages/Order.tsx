@@ -18,7 +18,6 @@ import { PhoneInputDialog } from "@/components/ui/phone-input-dialog";
 
 const checkoutSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
-  phone: z.string().trim().min(5, "Phone number is required").max(20, "Phone number must be less than 20 characters"),
   notes: z.string().max(500, "Notes must be less than 500 characters").optional(),
   cartItems: z.array(z.any()).min(1, "Cart cannot be empty"),
 });
@@ -26,9 +25,9 @@ const checkoutSchema = z.object({
 type Price = number | string | Record<string, number | string> | undefined;
 /** Grab the first number in a string like "€15,90 per person" or "15.90 per person" */
 const extractNumber = (v: string): number => {
-  const m = v.match(/-?\d+(?:[.,]\d+)?/); // finds 15.90 or 15,90
+  const m = v.match(/-?\d+(?:[.,]\d+)?/);
   if (!m) return NaN;
-  return parseFloat(m[0].replace(",", ".")); // "15,90" -> 15.90
+  return parseFloat(m[0].replace(",", "."));
 };
 
 /** Resolve a price to a numeric unit price, supporting numbers, strings, and variant maps */
@@ -37,7 +36,6 @@ export const getUnitPrice = (price: Price, variant?: string): number => {
   if (typeof price === "number") return price;
   if (typeof price === "string") return extractNumber(price);
 
-  // object -> variants like { small: 2.5, large: "3.00" }
   let val: any;
   if (variant && Object.prototype.hasOwnProperty.call(price, variant)) {
     val = (price as any)[variant];
@@ -96,7 +94,6 @@ const Order = () => {
   const [minute, setMinute] = useState(() => {
     const now = new Date();
     const mins = now.getMinutes();
-    // Round to nearest 15-minute interval
     const rounded = Math.ceil(mins / 15) * 15;
     return (rounded === 60 ? 0 : rounded).toString().padStart(2, "0");
   });
@@ -141,7 +138,6 @@ const Order = () => {
   useEffect(() => {
     fetchMenuItems();
 
-    // Real-time subscription
     const channel = supabase
       .channel("menu_order_changes")
       .on(
@@ -170,7 +166,6 @@ const Order = () => {
 
       setMenuData(data || []);
 
-      // Extract unique categories
       const uniqueCategories = Array.from(new Set(data?.map((item) => item.category) || [])).sort();
       setCategories(uniqueCategories);
     } catch (error) {
@@ -191,7 +186,6 @@ const Order = () => {
   const addToCart = (item: any, variant?: string) => {
     setAddingToCart(item.name_de);
 
-    // If price is an object and no variant chosen, default to the first key
     if (typeof item.price === "object" && item.price && !variant) {
       const firstKey = Object.keys(item.price)[0];
       variant = firstKey;
@@ -199,7 +193,6 @@ const Order = () => {
 
     const unitPrice = getUnitPrice(item.price, variant);
     if (isNaN(unitPrice)) {
-      // Optional: show a toast instead of silently failing
       setAddingToCart(null);
       return;
     }
@@ -218,7 +211,7 @@ const Order = () => {
           name_de: item.name_de,
           name_en: item.name_en,
           variant,
-          price: unitPrice, // store a clean number in the cart
+          price: unitPrice,
           quantity: 1,
         },
       ];
@@ -245,6 +238,8 @@ const Order = () => {
   }, 0);
 
   const handleCheckout = async () => {
+    console.log("🔷 handleCheckout called");
+
     if (cart.length === 0) {
       toast({ title: "Cart is empty", variant: "destructive" });
       return;
@@ -262,123 +257,123 @@ const Order = () => {
       return;
     }
 
-    // Build the order date-time
     const when = new Date(date);
     when.setHours(Number(hour), Number(minute), 0, 0);
 
-    // Get profile info for name and phone
-    const { data: profile } = await supabase.from("profiles").select("name, phone").eq("id", user.id).maybeSingle();
+    console.log("🔷 Fetching profile for user:", user.id);
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("name, phone")
+      .eq("id", user.id)
+      .maybeSingle();
 
-    // Check if phone number exists
+    console.log("🔷 Profile data:", profile);
+    console.log("🔷 Profile error:", profileError);
+
     if (!profile?.phone) {
-      // Show phone input dialog
+      console.log("🔷 No phone found, opening dialog");
       setPhoneDialogOpen(true);
       setPendingCheckout(true);
       return;
     }
 
-    // Continue with checkout
+    console.log("🔷 Phone exists, proceeding to checkout");
     await processCheckout(profile);
   };
 
   /**
-   * FIXED: Handle phone number submission with proper error handling and state management
-   * Uses .select() to get the updated profile immediately, eliminating race conditions
+   * DEBUG VERSION - Handle phone number submission
    */
   const handlePhoneSubmit = async (phone: string) => {
-    // Prevent duplicate submissions
+    console.log("📱 handlePhoneSubmit called with phone:", phone);
+    console.log("📱 User ID:", user?.id);
+    console.log("📱 processingPhone:", processingPhone);
+
     if (processingPhone) {
-      console.warn("Phone submission already in progress");
+      console.warn("📱 Phone submission already in progress, returning");
       return;
     }
 
     setProcessingPhone(true);
 
     try {
-      console.log("Starting phone submission for user:", user?.id);
-
-      // Step 1: Update profile with phone number AND get the updated record immediately
-      // This prevents race conditions by returning the updated data directly from Supabase
+      console.log("📱 Step 1: Updating profile with phone");
       const { data, error } = await supabase
         .from("profiles")
         .update({ phone })
         .eq("id", user!.id)
-        .select("id, name, phone, email"); // Return updated profile fields
+        .select("id, name, phone, email");
+
+      console.log("📱 Update response - data:", data);
+      console.log("📱 Update response - error:", error);
 
       if (error) {
-        console.error("Supabase update error:", error);
+        console.error("📱 Supabase update error:", error);
         throw new Error(`Failed to save phone number: ${error.message}`);
       }
 
       if (!data || data.length === 0) {
-        console.error("No data returned from update operation");
+        console.error("📱 No data returned from update");
         throw new Error("Profile update failed - no data returned from server");
       }
 
-      // Step 2: Use the updated profile directly from response
       const updatedProfile = data[0];
-      console.log("Profile updated successfully:", updatedProfile);
+      console.log("📱 Step 2: Updated profile:", updatedProfile);
 
-      // Step 3: Validate that phone was actually saved correctly
       if (!updatedProfile?.phone || updatedProfile.phone.trim().length === 0) {
-        console.error("Phone not saved in response:", updatedProfile);
+        console.error("📱 Phone not in response:", updatedProfile);
         throw new Error("Phone number was not saved properly");
       }
 
-      // Step 4: Verify phone meets validation requirements
-      if (updatedProfile.phone.trim().length < 5) {
-        throw new Error("Phone number must be at least 5 characters");
-      }
-
-      console.log("Phone validated successfully, closing dialog");
-
-      // Step 5: Close dialog
+      console.log("📱 Step 3: Phone validation passed");
+      console.log("📱 Step 4: Closing dialog");
       setPhoneDialogOpen(false);
 
-      // Step 6: Continue checkout with the verified profile data
       if (pendingCheckout) {
-        console.log("Processing pending checkout with updated profile");
+        console.log("📱 Step 5: Processing checkout");
         await processCheckout(updatedProfile);
         setPendingCheckout(false);
+      } else {
+        console.warn("📱 pendingCheckout is false, not processing checkout");
       }
 
       toast({
         title: "Success",
-        description: "Phone number saved and checkout proceeding",
+        description: "Phone number saved",
       });
     } catch (error) {
-      console.error("Error in handlePhoneSubmit:", error);
-
-      // Always reset the pending checkout flag on error
+      console.error("📱 Error in handlePhoneSubmit:", error);
       setPendingCheckout(false);
 
-      // Provide detailed error message to user
-      const errorMessage =
-        error instanceof Error ? error.message : "An unexpected error occurred while saving your phone number";
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
+      console.error("📱 Error message:", errorMessage);
 
       toast({
-        title: "Phone Number Error",
+        title: "Error",
         description: errorMessage,
         variant: "destructive",
       });
     } finally {
-      // Always reset processing flag
       setProcessingPhone(false);
+      console.log("📱 handlePhoneSubmit completed");
     }
   };
 
   const processCheckout = async (profile: { name?: string; phone?: string; id?: string; email?: string } | null) => {
+    console.log("💳 processCheckout called with profile:", profile);
+
     try {
-      // Validate input before checkout
       const result = checkoutSchema.safeParse({
         name: profile?.name || user!.email,
-        phone: profile?.phone || "",
         notes: "",
         cartItems: cart,
       });
 
+      console.log("💳 Schema validation result:", result);
+
       if (!result.success) {
         const errorMessages = result.error.errors.map((e) => e.message).join(", ");
+        console.error("💳 Validation failed:", errorMessages);
         toast({
           title: "Validation Error",
           description: errorMessages,
@@ -387,12 +382,13 @@ const Order = () => {
         return;
       }
 
+      console.log("💳 Validation passed, creating checkout session");
+
       toast({
         title: "Creating checkout session...",
         description: "Please wait",
       });
 
-      // Build a product name from cart items
       const productName =
         cart.length === 1
           ? cart[0].name_en
@@ -401,9 +397,16 @@ const Order = () => {
               .join(", ")
               .substring(0, 100)}`;
 
-      // Format date and time for order
       const orderDate = format(date, "yyyy-MM-dd");
       const orderTime = `${hour}:${minute}`;
+
+      console.log("💳 Calling stripe-checkout function with:", {
+        productName,
+        amount: subtotal,
+        customerEmail: user.email,
+        customerName: profile?.name || user.email,
+        customerPhone: profile?.phone || "",
+      });
 
       const { data, error } = await supabase.functions.invoke("stripe-checkout", {
         body: {
@@ -421,8 +424,11 @@ const Order = () => {
         },
       });
 
+      console.log("💳 Stripe function response - data:", data);
+      console.log("💳 Stripe function response - error:", error);
+
       if (error) {
-        console.error("Checkout error:", error);
+        console.error("💳 Checkout error:", error);
         toast({
           title: "Checkout failed",
           description: error.message || "Please try again",
@@ -431,9 +437,8 @@ const Order = () => {
         return;
       }
 
-      // Check if the function returned an error in the response data
       if (data && !data.success && data.error) {
-        console.error("Checkout error from function:", data.error);
+        console.error("💳 Checkout error from function:", data.error);
         toast({
           title: "Checkout failed",
           description: data.error || "Payment setup failed, please try again",
@@ -443,21 +448,22 @@ const Order = () => {
       }
 
       if (data?.url) {
-        // Open Stripe Checkout in new tab
+        console.log("💳 Checkout URL received, opening in new tab:", data.url);
         window.open(data.url, "_blank");
         toast({
           title: "Redirecting to payment",
           description: "Opening Stripe Checkout in new tab",
         });
       } else {
+        console.error("💳 No checkout URL in response");
         toast({
           title: "Error",
-          description: "No checkout URL received from server",
+          description: "No checkout URL received",
           variant: "destructive",
         });
       }
     } catch (err) {
-      console.error("Checkout error:", err);
+      console.error("💳 Checkout error:", err);
       toast({
         title: "Checkout failed",
         description: "An unexpected error occurred",
@@ -593,7 +599,6 @@ const Order = () => {
             </Card>
 
             <Card className="p-6">
-              {/* auto rows; columns expand/shrink with space */}
               <div className="grid gap-3 grid-cols-2 sm:grid-cols-[repeat(auto-fit,minmax(160px,1fr))]">
                 <Button
                   className="w-full text-center whitespace-normal break-words leading-snug px-4 py-2"
