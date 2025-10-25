@@ -15,9 +15,10 @@ interface PhoneInputDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (phone: string) => void;
+  disabled?: boolean;
 }
 
-export function PhoneInputDialog({ open, onOpenChange, onSubmit }: PhoneInputDialogProps) {
+export function PhoneInputDialog({ open, onOpenChange, onSubmit, disabled = false }: PhoneInputDialogProps) {
   const [phone, setPhone] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -64,10 +65,10 @@ export function PhoneInputDialog({ open, onOpenChange, onSubmit }: PhoneInputDia
           </div>
         </div>
         <DialogFooter>
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={disabled}>
             Cancel
           </Button>
-          <Button type="button" onClick={handleSubmit}>
+          <Button type="button" onClick={handleSubmit} disabled={disabled}>
             Continue to Payment
           </Button>
         </DialogFooter>
