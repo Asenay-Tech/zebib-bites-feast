@@ -43,8 +43,16 @@ const Reserve = () => {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [date, setDate] = useState<Date>(new Date());
-  const [hour, setHour] = useState(new Date().getHours().toString().padStart(2, '0'));
-  const [minute, setMinute] = useState(Math.floor(new Date().getMinutes() / 15) * 15 === 0 ? "00" : (Math.floor(new Date().getMinutes() / 15) * 15).toString());
+  const currentHour = new Date().getHours();
+  const currentMinute = Math.ceil(new Date().getMinutes() / 15) * 15;
+  const [hour, setHour] = useState(
+    currentHour >= 11 && currentHour <= 23 
+      ? currentHour.toString().padStart(2, '0') 
+      : '18'
+  );
+  const [minute, setMinute] = useState(
+    currentMinute >= 60 ? '00' : currentMinute.toString().padStart(2, '0')
+  );
   const [people, setPeople] = useState(2);
   const [tableNumber, setTableNumber] = useState("1");
   const [eventType, setEventType] = useState("");
