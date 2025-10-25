@@ -299,8 +299,7 @@ const Order = () => {
     try {
       const { data, error } = await supabase
         .from("profiles")
-        .update({ phone })
-        .eq("id", user.id)
+        .upsert({ id: user.id, phone, email: user.email ?? null })
         .select()
         .single();
 
@@ -387,7 +386,7 @@ const Order = () => {
           date: orderDate,
           time: orderTime,
           diningType,
-          successUrl: `${BASE_URL}/checkout?success=true`,
+          successUrl: `${BASE_URL}/success`,
           cancelUrl: `${BASE_URL}/order?canceled=true`,
         },
       });
@@ -413,11 +412,7 @@ const Order = () => {
       }
 
       if (data?.url) {
-        window.open(data.url, "_blank");
-        toast({
-          title: "Success",
-          description: "Opening Stripe payment page",
-        });
+        window.location.href = data.url;
       } else {
         console.error("No checkout URL in response");
         toast({
