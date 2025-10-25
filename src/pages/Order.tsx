@@ -290,6 +290,12 @@ const Order = () => {
 
     setProcessingPhone(true);
 
+    // Show loading toast
+    toast({
+      title: "Updating phone number...",
+      description: "Please wait",
+    });
+
     try {
       const { data, error } = await supabase
         .from("profiles")
@@ -305,6 +311,12 @@ const Order = () => {
       // Close dialog immediately
       setPhoneDialogOpen(false);
 
+      // Show success toast
+      toast({
+        title: "Phone number updated",
+        description: "Redirecting to payment page...",
+      });
+
       // Process checkout immediately with the updated profile
       if (pendingCheckout) {
         await processCheckout(data);
@@ -315,8 +327,8 @@ const Order = () => {
       setPendingCheckout(false);
 
       toast({
-        title: "Error",
-        description: "Something went wrong. Please try again.",
+        title: "Profile update failed",
+        description: "Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -325,8 +337,6 @@ const Order = () => {
   };
 
   const processCheckout = async (profile: { name?: string; phone?: string; id?: string; email?: string } | null) => {
-    console.log("💳 processCheckout called with profile:", profile);
-
     try {
       const result = checkoutSchema.safeParse({
         name: profile?.name || user!.email,
@@ -334,11 +344,8 @@ const Order = () => {
         cartItems: cart,
       });
 
-      console.log("💳 Schema validation result:", result);
-
       if (!result.success) {
         const errorMessages = result.error.errors.map((e) => e.message).join(", ");
-        console.error("💳 Validation failed:", errorMessages);
         toast({
           title: "Validation Error",
           description: errorMessages,
@@ -347,10 +354,8 @@ const Order = () => {
         return;
       }
 
-      console.log("💳 Validation passed, creating checkout session");
-
       toast({
-        title: "Creating checkout session...",
+        title: "Redirecting to payment page...",
         description: "Please wait",
       });
 
@@ -365,13 +370,11 @@ const Order = () => {
       const orderDate = format(date, "yyyy-MM-dd");
       const orderTime = `${hour}:${minute}`;
 
-      console.log("💳 Calling stripe-checkout function with:", {
-        productName,
-        amount: subtotal,
-        customerEmail: user.email,
-        customerName: profile?.name || user.email,
-        customerPhone: profile?.phone || "",
-      });
+      // Determine base URL based on environment
+      const BASE_URL =
+        window.location.hostname === "localhost"
+          ? "http://localhost:5173"
+          : "https://zebib-bites-feast.lovable.app";
 
       const { data, error } = await supabase.functions.invoke("stripe-checkout", {
         body: {
@@ -384,16 +387,13 @@ const Order = () => {
           date: orderDate,
           time: orderTime,
           diningType,
-          successUrl: `${window.location.origin}/checkout?success=true`,
-          cancelUrl: `${window.location.origin}/order?canceled=true`,
+          successUrl: `${BASE_URL}/checkout?success=true`,
+          cancelUrl: `${BASE_URL}/order?canceled=true`,
         },
       });
 
-      console.log("💳 Stripe function response - data:", data);
-      console.log("💳 Stripe function response - error:", error);
-
       if (error) {
-        console.error("💳 Checkout error:", error);
+        console.error("Checkout error:", error);
         toast({
           title: "Checkout failed",
           description: error.message || "Please try again",
@@ -403,7 +403,7 @@ const Order = () => {
       }
 
       if (data && !data.success && data.error) {
-        console.error("💳 Checkout error from function:", data.error);
+        console.error("Checkout error from function:", data.error);
         toast({
           title: "Checkout failed",
           description: data.error || "Payment setup failed, please try again",
@@ -413,14 +413,13 @@ const Order = () => {
       }
 
       if (data?.url) {
-        console.log("💳 Checkout URL received, opening in new tab:", data.url);
         window.open(data.url, "_blank");
         toast({
-          title: "Redirecting to payment",
-          description: "Opening Stripe Checkout in new tab",
+          title: "Success",
+          description: "Opening Stripe payment page",
         });
       } else {
-        console.error("💳 No checkout URL in response");
+        console.error("No checkout URL in response");
         toast({
           title: "Error",
           description: "No checkout URL received",
@@ -428,10 +427,10 @@ const Order = () => {
         });
       }
     } catch (err) {
-      console.error("💳 Checkout error:", err);
+      console.error("Checkout error:", err);
       toast({
-        title: "Checkout failed",
-        description: "An unexpected error occurred",
+        title: "Something went wrong",
+        description: "Please try again.",
         variant: "destructive",
       });
     }
