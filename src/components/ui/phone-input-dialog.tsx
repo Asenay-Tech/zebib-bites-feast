@@ -7,9 +7,8 @@ import { z } from "zod";
 
 const phoneSchema = z.string()
   .trim()
-  .min(5, "Phone number must be at least 5 digits")
-  .max(20, "Phone number must be less than 20 digits")
-  .regex(/^[\d\s\-\+\(\)]+$/, "Invalid phone number format");
+  .min(8, "Phone number must be at least 8 digits")
+  .regex(/^\d+$/, "Phone number must contain only numbers");
 
 interface PhoneInputDialogProps {
   open: boolean;

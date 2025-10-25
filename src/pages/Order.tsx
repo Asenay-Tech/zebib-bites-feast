@@ -281,81 +281,46 @@ const Order = () => {
     await processCheckout(profile);
   };
 
-  /**
-   * DEBUG VERSION - Handle phone number submission
-   */
   const handlePhoneSubmit = async (phone: string) => {
-    console.log("📱 handlePhoneSubmit called with phone:", phone);
-    console.log("📱 User ID:", user?.id);
-    console.log("📱 processingPhone:", processingPhone);
+    if (!user) return;
 
     if (processingPhone) {
-      console.warn("📱 Phone submission already in progress, returning");
       return;
     }
 
     setProcessingPhone(true);
 
     try {
-      console.log("📱 Step 1: Updating profile with phone");
       const { data, error } = await supabase
         .from("profiles")
         .update({ phone })
-        .eq("id", user!.id)
-        .select("id, name, phone, email");
-
-      console.log("📱 Update response - data:", data);
-      console.log("📱 Update response - error:", error);
+        .eq("id", user.id)
+        .select()
+        .single();
 
       if (error) {
-        console.error("📱 Supabase update error:", error);
-        throw new Error(`Failed to save phone number: ${error.message}`);
+        throw error;
       }
 
-      if (!data || data.length === 0) {
-        console.error("📱 No data returned from update");
-        throw new Error("Profile update failed - no data returned from server");
-      }
-
-      const updatedProfile = data[0];
-      console.log("📱 Step 2: Updated profile:", updatedProfile);
-
-      if (!updatedProfile?.phone || updatedProfile.phone.trim().length === 0) {
-        console.error("📱 Phone not in response:", updatedProfile);
-        throw new Error("Phone number was not saved properly");
-      }
-
-      console.log("📱 Step 3: Phone validation passed");
-      console.log("📱 Step 4: Closing dialog");
+      // Close dialog immediately
       setPhoneDialogOpen(false);
 
+      // Process checkout immediately with the updated profile
       if (pendingCheckout) {
-        console.log("📱 Step 5: Processing checkout");
-        await processCheckout(updatedProfile);
+        await processCheckout(data);
         setPendingCheckout(false);
-      } else {
-        console.warn("📱 pendingCheckout is false, not processing checkout");
       }
-
-      toast({
-        title: "Success",
-        description: "Phone number saved",
-      });
     } catch (error) {
-      console.error("📱 Error in handlePhoneSubmit:", error);
+      console.error("Error updating phone:", error);
       setPendingCheckout(false);
-
-      const errorMessage = error instanceof Error ? error.message : "An error occurred";
-      console.error("📱 Error message:", errorMessage);
 
       toast({
         title: "Error",
-        description: errorMessage,
+        description: "Something went wrong. Please try again.",
         variant: "destructive",
       });
     } finally {
       setProcessingPhone(false);
-      console.log("📱 handlePhoneSubmit completed");
     }
   };
 
