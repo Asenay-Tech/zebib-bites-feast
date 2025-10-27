@@ -144,7 +144,10 @@ const Login = () => {
       const intended = searchParams.get("redirect") || "/";
       localStorage.setItem("post_oauth_redirect", intended);
 
-      const redirectUrl = `${window.location.origin}/auth/v1/callback`;
+      // Environment-aware redirect: localhost vs production
+      const redirectUrl = window.location.hostname === "localhost"
+        ? "http://localhost:5173/login"
+        : `${window.location.origin}/login`;
 
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: "google",
