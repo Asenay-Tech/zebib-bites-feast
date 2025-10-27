@@ -50,6 +50,30 @@ export type Database = {
         }
         Relationships: []
       }
+      category_settings: {
+        Row: {
+          category: string
+          created_at: string | null
+          id: string
+          show_image: boolean
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          id?: string
+          show_image?: boolean
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          id?: string
+          show_image?: boolean
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       contact_messages: {
         Row: {
           created_at: string | null
