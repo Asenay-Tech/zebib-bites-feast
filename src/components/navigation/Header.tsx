@@ -109,85 +109,15 @@ export function Header({ currentSection, onSectionChange }: HeaderProps) {
     }
   };
 
+  const languages = [
+    { code: "de" as const, label: "Deutsch", flag: "🇩🇪" },
+    { code: "en" as const, label: "English", flag: "🇬🇧" },
+  ];
+
+  const currentLanguageObj = languages.find(lang => lang.code === language) || languages[0];
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
-      {/* Top Info Bar */}
-      <div className="bg-surface border-b border-border px-4 py-2 text-sm">
-        <div className="container mx-auto flex flex-wrap items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-6">
-            <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-accent" />
-              <span className="text-body">{t("info.address")}</span>
-              <a
-                href="https://maps.google.com/?q=Salzstraße+14,+63450+Hanau"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-accent hover:text-accent-hover transition-colors"
-              >
-                {t("info.directions")}
-              </a>
-            </div>
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-accent" />
-              <span className="text-body">{t("info.hours")}</span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <a
-              href="tel:+4917746295"
-              className="flex items-center gap-2 text-body hover:text-accent transition-colors"
-            >
-              <Phone className="h-4 w-4" />
-              {t("info.phone")}
-            </a>
-            <LanguageSwitcher
-              currentLanguage={language}
-              onLanguageChange={setLanguage}
-            />
-            {user && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    <span className="hidden md:inline">{user.email?.split('@')[0]}</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 bg-surface border-border">
-                  {isAdmin && (
-                    <>
-                      <DropdownMenuItem onClick={() => navigate("/admin")} className="cursor-pointer font-medium">
-                        <User className="mr-2 h-4 w-4" />
-                        Admin Dashboard
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                    </>
-                  )}
-                  <DropdownMenuItem onClick={() => navigate("/reserve")} className="cursor-pointer">
-                    <Calendar className="mr-2 h-4 w-4" />
-                    {t("nav.reserve")}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/order")} className="cursor-pointer">
-                    <ShoppingBag className="mr-2 h-4 w-4" />
-                    {t("nav.order")}
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    {t("auth.logout")}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-            {!user && (
-              <Button variant="ghost" size="sm" onClick={() => navigate("/login")}>
-                {t("auth.login")}
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
-
       {/* Main Navigation */}
       <nav
         className={`backdrop-blur-md transition-all duration-300 ${
@@ -226,10 +156,150 @@ export function Header({ currentSection, onSectionChange }: HeaderProps) {
                   )}
                 </button>
               ))}
+              
+              {/* Language Switcher */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-9 w-9 rounded-full p-0 hover:scale-110 transition-transform"
+                  >
+                    <span className="text-xl">{currentLanguageObj.flag}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 bg-surface border-border">
+                  {languages.map((lang) => (
+                    <DropdownMenuItem
+                      key={lang.code}
+                      onClick={() => setLanguage(lang.code)}
+                      className={`cursor-pointer ${
+                        language === lang.code
+                          ? "bg-primary/10 text-primary"
+                          : "hover:bg-muted"
+                      }`}
+                    >
+                      <span className="mr-3 text-lg">{lang.flag}</span>
+                      <span className="font-medium">{lang.label}</span>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* User Menu */}
+              {user && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      <span className="hidden lg:inline">{user.email?.split('@')[0]}</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48 bg-surface border-border">
+                    {isAdmin && (
+                      <>
+                        <DropdownMenuItem onClick={() => navigate("/admin")} className="cursor-pointer font-medium">
+                          <User className="mr-2 h-4 w-4" />
+                          Admin Dashboard
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                      </>
+                    )}
+                    <DropdownMenuItem onClick={() => navigate("/reserve")} className="cursor-pointer">
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {t("nav.reserve")}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate("/order")} className="cursor-pointer">
+                      <ShoppingBag className="mr-2 h-4 w-4" />
+                      {t("nav.order")}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      {t("auth.logout")}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+              {!user && (
+                <Button variant="ghost" size="sm" onClick={() => navigate("/login")}>
+                  {t("auth.login")}
+                </Button>
+              )}
             </div>
 
             {/* Mobile menu button */}
-            <div className="md:hidden">
+            <div className="md:hidden flex items-center gap-2">
+              {/* Mobile Language Switcher */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-9 w-9 rounded-full p-0"
+                  >
+                    <span className="text-lg">{currentLanguageObj.flag}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 bg-surface border-border">
+                  {languages.map((lang) => (
+                    <DropdownMenuItem
+                      key={lang.code}
+                      onClick={() => setLanguage(lang.code)}
+                      className={`cursor-pointer ${
+                        language === lang.code
+                          ? "bg-primary/10 text-primary"
+                          : "hover:bg-muted"
+                      }`}
+                    >
+                      <span className="mr-3 text-lg">{lang.flag}</span>
+                      <span className="font-medium">{lang.label}</span>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Mobile User Menu */}
+              {user && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
+                      <User className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48 bg-surface border-border">
+                    {isAdmin && (
+                      <>
+                        <DropdownMenuItem onClick={() => navigate("/admin")} className="cursor-pointer font-medium">
+                          <User className="mr-2 h-4 w-4" />
+                          Admin Dashboard
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                      </>
+                    )}
+                    <DropdownMenuItem onClick={() => navigate("/reserve")} className="cursor-pointer">
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {t("nav.reserve")}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate("/order")} className="cursor-pointer">
+                      <ShoppingBag className="mr-2 h-4 w-4" />
+                      {t("nav.order")}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      {t("auth.logout")}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+              {!user && (
+                <Button variant="ghost" size="sm" onClick={() => navigate("/login")}>
+                  {t("auth.login")}
+                </Button>
+              )}
+
+              {/* Mobile Menu Toggle */}
               <Button
                 variant="ghost"
                 size="sm"
