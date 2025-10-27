@@ -19,11 +19,17 @@ interface MenuItem {
   category: string;
 }
 
+interface CategorySetting {
+  category: string;
+  show_image: boolean;
+}
+
 export function Menu() {
   const { language, t } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
+  const [categorySettings, setCategorySettings] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -66,6 +72,17 @@ export function Menu() {
         new Set(data?.map((item) => item.category) || [])
       ).sort();
       setCategories(uniqueCategories);
+
+      // Fetch category settings
+      const { data: settings } = await supabase
+        .from("category_settings")
+        .select("category, show_image");
+
+      const settingsMap: Record<string, boolean> = {};
+      settings?.forEach((s) => {
+        settingsMap[s.category] = s.show_image;
+      });
+      setCategorySettings(settingsMap);
     } catch (error) {
       console.error("Error fetching menu items:", error);
     } finally {
@@ -92,16 +109,22 @@ export function Menu() {
   const getItemDescription = (item: MenuItem) => (language === "de" ? item.description_de : item.description_en) || "";
 
   const formatPrice = (price: any) => {
-    if (price === undefined || price === null) return "€0.00";
+    if (price === undefined || price === null) return "0,00 €";
     
     // If it's a number
     if (typeof price === "number") {
-      return `€${price.toFixed(2)}`;
+      return `${price.toFixed(2).replace('.', ',')} €`;
     }
     
     // If it's a string
     if (typeof price === "string") {
-      return price.includes("€") ? price : `€${price}`;
+      // If it already has € symbol, format it with comma
+      if (price.includes("€")) {
+        return price.replace('.', ',');
+      }
+      // Otherwise add € at the end with comma
+      const num = parseFloat(price);
+      return isNaN(num) ? price : `${num.toFixed(2).replace('.', ',')} €`;
     }
     
     // If it's an object (JSONB with variants)
@@ -109,14 +132,13 @@ export function Menu() {
       const firstKey = Object.keys(price)[0];
       const firstValue = price[firstKey];
       if (typeof firstValue === "number") {
-        return `€${firstValue.toFixed(2)}`;
+        return `${firstValue.toFixed(2).replace('.', ',')} €`;
       }
-      return typeof firstValue === "string" && firstValue.includes("€") 
-        ? firstValue 
-        : `€${firstValue}`;
+      const num = parseFloat(firstValue);
+      return isNaN(num) ? firstValue : `${num.toFixed(2).replace('.', ',')} €`;
     }
     
-    return "€0.00";
+    return "0,00 €";
   };
 
   const getItemVariants = (price: any) => {
@@ -189,13 +211,15 @@ export function Menu() {
             {filteredItems.map((item) => {
               const variants = getItemVariants(item.price);
 
+              const shouldShowImage = categorySettings[item.category] !== false;
+              
               return (
                 <Card
                   key={item.id}
                   className="bg-surface border-border hover:shadow-card-hover transition-all duration-300 overflow-hidden"
                 >
                   <CardContent className="p-0">
-                    {getItemImageSrc(item) && (
+                    {shouldShowImage && getItemImageSrc(item) && (
                       <div className="w-full h-48 overflow-hidden">
                         <img
                           src={getItemImageSrc(item)!}
@@ -217,13 +241,21 @@ export function Menu() {
                       {getItemDescription(item) && <p className="text-body text-sm mb-4">{getItemDescription(item)}</p>}
 
                       {/* Price Display */}
-                      <div className="text-xl font-bold text-accent">{formatPrice(item.price)}</div>
-                      
-                      {/* Show variants if available */}
-                      {variants.length > 1 && (
-                        <div className="text-sm text-muted-foreground mt-2">
-                          {variants.join(", ")}
+                      {variants.length > 1 ? (
+                        <div className="space-y-2">
+                          {variants.map((variant) => (
+                            <div key={variant} className="flex justify-between items-center">
+                              <span className="text-sm text-body">{variant}</span>
+                              <span className="text-lg font-bold text-accent">
+                                {typeof item.price === "object" && item.price[variant]
+                                  ? `${parseFloat(item.price[variant]).toFixed(2).replace('.', ',')} €`
+                                  : formatPrice(item.price)}
+                              </span>
+                            </div>
+                          ))}
                         </div>
+                      ) : (
+                        <div className="text-xl font-bold text-accent">{formatPrice(item.price)}</div>
                       )}
                     </div>
                   </CardContent>

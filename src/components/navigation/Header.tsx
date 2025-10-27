@@ -277,15 +277,6 @@ export function Header({ currentSection, onSectionChange }: HeaderProps) {
                         <DropdownMenuSeparator />
                       </>
                     )}
-                    <DropdownMenuItem onClick={() => navigate("/reserve")} className="cursor-pointer">
-                      <Calendar className="mr-2 h-4 w-4" />
-                      {t("nav.reserve")}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate("/order")} className="cursor-pointer">
-                      <ShoppingBag className="mr-2 h-4 w-4" />
-                      {t("nav.order")}
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive">
                       <LogOut className="mr-2 h-4 w-4" />
                       {t("auth.logout")}

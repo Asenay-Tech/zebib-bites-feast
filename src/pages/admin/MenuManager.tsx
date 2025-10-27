@@ -70,6 +70,11 @@ const DEFAULT_CATEGORIES = [
   "Beer"
 ];
 
+interface CategorySetting {
+  category: string;
+  show_image: boolean;
+}
+
 export default function MenuManager() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [filteredItems, setFilteredItems] = useState<MenuItem[]>([]);
@@ -86,6 +91,7 @@ export default function MenuManager() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [categories, setCategories] = useState<string[]>(DEFAULT_CATEGORIES);
+  const [categorySettings, setCategorySettings] = useState<Record<string, boolean>>({});
   const [newCategory, setNewCategory] = useState("");
   const [previewMode, setPreviewMode] = useState(false);
   const [draggedItem, setDraggedItem] = useState<MenuItem | null>(null);
@@ -152,6 +158,17 @@ export default function MenuManager() {
       if (uniqueCategories.length > 0) {
         setCategories(uniqueCategories);
       }
+
+      // Fetch category settings
+      const { data: settings } = await supabase
+        .from("category_settings")
+        .select("category, show_image");
+
+      const settingsMap: Record<string, boolean> = {};
+      settings?.forEach((s) => {
+        settingsMap[s.category] = s.show_image;
+      });
+      setCategorySettings(settingsMap);
     } catch (error) {
       console.error('Error fetching menu items:', error);
       toast({
@@ -352,7 +369,9 @@ export default function MenuManager() {
       name_en: item.name_en,
       description_de: item.description_de || "",
       description_en: item.description_en || "",
-      price: typeof item.price === 'object' ? JSON.stringify(item.price) : String(item.price),
+      price: typeof item.price === 'object' 
+        ? JSON.stringify(item.price) 
+        : String(item.price).replace('.', ','), // Convert to European format
       category: item.category,
     });
     // Load original image for editing, not the edited version
@@ -394,7 +413,22 @@ export default function MenuManager() {
         if (edited) editedImageUrl = edited;
       }
 
-      const priceData = parseFloat(formData.price) || 0;
+      // Parse price - handle both European format and JSON for multiple sizes
+      let priceData: any;
+      try {
+        // Try to parse as JSON first (for drinks with multiple sizes)
+        if (formData.price.trim().startsWith('{')) {
+          priceData = JSON.parse(formData.price);
+        } else {
+          // Handle European format: replace comma with dot and parse
+          const normalizedPrice = formData.price.replace(',', '.');
+          priceData = parseFloat(normalizedPrice) || 0;
+        }
+      } catch (error) {
+        // If JSON parse fails, treat as regular number
+        const normalizedPrice = formData.price.replace(',', '.');
+        priceData = parseFloat(normalizedPrice) || 0;
+      }
 
       const itemData = {
         category: formData.category,
@@ -703,13 +737,11 @@ export default function MenuManager() {
   const renderPrice = (price: any) => {
     if (typeof price === 'object') {
       return Object.entries(price)
-        .map(([size, p]) => `${size}: €${p}`)
+        .map(([size, p]) => `${size}: ${parseFloat(String(p)).toFixed(2).replace('.', ',')} €`)
         .join(', ');
     }
-    return new Intl.NumberFormat("de-DE", {
-      style: "currency",
-      currency: "EUR",
-    }).format(Number(price));
+    const num = parseFloat(String(price));
+    return isNaN(num) ? price : `${num.toFixed(2).replace('.', ',')} €`;
   };
 
 
@@ -1063,17 +1095,18 @@ export default function MenuManager() {
             </div>
 
             <div>
-              <Label htmlFor="price">Price (e.g., 22.90)</Label>
+              <Label htmlFor="price">Price (European format, e.g., 7,50 or JSON for multiple sizes)</Label>
               <Input
                 id="price"
-                type="number"
-                step="0.01"
-                min="0"
+                type="text"
                 value={formData.price}
                 onChange={(e) => setFormData({...formData, price: e.target.value})}
-                placeholder="e.g., 22.90"
+                placeholder='e.g., 7,50 or {"0.1L": 7.00, "0.75L": 32.00}'
                 required
               />
+              <p className="text-xs text-muted-foreground mt-1">
+                For drinks with multiple sizes, use JSON format: {`{"0.1L": 7.00, "0.75L": 32.00}`}
+              </p>
             </div>
 
             <div>
@@ -1269,8 +1302,36 @@ export default function MenuManager() {
 
             <div className="space-y-2">
               {categories.map((category) => (
-                <div key={category} className="flex items-center justify-between p-2 border border-border rounded-md">
-                  <span>{category}</span>
+                <div key={category} className="flex items-center justify-between gap-4 p-2 border border-border rounded-md">
+                  <div className="flex items-center gap-3 flex-1">
+                    <Label htmlFor={`show-image-${category}`} className="flex items-center gap-2 cursor-pointer flex-1">
+                      <input
+                        type="checkbox"
+                        id={`show-image-${category}`}
+                        checked={categorySettings[category] !== false}
+                        onChange={async (e) => {
+                          const showImage = e.target.checked;
+                          setCategorySettings(prev => ({ ...prev, [category]: showImage }));
+                          
+                          // Update or insert in database
+                          const { error } = await supabase
+                            .from("category_settings")
+                            .upsert({ category, show_image: showImage }, { onConflict: "category" });
+                          
+                          if (error) {
+                            toast({
+                              title: "Error",
+                              description: "Failed to update category setting",
+                              variant: "destructive",
+                            });
+                          }
+                        }}
+                        className="h-4 w-4"
+                      />
+                      <span className="text-sm">Show Menu Image</span>
+                    </Label>
+                    <span className="font-medium">{category}</span>
+                  </div>
                   <Button
                     variant="ghost"
                     size="sm"
