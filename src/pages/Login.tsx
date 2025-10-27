@@ -145,9 +145,10 @@ const Login = () => {
       localStorage.setItem("post_oauth_redirect", intended);
 
       // Environment-aware redirect: localhost vs production
+      // Redirect to root (/) where Index.tsx handles OAuth and redirects appropriately
       const redirectUrl = window.location.hostname === "localhost"
-        ? "http://localhost:5173/login"
-        : `${window.location.origin}/login`;
+        ? "http://localhost:5173/"
+        : `${window.location.origin}/`;
 
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: "google",
