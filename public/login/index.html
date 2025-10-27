@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <meta name="robots" content="noindex" />
+    <title>Redirecting…</title>
+    <script>
+      (function () {
+        // Preserve any query and hash from the OAuth provider
+        var search = window.location.search || "";
+        var hash = window.location.hash || "";
+        // Redirect to root so the SPA can load and handle the auth hash
+        var dest = "/" + (search ? search : "") + (hash ? hash : "");
+        // Use replace so the transient /login page doesn't remain in history
+        window.location.replace(dest);
+      })();
+    </script>
+  </head>
+  <body>
+    Redirecting…
+  </body>
+</html>

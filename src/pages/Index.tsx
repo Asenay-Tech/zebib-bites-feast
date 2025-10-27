@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/navigation/Header";
 import { Hero } from "@/components/sections/Hero";
 import { Menu } from "@/components/sections/Menu";
@@ -8,6 +10,7 @@ import { Contact } from "@/components/sections/Contact";
 import { Footer } from "@/components/sections/Footer";
 
 const Index = () => {
+  const navigate = useNavigate();
   const [currentSection, setCurrentSection] = useState("home");
 
   // Handle scroll to update current section
@@ -31,6 +34,30 @@ const Index = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Post-OAuth redirect handler (works on root as a fallback)
+  useEffect(() => {
+    const intended = localStorage.getItem("post_oauth_redirect");
+    if (!intended) return;
+
+    // 1) Listen for sign-in events
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" && session) {
+        localStorage.removeItem("post_oauth_redirect");
+        navigate(intended, { replace: true });
+      }
+    });
+
+    // 2) Also check immediately in case session is already available
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        localStorage.removeItem("post_oauth_redirect");
+        navigate(intended, { replace: true });
+      }
+    });
+
+    return () => sub.subscription.unsubscribe();
+  }, [navigate]);
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
