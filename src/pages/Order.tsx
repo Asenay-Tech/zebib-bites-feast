@@ -589,39 +589,72 @@ const Order = () => {
                 <p className="text-center text-muted-foreground py-12">{t("menu.noItems")}</p>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {filteredMenu.map((item) => (
-                    <Card key={item.id} className="p-4 overflow-hidden">
-                      <div className="flex gap-4">
-                        <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                          <img
-                            src={item.image_url || menuPlaceholder}
-                            alt={language === "de" ? item.name_de : item.name_en}
-                            className="w-full h-full object-cover transition-transform duration-200"
-                            style={{
-                              transform: `scale(${item.image_scale || 1})`,
-                              transformOrigin: "center",
-                            }}
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold truncate">{language === "de" ? item.name_de : item.name_en}</h3>
-                          <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                            {language === "de" ? item.description_de : item.description_en}
-                          </p>
-                          <div className="flex justify-between items-center">
-                            <span className="font-bold text-accent">{formatEUR(getUnitPrice(item.price))}</span>
-                            <Button size="sm" onClick={() => addToCart(item)} disabled={addingToCart === item.name_de}>
-                              {addingToCart === item.name_de ? (
-                                <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                              ) : (
-                                <Plus className="h-4 w-4" />
-                              )}
-                            </Button>
+                  {filteredMenu.map((item) => {
+                    const hasVariants = typeof item.price === "object" && item.price && Object.keys(item.price).length > 1;
+                    const variants = hasVariants ? Object.keys(item.price as Record<string, any>) : [];
+                    
+                    return (
+                      <Card key={item.id} className="p-4 overflow-hidden">
+                        <div className="flex gap-4">
+                          <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                            <img
+                              src={item.image_url || menuPlaceholder}
+                              alt={language === "de" ? item.name_de : item.name_en}
+                              className="w-full h-full object-cover transition-transform duration-200"
+                              style={{
+                                transform: `scale(${item.image_scale || 1})`,
+                                transformOrigin: "center",
+                              }}
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold truncate">{language === "de" ? item.name_de : item.name_en}</h3>
+                            <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                              {language === "de" ? item.description_de : item.description_en}
+                            </p>
+                            
+                            {hasVariants ? (
+                              <div className="space-y-2">
+                                {variants.map((variant) => {
+                                  const variantPrice = getUnitPrice(item.price, variant);
+                                  return (
+                                    <div key={variant} className="flex justify-between items-center gap-2">
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-xs text-muted-foreground">{variant}</span>
+                                        <span className="font-bold text-sm text-accent">{formatEUR(variantPrice)}</span>
+                                      </div>
+                                      <Button 
+                                        size="sm" 
+                                        onClick={() => addToCart(item, variant)} 
+                                        disabled={addingToCart === item.name_de}
+                                      >
+                                        {addingToCart === item.name_de ? (
+                                          <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                        ) : (
+                                          <Plus className="h-4 w-4" />
+                                        )}
+                                      </Button>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            ) : (
+                              <div className="flex justify-between items-center">
+                                <span className="font-bold text-accent">{formatEUR(getUnitPrice(item.price))}</span>
+                                <Button size="sm" onClick={() => addToCart(item)} disabled={addingToCart === item.name_de}>
+                                  {addingToCart === item.name_de ? (
+                                    <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                  ) : (
+                                    <Plus className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              </div>
+                            )}
                           </div>
                         </div>
-                      </div>
-                    </Card>
-                  ))}
+                      </Card>
+                    );
+                  })}
                 </div>
               )}
             </Card>
