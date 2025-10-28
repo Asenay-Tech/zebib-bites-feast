@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/components/ui/language-switcher";
@@ -201,68 +202,130 @@ export function Menu() {
           </div>
         </div>
 
-        {/* Menu Items Grid */}
+        {/* Menu Items */}
         {loading ? (
           <div className="text-center py-12 text-body">{t("common.loading")}</div>
         ) : filteredItems.length === 0 ? (
           <div className="text-center py-12 text-body">No menu items available</div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredItems.map((item) => {
-              const variants = getItemVariants(item.price);
+          <>
+            {/* Check if current category should show images */}
+            {(() => {
+              const shouldShowImages = selectedCategory === "all" 
+                ? filteredItems.some(item => categorySettings[item.category] !== false && getItemImageSrc(item))
+                : categorySettings[selectedCategory] !== false;
 
-              const shouldShowImage = categorySettings[item.category] !== false;
-              
-              return (
-                <Card
-                  key={item.id}
-                  className="bg-surface border-border hover:shadow-card-hover transition-all duration-300 overflow-hidden"
-                >
-                  <CardContent className="p-0">
-                    {shouldShowImage && getItemImageSrc(item) && (
-                      <div className="w-full h-48 overflow-hidden">
-                        <img
-                          src={getItemImageSrc(item)!}
-                          alt={getItemName(item)}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                          onError={(e) => {
-                            e.currentTarget.style.display = "none";
-                          }}
-                        />
-                      </div>
-                    )}
-
-                    <div className="p-6">
-                      {/* Item Name */}
-                      <h3 className="text-lg font-semibold text-foreground mb-4">{getItemName(item)}</h3>
-
-                      {/* Item Description */}
-                      {getItemDescription(item) && <p className="text-body text-sm mb-4">{getItemDescription(item)}</p>}
-
-                      {/* Price Display */}
-                      {variants.length > 1 ? (
-                        <div className="space-y-2">
-                          {variants.map((variant) => (
-                            <div key={variant} className="flex justify-between items-center">
-                              <span className="text-sm text-body">{variant}</span>
-                              <span className="text-lg font-bold text-accent">
-                                {typeof item.price === "object" && item.price[variant]
-                                  ? `${parseFloat(item.price[variant]).toFixed(2).replace('.', ',')} €`
-                                  : formatPrice(item.price)}
-                              </span>
+              return shouldShowImages ? (
+                // Card layout with images
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredItems.map((item) => {
+                    const variants = getItemVariants(item.price);
+                    const shouldShowImage = categorySettings[item.category] !== false;
+                    
+                    return (
+                      <Card
+                        key={item.id}
+                        className="bg-surface border-border hover:shadow-card-hover transition-all duration-300 overflow-hidden"
+                      >
+                        <CardContent className="p-0">
+                          {shouldShowImage && getItemImageSrc(item) && (
+                            <div className="w-full h-48 overflow-hidden">
+                              <img
+                                src={getItemImageSrc(item)!}
+                                alt={getItemName(item)}
+                                className="w-full h-full object-cover"
+                                loading="lazy"
+                                onError={(e) => {
+                                  e.currentTarget.style.display = "none";
+                                }}
+                              />
                             </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="text-xl font-bold text-accent">{formatPrice(item.price)}</div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                          )}
+
+                          <div className="p-6">
+                            <h3 className="text-lg font-semibold text-foreground mb-4">{getItemName(item)}</h3>
+                            {getItemDescription(item) && <p className="text-body text-sm mb-4">{getItemDescription(item)}</p>}
+
+                            {variants.length > 1 ? (
+                              <div className="space-y-2">
+                                {variants.map((variant) => (
+                                  <div key={variant} className="flex justify-between items-center">
+                                    <span className="text-sm text-body">{variant}</span>
+                                    <span className="text-lg font-bold text-accent">
+                                      {typeof item.price === "object" && item.price[variant]
+                                        ? `${parseFloat(item.price[variant]).toFixed(2).replace('.', ',')} €`
+                                        : formatPrice(item.price)}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="text-xl font-bold text-accent">{formatPrice(item.price)}</div>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              ) : (
+                // Clean list layout without images (like Specialties)
+                <div className="max-w-4xl mx-auto space-y-4">
+                  {filteredItems.map((item) => {
+                    const variants = getItemVariants(item.price);
+                    
+                    return (
+                      <div 
+                        key={item.id} 
+                        className="group py-4 border-b border-border/50 hover:border-accent/50 transition-colors duration-300"
+                      >
+                        {variants.length > 1 ? (
+                          // Multiple sizes
+                          <div className="space-y-3">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1">
+                                <h4 className="text-foreground font-medium mb-1">{getItemName(item)}</h4>
+                                {getItemDescription(item) && (
+                                  <p className="text-body text-sm">{getItemDescription(item)}</p>
+                                )}
+                              </div>
+                            </div>
+                            {variants.map((variant) => (
+                              <div key={variant} className="flex items-center justify-between gap-4 pl-4">
+                                <span className="text-sm text-body">{variant}</span>
+                                <div className="flex items-center gap-4">
+                                  <div className="w-12 h-px bg-accent/60"></div>
+                                  <span className="text-accent font-bold whitespace-nowrap">
+                                    {typeof item.price === "object" && item.price[variant]
+                                      ? `${parseFloat(item.price[variant]).toFixed(2).replace('.', ',')} €`
+                                      : formatPrice(item.price)}
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          // Single price
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1">
+                              <h4 className="text-foreground font-medium mb-1">{getItemName(item)}</h4>
+                              {getItemDescription(item) && (
+                                <p className="text-body text-sm">{getItemDescription(item)}</p>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-4">
+                              <div className="w-16 h-px bg-accent/60"></div>
+                              <span className="text-accent font-bold whitespace-nowrap">{formatPrice(item.price)}</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               );
-            })}
-          </div>
+            })()}
+          </>
         )}
 
         {/* Special Section */}
