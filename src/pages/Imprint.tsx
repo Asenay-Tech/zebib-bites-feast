@@ -17,7 +17,7 @@ export default function Imprint() {
       metaDescription.setAttribute('name', 'description');
       document.head.appendChild(metaDescription);
     }
-    metaDescription.setAttribute('content', `${t("imprint.title")} - Zebib Foods, Salzstraße 14, 63450 Hanau, Germany`);
+    metaDescription.setAttribute('content', `${t("imprint.title")} - Zebib Foods, Dettinger Str. 2, 63450 Hanau, Germany`);
     
     // Update canonical URL
     let canonical = document.querySelector('link[rel="canonical"]');
@@ -75,9 +75,16 @@ export default function Imprint() {
 
               <div>
                 <h2 className="text-xl font-semibold text-foreground mb-2">
+                  {t("imprint.owner")}
+                </h2>
+                <p>Zebib Haile Hamde</p>
+              </div>
+
+              <div>
+                <h2 className="text-xl font-semibold text-foreground mb-2">
                   {t("imprint.address")}
                 </h2>
-                <p>Salzstraße 14</p>
+                <p>Dettinger Str. 2</p>
                 <p>63450 Hanau, Germany</p>
               </div>
 
@@ -91,33 +98,25 @@ export default function Imprint() {
 
               <div>
                 <h2 className="text-xl font-semibold text-foreground mb-2">
-                  {t("imprint.responsible")}
-                </h2>
-                <p>Ale Tesfaldet</p>
-              </div>
-
-              <div>
-                <h2 className="text-xl font-semibold text-foreground mb-2">
                   {t("imprint.vat")}
                 </h2>
                 <p>{t("imprint.vatNumber")}</p>
               </div>
+
+              <div>
+                <h2 className="text-xl font-semibold text-foreground mb-2">
+                  {t("imprint.responsible")}
+                </h2>
+                <p>Zebib Haile Hamde</p>
+              </div>
             </section>
 
-            {/* Liability Disclaimer */}
+            {/* Disclaimer */}
             <section>
               <h2 className="text-2xl font-semibold text-foreground mb-4">
-                {t("imprint.liability.title")}
+                {t("imprint.disclaimer.title")}
               </h2>
-              <p className="leading-relaxed">{t("imprint.liability.content")}</p>
-            </section>
-
-            {/* External Links */}
-            <section>
-              <h2 className="text-2xl font-semibold text-foreground mb-4">
-                {t("imprint.externalLinks.title")}
-              </h2>
-              <p className="leading-relaxed">{t("imprint.externalLinks.content")}</p>
+              <p className="leading-relaxed">{t("imprint.disclaimer.content")}</p>
             </section>
           </div>
         </div>
