@@ -547,7 +547,24 @@ const Order = () => {
             </Card>
 
             <Card className="p-6">
-              <div className="grid gap-3 grid-cols-2 sm:grid-cols-[repeat(auto-fit,minmax(160px,1fr))]">
+              {/* Mobile Dropdown */}
+              <div className="flex md:hidden mb-4">
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger className="w-full bg-surface border-border text-foreground">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-surface border-border z-50">
+                    {categories.map((cat) => (
+                      <SelectItem key={cat} value={cat}>
+                        {cat}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Desktop Button Grid */}
+              <div className="hidden md:grid gap-3 grid-cols-2 sm:grid-cols-[repeat(auto-fit,minmax(160px,1fr))]">
                 {categories.map((cat) => {
                   return (
                     <Button
