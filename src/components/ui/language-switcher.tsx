@@ -134,6 +134,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "auth.newPassword": "Neues Passwort",
         "auth.updatePassword": "Passwort aktualisieren",
         "auth.backToLogin": "Zurück zur Anmeldung",
+        "auth.continueWithGoogle": "Weiter mit Google",
 
         // Reserve
         "reserve.title": "Reservieren",
@@ -224,7 +225,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "common.total": "Gesamt",
 
         // Footer
-        "footer.developed": "Entwickelt von ",
+        "footer.developed": "Entwickelt von Asenay Tech",
         "footer.followUs": "Folgen Sie uns",
         "footer.rights": "Alle Rechte vorbehalten.",
         "footer.privacy": "Datenschutz",
@@ -330,6 +331,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "auth.newPassword": "New password",
         "auth.updatePassword": "Update password",
         "auth.backToLogin": "Back to login",
+        "auth.continueWithGoogle": "Continue with Google",
 
         // Reserve
         "reserve.title": "Make a Reservation",
@@ -420,7 +422,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "common.total": "Total",
 
         // Footer
-        "footer.developed": "Developed by ",
+        "footer.developed": "Developed by Asenay Tech",
         "footer.followUs": "Follow us",
         "footer.rights": "All rights reserved.",
         "footer.privacy": "Privacy Policy",
