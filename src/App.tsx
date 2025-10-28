@@ -21,6 +21,8 @@ import Checkout from "./pages/Checkout";
 import CallbackHandler from "./pages/CallbackHandler";
 import VerifyEmail from "./pages/VerifyEmail";
 import ResetPassword from "./pages/ResetPassword";
+import Privacy from "./pages/Privacy";
+import Imprint from "./pages/Imprint";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +43,8 @@ const App = () => (
             <Route path="/auth/v1/callback" element={<CallbackHandler />} />
             <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/imprint" element={<Imprint />} />
 
             {/* Admin Routes */}
             <Route

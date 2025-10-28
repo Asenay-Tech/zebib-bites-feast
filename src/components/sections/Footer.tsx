@@ -94,10 +94,10 @@ export function Footer() {
           </p>
 
           <div className="flex items-center gap-6 text-sm text-body">
-            <a href="#" className="hover:text-accent transition-colors">
+            <a href="/privacy" className="hover:text-accent transition-colors">
               {t("footer.privacy")}
             </a>
-            <a href="#" className="hover:text-accent transition-colors">
+            <a href="/imprint" className="hover:text-accent transition-colors">
               {t("footer.imprint")}
             </a>
             <span>{t("footer.developed")}</span>
