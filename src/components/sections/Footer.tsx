@@ -1,5 +1,6 @@
 import { useLanguage } from "@/components/ui/language-switcher";
 import { Facebook, Instagram, Twitter } from "lucide-react";
+import { Trans } from "react-i18next";
 
 export function Footer() {
   const { t } = useLanguage();
