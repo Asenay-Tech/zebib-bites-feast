@@ -54,10 +54,10 @@ serve(async (req) => {
     }
     console.log("[stripe-checkout] User authenticated:", user.id);
 
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY_LIVE");
     if (!stripeKey) {
-      console.error("[stripe-checkout] STRIPE_SECRET_KEY not configured");
-      throw new Error("STRIPE_SECRET_KEY not found");
+      console.error("[stripe-checkout] STRIPE_SECRET_KEY_LIVE not configured");
+      throw new Error("STRIPE_SECRET_KEY_LIVE not found");
     }
 
     // Detect and log Stripe mode

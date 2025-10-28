@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY_LIVE") || "", {
       apiVersion: "2025-08-27.basil",
     });
 
