@@ -386,8 +386,8 @@ const Order = () => {
           date: orderDate,
           time: orderTime,
           diningType,
-          successUrl: `${BASE_URL}/success`,
-          cancelUrl: `${BASE_URL}/order?canceled=true`,
+          successUrl: `${BASE_URL}/checkout?success=true`,
+          cancelUrl: `${BASE_URL}/checkout?canceled=true`,
         },
       });
 
