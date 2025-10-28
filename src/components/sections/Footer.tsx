@@ -100,10 +100,7 @@ export function Footer() {
             <a href="/imprint" className="hover:text-accent transition-colors">
               {t("footer.imprint")}
             </a>
-            <span className="text-sm text-body">
-              <Trans i18nKey="footer.developed">
-                Developed by <a href="https://asenaytech.com" target="_blank" rel="noopener noreferrer" className="hover:text-accent font-semibold">Asenay Tech</a>
-              </Trans
+            <span>{t("footer.developed")}</span>
           </div>
         </div>
       </div>
