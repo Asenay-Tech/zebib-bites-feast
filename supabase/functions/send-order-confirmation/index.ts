@@ -100,7 +100,7 @@ serve(async (req) => {
 
     // In test mode, Resend only allows sending to verified email
     // So we'll send customer copy to admin email for testing
-    const adminEmail = Deno.env.get("ADMIN_EMAIL") || "admin@zebibfood.de";
+    const adminEmail = Deno.env.get("ADMIN_EMAIL") || "ale@zebibfood.de";
     const testMode = !RESEND_API_KEY?.startsWith("re_");
     
     console.log(`Sending emails in ${testMode ? "TEST" : "LIVE"} mode`);
@@ -113,7 +113,7 @@ serve(async (req) => {
         "Authorization": `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Zebib Foods <onboarding@resend.dev>",
+        from: "Zebib Foods <ale@zebibfood.de>",
         to: testMode ? [adminEmail] : [email],
         subject: `Order Confirmation #${orderId.slice(0, 8).toUpperCase()} - Zebib Foods`,
         html,
@@ -144,7 +144,7 @@ serve(async (req) => {
         "Authorization": `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Zebib Foods <onboarding@resend.dev>",
+        from: "Zebib Foods <ale@zebibfood.de>",
         to: [adminEmail],
         subject: `🔔 New Order #${orderId.slice(0, 8).toUpperCase()} - €${(totalAmount / 100).toFixed(2)}`,
         html: adminHtml,
