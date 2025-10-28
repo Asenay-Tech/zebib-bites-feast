@@ -100,7 +100,17 @@ export function Footer() {
             <a href="/imprint" className="hover:text-accent transition-colors">
               {t("footer.imprint")}
             </a>
-            <span>{t("footer.developed")}</span>
+            <span>
+    {t("footer.developed")}{" "}
+    <a
+      href="https://asenaytech.com"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="hover:text-accent transition-colors font-semibold"
+    >
+      Asenay Tech
+    </a>
+  </span>
           </div>
         </div>
       </div>

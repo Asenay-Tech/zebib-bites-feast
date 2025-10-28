@@ -224,7 +224,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "common.total": "Gesamt",
 
         // Footer
-        "footer.developed": "Entwickelt von Asenay Tech",
+        "footer.developed": "Entwickelt von ",
         "footer.followUs": "Folgen Sie uns",
         "footer.rights": "Alle Rechte vorbehalten.",
         "footer.privacy": "Datenschutz",
@@ -420,7 +420,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "common.total": "Total",
 
         // Footer
-        "footer.developed": "Developed by Asenay Tech",
+        "footer.developed": "Developed by ",
         "footer.followUs": "Follow us",
         "footer.rights": "All rights reserved.",
         "footer.privacy": "Privacy Policy",
