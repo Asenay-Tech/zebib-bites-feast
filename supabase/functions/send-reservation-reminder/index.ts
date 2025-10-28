@@ -71,7 +71,7 @@ serve(async (req) => {
         "Authorization": `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Zebib Foods <noreply@zebibfood.de>",
+        from: "Zebib Foods <ale@zebibfood.de>",
         to: [email],
         subject: `Reservation Reminder - Today at ${time}`,
         html,

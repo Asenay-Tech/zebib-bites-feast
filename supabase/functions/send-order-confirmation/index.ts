@@ -114,7 +114,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         from: "Zebib Foods <ale@zebibfood.de>",
-        to: testMode ? [adminEmail] : [email],
+        to: [email],
         subject: `Order Confirmation #${orderId.slice(0, 8).toUpperCase()} - Zebib Foods`,
         html,
       }),
