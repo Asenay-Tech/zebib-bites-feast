@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AdminBreadcrumb } from "@/components/admin/Breadcrumb";
 import { toast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { logger } from "@/lib/logger";
 
 interface ActivityLog {
   id: string;
@@ -77,7 +78,7 @@ export default function Dashboard() {
         totalRevenue: revenue / 100,
       });
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      logger.error('Error fetching stats:', error);
     }
   };
 
@@ -117,7 +118,7 @@ export default function Dashboard() {
 
       setOrdersByDay(chartData);
     } catch (error) {
-      console.error('Error fetching orders by day:', error);
+      logger.error('Error fetching orders by day:', error);
     }
   };
 
@@ -131,7 +132,7 @@ export default function Dashboard() {
 
       setRecentActivity(data || []);
     } catch (error) {
-      console.error('Error fetching recent activity:', error);
+      logger.error('Error fetching recent activity:', error);
     }
   };
 

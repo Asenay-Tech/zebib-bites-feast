@@ -11,6 +11,7 @@ import { AdminBreadcrumb } from "@/components/admin/Breadcrumb";
 import { ArrowUpDown, Download, Edit, Trash2, Plus, RefreshCw } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { logActivity } from "@/lib/activityLogger";
+import { logger } from "@/lib/logger";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -78,7 +79,7 @@ export default function Orders() {
       if (error) throw error;
       setOrders(data || []);
     } catch (error) {
-      console.error('Error fetching orders:', error);
+      logger.error('Error fetching orders:', error);
       toast({
         title: "Error loading orders",
         variant: "destructive",
@@ -144,7 +145,7 @@ export default function Orders() {
       
       fetchOrders();
     } catch (error) {
-      console.error('Error updating order:', error);
+      logger.error('Error updating order:', error);
       toast({
         title: "Error updating order",
         variant: "destructive",
@@ -175,7 +176,7 @@ export default function Orders() {
       });
       fetchOrders();
     } catch (error) {
-      console.error('Error deleting order:', error);
+      logger.error('Error deleting order:', error);
       toast({
         title: "Error deleting order",
         variant: "destructive",
@@ -287,7 +288,7 @@ export default function Orders() {
       fetchOrders();
       resetForm();
     } catch (error) {
-      console.error('Error saving order:', error);
+      logger.error('Error saving order:', error);
       toast({
         title: "Error saving order",
         variant: "destructive",

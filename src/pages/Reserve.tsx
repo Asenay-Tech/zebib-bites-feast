@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -190,7 +191,7 @@ const Reserve = () => {
           },
         });
       } catch (emailError) {
-        console.error("Failed to send confirmation email:", emailError);
+        logger.error("Failed to send confirmation email:", emailError);
         // Don't fail the reservation if email fails
       }
 

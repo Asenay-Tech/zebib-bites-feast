@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from "@/lib/logger";
 
 /**
  * Each reservation has a 2-hour duration window
@@ -32,7 +33,7 @@ export async function checkTableAvailability(
       .eq("date", dateString);
 
     if (error) {
-      console.error("Error checking table availability:", error);
+      logger.error("Error checking table availability:", error);
       return { available: false, error: error.message };
     }
 
@@ -56,7 +57,7 @@ export async function checkTableAvailability(
 
     return { available: true };
   } catch (err: any) {
-    console.error("Error in checkTableAvailability:", err);
+    logger.error("Error in checkTableAvailability:", err);
     return { available: false, error: err.message };
   }
 }
@@ -82,7 +83,7 @@ export async function getBookedTables(
       .eq("date", dateString);
 
     if (error || !reservations) {
-      console.error("Error fetching booked tables:", error);
+      logger.error("Error fetching booked tables:", error);
       return [];
     }
 
@@ -107,7 +108,7 @@ export async function getBookedTables(
 
     return bookedTables;
   } catch (err) {
-    console.error("Error in getBookedTables:", err);
+    logger.error("Error in getBookedTables:", err);
     return [];
   }
 }

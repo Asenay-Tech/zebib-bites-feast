@@ -9,6 +9,7 @@ import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminBreadcrumb } from "@/components/admin/Breadcrumb";
 import { logActivity } from "@/lib/activityLogger";
+import { logger } from "@/lib/logger";
 import {
   Tooltip,
   TooltipContent,
@@ -123,7 +124,7 @@ export default function MenuManager() {
           table: "menu_items",
         },
         (payload) => {
-          console.log("Menu item changed:", payload);
+          logger.log("Menu item changed:", payload);
           fetchMenuItems();
         }
       )
@@ -170,7 +171,7 @@ export default function MenuManager() {
       });
       setCategorySettings(settingsMap);
     } catch (error) {
-      console.error('Error fetching menu items:', error);
+      logger.error('Error fetching menu items:', error);
       toast({
         title: "Error",
         description: "Failed to load menu items",
@@ -241,7 +242,7 @@ export default function MenuManager() {
 
       return data.publicUrl;
     } catch (error) {
-      console.error('Error uploading image:', error);
+      logger.error('Error uploading image:', error);
       toast({
         title: "Error",
         description: "Failed to upload image",
@@ -322,7 +323,7 @@ export default function MenuManager() {
               .upload(filePath, blob);
 
             if (uploadError) {
-              console.error('Upload error:', uploadError);
+              logger.error('Upload error:', uploadError);
               reject(uploadError);
               return;
             }
@@ -484,7 +485,7 @@ export default function MenuManager() {
       setImageOffsetY(0);
       fetchMenuItems();
     } catch (error) {
-      console.error('Error saving menu item:', error);
+      logger.error('Error saving menu item:', error);
       toast({
         title: "Error",
         description: "Failed to save menu item",
@@ -520,7 +521,7 @@ export default function MenuManager() {
       setItemToDelete(null);
       fetchMenuItems();
     } catch (error) {
-      console.error('Error deleting menu item:', error);
+      logger.error('Error deleting menu item:', error);
       toast({
         title: "Error",
         description: "Failed to delete menu item",
@@ -563,7 +564,7 @@ export default function MenuManager() {
 
       fetchMenuItems();
     } catch (error) {
-      console.error('Error duplicating item:', error);
+      logger.error('Error duplicating item:', error);
       toast({
         title: "Error",
         description: "Failed to duplicate menu item",
@@ -620,7 +621,7 @@ export default function MenuManager() {
         description: `Backup saved to /backups/${fileName}`,
       });
     } catch (error) {
-      console.error('Error creating backup:', error);
+      logger.error('Error creating backup:', error);
       toast({
         title: "Error creating backup",
         variant: "destructive",
@@ -670,7 +671,7 @@ export default function MenuManager() {
 
       fetchMenuItems();
     } catch (error) {
-      console.error('Error importing CSV:', error);
+      logger.error('Error importing CSV:', error);
       toast({
         title: "Error importing CSV",
         variant: "destructive",

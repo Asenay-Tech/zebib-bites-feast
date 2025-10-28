@@ -7,6 +7,7 @@ import { useLanguage } from "@/components/ui/language-switcher";
 import { Star, ExternalLink } from "lucide-react";
 import { format } from "date-fns";
 import { de, enUS } from "date-fns/locale";
+import { logger } from "@/lib/logger";
 
 interface Review {
   author_name: string;
@@ -31,7 +32,7 @@ export function Reviews() {
         const { data, error } = await supabase.functions.invoke('fetch-google-reviews');
         
         if (error) {
-          console.error("Error fetching reviews:", error);
+          logger.error("Error fetching reviews:", error);
           return;
         }
         
@@ -62,7 +63,7 @@ export function Reviews() {
           }
         }
       } catch (err) {
-        console.error("Error fetching reviews:", err);
+        logger.error("Error fetching reviews:", err);
       } finally {
         setLoading(false);
       }

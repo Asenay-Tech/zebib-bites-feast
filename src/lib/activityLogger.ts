@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from "@/lib/logger";
 
 export async function logActivity(
   action: string,
@@ -28,6 +29,6 @@ export async function logActivity(
       details: details || null,
     });
   } catch (error) {
-    console.error('Error logging activity:', error);
+    logger.error('Error logging activity:', error);
   }
 }

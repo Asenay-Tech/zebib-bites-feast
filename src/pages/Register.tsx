@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -71,7 +72,7 @@ const Register = () => {
             },
           });
         } catch (emailError) {
-          console.error("Failed to send verification email:", emailError);
+          logger.error("Failed to send verification email:", emailError);
         }
 
         // Send welcome email
@@ -83,7 +84,7 @@ const Register = () => {
             },
           });
         } catch (emailError) {
-          console.error("Failed to send welcome email:", emailError);
+          logger.error("Failed to send welcome email:", emailError);
         }
       }
 

@@ -15,6 +15,7 @@ import { Trash2, Download, FileText, Plus, Edit, CalendarIcon } from "lucide-rea
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AdminBreadcrumb } from "@/components/admin/Breadcrumb";
 import { logActivity } from "@/lib/activityLogger";
+import { logger } from "@/lib/logger";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import {
@@ -84,7 +85,7 @@ export default function Reservations() {
       if (error) throw error;
       setReservations(data || []);
     } catch (error) {
-      console.error('Error fetching reservations:', error);
+      logger.error('Error fetching reservations:', error);
       toast({
         title: "Error loading reservations",
         variant: "destructive",
@@ -109,7 +110,7 @@ export default function Reservations() {
       
       fetchReservations();
     } catch (error) {
-      console.error('Error updating reservation:', error);
+      logger.error('Error updating reservation:', error);
       toast({
         title: "Error updating reservation",
         variant: "destructive",
@@ -140,7 +141,7 @@ export default function Reservations() {
       });
       fetchReservations();
     } catch (error) {
-      console.error('Error deleting reservation:', error);
+      logger.error('Error deleting reservation:', error);
       toast({
         title: "Error cancelling reservation",
         variant: "destructive",
@@ -291,7 +292,7 @@ export default function Reservations() {
       fetchReservations();
       resetForm();
     } catch (error) {
-      console.error('Error saving reservation:', error);
+      logger.error('Error saving reservation:', error);
       toast({
         title: "Error saving reservation",
         variant: "destructive",

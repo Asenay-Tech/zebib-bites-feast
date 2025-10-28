@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from "@/lib/logger";
 
 const CallbackHandler = () => {
   const navigate = useNavigate();
@@ -32,7 +33,7 @@ const CallbackHandler = () => {
         }
         navigate(redirectTo, { replace: true });
       } else if (error) {
-        console.error("OAuth callback error:", error);
+        logger.error("OAuth callback error:", error);
         setMessage("Redirecting to login...");
         setTimeout(() => navigate("/login", { replace: true }), 1200);
       }

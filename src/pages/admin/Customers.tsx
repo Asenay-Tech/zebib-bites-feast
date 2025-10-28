@@ -8,6 +8,7 @@ import { Search, Trash2, Eye, Download } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { AdminBreadcrumb } from "@/components/admin/Breadcrumb";
 import { logActivity } from "@/lib/activityLogger";
+import { logger } from "@/lib/logger";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -76,7 +77,7 @@ export default function Customers() {
       if (error) throw error;
       setCustomers(data || []);
     } catch (error) {
-      console.error('Error fetching customers:', error);
+      logger.error('Error fetching customers:', error);
       toast({
         title: "Error loading customers",
         variant: "destructive",
@@ -122,7 +123,7 @@ export default function Customers() {
       });
       fetchCustomers();
     } catch (error) {
-      console.error('Error deleting customer:', error);
+      logger.error('Error deleting customer:', error);
       toast({
         title: "Error deleting customer",
         variant: "destructive",
@@ -164,7 +165,7 @@ export default function Customers() {
 
       setProfileDialogOpen(true);
     } catch (error) {
-      console.error('Error fetching customer profile:', error);
+      logger.error('Error fetching customer profile:', error);
       toast({
         title: "Error loading customer profile",
         variant: "destructive",

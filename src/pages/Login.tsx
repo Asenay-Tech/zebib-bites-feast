@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -128,7 +129,7 @@ const Login = () => {
         navigate(redirectTo);
       }
     } catch (err: any) {
-      console.error("Login error:", err);
+      logger.error("Login error:", err);
       setError(err.message || t("common.error"));
     } finally {
       setLoading(false);
@@ -164,7 +165,7 @@ const Login = () => {
 
       if (oauthError) throw oauthError;
     } catch (err: any) {
-      console.error("Google OAuth error:", err);
+      logger.error("Google OAuth error:", err);
       setError(err.message || t("common.error"));
     } finally {
       setLoading(false);

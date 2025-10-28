@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/components/ui/language-switcher";
+import { logger } from "@/lib/logger";
 
 interface MenuItem {
   id: string;
@@ -53,7 +54,7 @@ export function Specialties() {
       if (error) throw error;
       setSpecialties(data || []);
     } catch (error) {
-      console.error('Error fetching specialties:', error);
+      logger.error('Error fetching specialties:', error);
     }
   };
 

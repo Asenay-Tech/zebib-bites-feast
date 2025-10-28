@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { logger } from "@/lib/logger";
 import { CheckCircle, XCircle } from "lucide-react";
 
 export default function Checkout() {
@@ -47,8 +48,8 @@ export default function Checkout() {
           });
 
           if (error) {
-            console.error("Confirmation error:", error);
-            toast({ 
+            logger.error("Confirmation error:", error);
+            toast({
               title: "Error confirming order", 
               description: error.message,
               variant: "destructive" 
@@ -73,8 +74,8 @@ export default function Checkout() {
             });
           }
         } catch (err) {
-          console.error("Error:", err);
-          toast({ 
+          logger.error("Error:", err);
+          toast({
             title: "Error processing order", 
             variant: "destructive" 
           });

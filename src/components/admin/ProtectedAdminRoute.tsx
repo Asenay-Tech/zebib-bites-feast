@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
+import { logger } from "@/lib/logger";
 
 interface ProtectedAdminRouteProps {
   children: React.ReactNode;
@@ -33,7 +34,7 @@ export const ProtectedAdminRoute = ({ children }: ProtectedAdminRouteProps) => {
 
       setIsAdmin(!!roles);
     } catch (error) {
-      console.error('Error checking admin role:', error);
+      logger.error('Error checking admin role:', error);
       setIsAdmin(false);
     } finally {
       setLoading(false);

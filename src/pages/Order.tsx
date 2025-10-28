@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
@@ -195,7 +196,7 @@ const Order = () => {
   }, 0);
 
   const handleCheckout = async () => {
-    console.log("🔷 handleCheckout called");
+    logger.log("🔷 handleCheckout called");
 
     if (cart.length === 0) {
       toast({ title: "Cart is empty", variant: "destructive" });
@@ -232,24 +233,24 @@ const Order = () => {
     const when = new Date(date);
     when.setHours(Number(hour), Number(minute), 0, 0);
 
-    console.log("🔷 Fetching profile for user:", user.id);
+    logger.log("🔷 Fetching profile for user:", user.id);
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("name, phone")
       .eq("id", user.id)
       .maybeSingle();
 
-    console.log("🔷 Profile data:", profile);
-    console.log("🔷 Profile error:", profileError);
+    logger.log("🔷 Profile data:", profile);
+    logger.log("🔷 Profile error:", profileError);
 
     if (!profile?.phone) {
-      console.log("🔷 No phone found, opening dialog");
+      logger.log("🔷 No phone found, opening dialog");
       setPhoneDialogOpen(true);
       setPendingCheckout(true);
       return;
     }
 
-    console.log("🔷 Phone exists, proceeding to checkout");
+    logger.log("🔷 Phone exists, proceeding to checkout");
     await processCheckout(profile);
   };
 
@@ -294,7 +295,7 @@ const Order = () => {
         setPendingCheckout(false);
       }
     } catch (error) {
-      console.error("Error updating phone:", error);
+      logger.error("Error updating phone:", error);
       setPendingCheckout(false);
 
       toast({
@@ -361,7 +362,7 @@ const Order = () => {
       });
 
       if (error) {
-        console.error("Checkout error:", error);
+        logger.error("Checkout error:", error);
         toast({
           title: "Checkout failed",
           description: error.message || "Please try again",
@@ -371,7 +372,7 @@ const Order = () => {
       }
 
       if (data && !data.success && data.error) {
-        console.error("Checkout error from function:", data.error);
+        logger.error("Checkout error from function:", data.error);
         toast({
           title: "Checkout failed",
           description: data.error || "Payment setup failed, please try again",
@@ -383,7 +384,7 @@ const Order = () => {
       if (data?.url) {
         window.location.href = data.url;
       } else {
-        console.error("No checkout URL in response");
+        logger.error("No checkout URL in response");
         toast({
           title: "Error",
           description: "No checkout URL received",
@@ -391,7 +392,7 @@ const Order = () => {
         });
       }
     } catch (err) {
-      console.error("Checkout error:", err);
+      logger.error("Checkout error:", err);
       toast({
         title: "Something went wrong",
         description: "Please try again.",

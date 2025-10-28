@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 import { useLanguage } from "@/components/ui/language-switcher";
+import { logger } from "@/lib/logger";
 import heroImage from "@/assets/hero-restaurant.jpg?url";
 
 interface HeroProps {
@@ -24,10 +25,10 @@ export function Hero({ onScrollToMenu }: HeroProps) {
           alt="Zebib Restaurant Interior"
           className="w-full h-full object-cover"
           onError={(e) => {
-            console.error("Failed to load hero image:", heroImage, e.currentTarget?.src);
+            logger.error("Failed to load hero image:", heroImage, e.currentTarget?.src);
           }}
           onLoad={() => {
-            console.info("Hero image loaded:", heroImage);
+            logger.info("Hero image loaded:", heroImage);
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background/80" />
