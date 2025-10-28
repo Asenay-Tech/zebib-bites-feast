@@ -203,6 +203,31 @@ serve(async (req) => {
     }
 
     // Build Stripe checkout session params with proper structure
+    // Ensure we append order_id correctly even when URLs already contain query params
+    const successUrlFinal = orderUuid
+      ? (() => {
+          try {
+            const u = new URL(successUrl);
+            u.searchParams.set("order_id", orderUuid);
+            return u.toString();
+          } catch {
+            return `${successUrl}${successUrl.includes("?") ? "&" : "?"}order_id=${orderUuid}`;
+          }
+        })()
+      : successUrl;
+
+    const cancelUrlFinal = orderUuid
+      ? (() => {
+          try {
+            const u = new URL(cancelUrl);
+            u.searchParams.set("order_id", orderUuid);
+            return u.toString();
+          } catch {
+            return `${cancelUrl}${cancelUrl.includes("?") ? "&" : "?"}order_id=${orderUuid}`;
+          }
+        })()
+      : cancelUrl;
+
     const checkoutData: Record<string, any> = {
       payment_method_types: ["card"],
       mode: "payment",
@@ -218,8 +243,8 @@ serve(async (req) => {
           quantity: 1,
         },
       ],
-      success_url: orderUuid ? `${successUrl}?order_id=${orderUuid}` : successUrl,
-      cancel_url: orderUuid ? `${cancelUrl}?order_id=${orderUuid}` : cancelUrl,
+      success_url: successUrlFinal,
+      cancel_url: cancelUrlFinal,
     };
 
     // Add customer email for Stripe receipts if provided
