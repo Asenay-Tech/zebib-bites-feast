@@ -1,95 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/components/ui/language-switcher";
-import { supabase } from "@/integrations/supabase/client";
 import traditionalPlatterImage from "@/assets/traditional-platter.jpg?url";
-
-
-interface MenuItem {
-  id: string;
-  name_de: string;
-  name_en: string;
-  description_de?: string | null;
-  description_en?: string | null;
-  price: any;
-  image_url?: string | null;
-  image_scale?: number;
-  category: string;
-}
-
-interface CategorySetting {
-  category: string;
-  show_image: boolean;
-}
+import { useMenuData, getItemImageSrc, formatPrice, getItemVariants, shouldShowImages } from "@/hooks/useMenuData";
 
 export function Menu() {
   const { language, t } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [categorySettings, setCategorySettings] = useState<Record<string, boolean>>({});
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchMenuItems();
-
-    // Real-time subscription
-    const channel = supabase
-      .channel("menu_public_changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "menu_items",
-        },
-        () => {
-          fetchMenuItems();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
-
-  const fetchMenuItems = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("menu_items")
-        .select("id, name_de, name_en, description_de, description_en, price, image_url, image_scale, category")
-        .order("category", { ascending: true });
-
-      if (error) throw error;
-
-      setMenuItems(data || []);
-      
-      // Extract unique categories
-      const uniqueCategories = Array.from(
-        new Set(data?.map((item) => item.category) || [])
-      ).sort();
-      setCategories(uniqueCategories);
-
-      // Fetch category settings
-      const { data: settings } = await supabase
-        .from("category_settings")
-        .select("category, show_image");
-
-      const settingsMap: Record<string, boolean> = {};
-      settings?.forEach((s) => {
-        settingsMap[s.category] = s.show_image;
-      });
-      setCategorySettings(settingsMap);
-    } catch (error) {
-      console.error("Error fetching menu items:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { menuItems, categories, categorySettings, loading } = useMenuData();
 
   const categoryOptions = [
     { value: "all", label: t("menu.category.all") },
@@ -105,59 +25,9 @@ export function Menu() {
     : menuItems.filter((item) => item.category === selectedCategory);
 
   // Helpers
-  const getItemName = (item: MenuItem) => (language === "de" ? item.name_de : item.name_en);
+  const getItemName = (item: typeof menuItems[0]) => (language === "de" ? item.name_de : item.name_en);
 
-  const getItemDescription = (item: MenuItem) => (language === "de" ? item.description_de : item.description_en) || "";
-
-  const formatPrice = (price: any) => {
-    if (price === undefined || price === null) return "0,00 €";
-    
-    // If it's a number
-    if (typeof price === "number") {
-      return `${price.toFixed(2).replace('.', ',')} €`;
-    }
-    
-    // If it's a string
-    if (typeof price === "string") {
-      // If it already has € symbol, format it with comma
-      if (price.includes("€")) {
-        return price.replace('.', ',');
-      }
-      // Otherwise add € at the end with comma
-      const num = parseFloat(price);
-      return isNaN(num) ? price : `${num.toFixed(2).replace('.', ',')} €`;
-    }
-    
-    // If it's an object (JSONB with variants)
-    if (typeof price === "object" && price !== null) {
-      const firstKey = Object.keys(price)[0];
-      const firstValue = price[firstKey];
-      if (typeof firstValue === "number") {
-        return `${firstValue.toFixed(2).replace('.', ',')} €`;
-      }
-      const num = parseFloat(firstValue);
-      return isNaN(num) ? firstValue : `${num.toFixed(2).replace('.', ',')} €`;
-    }
-    
-    return "0,00 €";
-  };
-
-  const getItemVariants = (price: any) => {
-    if (typeof price === "object" && price !== null && !Array.isArray(price)) {
-      return Object.keys(price);
-    }
-    return [];
-  };
-
-  const getItemImageSrc = (item: MenuItem) => {
-    if (!item.image_url) return undefined;
-    // If it's already a full URL or starts with /, use it directly
-    if (item.image_url.startsWith('http') || item.image_url.startsWith('/')) {
-      return item.image_url;
-    }
-    // Otherwise, construct the path
-    return `/menu-images/${item.image_url}`;
-  };
+  const getItemDescription = (item: typeof menuItems[0]) => (language === "de" ? item.description_de : item.description_en) || "";
   return (
     <section id="menu" className="py-20 bg-background">
       <div className="container mx-auto px-4">
@@ -211,11 +81,9 @@ export function Menu() {
           <>
             {/* Check if current category should show images */}
             {(() => {
-              const shouldShowImages = selectedCategory === "all" 
-                ? filteredItems.some(item => categorySettings[item.category] !== false && getItemImageSrc(item))
-                : categorySettings[selectedCategory] !== false;
+              const showImages = shouldShowImages(selectedCategory, filteredItems, categorySettings);
 
-              return shouldShowImages ? (
+              return showImages ? (
                 // Card layout with images
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredItems.map((item) => {

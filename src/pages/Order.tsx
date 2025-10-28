@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import menuPlaceholder from "@/assets/menu-placeholder.jpg";
 import { z } from "zod";
 import { PhoneInputDialog } from "@/components/ui/phone-input-dialog";
+import { useMenuData, getItemImageSrc, formatPrice as formatMenuPrice, getItemVariants, shouldShowImages, type MenuItem as MenuItemType } from "@/hooks/useMenuData";
 
 const checkoutSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
@@ -54,22 +55,6 @@ export const formatEUR = (n: number) =>
         currency: "EUR",
       }).format(n);
 
-interface MenuItem {
-  id: string;
-  name_de: string;
-  name_en: string;
-  description_de?: string | null;
-  description_en?: string | null;
-  price?: any;
-  category: string;
-  image_url?: string | null;
-  image_scale?: number | null;
-  created_at?: string;
-  updated_at?: string;
-  created_by?: string | null;
-  updated_by?: string | null;
-}
-
 interface CartItem {
   id: string;
   name_de: string;
@@ -102,12 +87,12 @@ const Order = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [addingToCart, setAddingToCart] = useState<string | null>(null);
-  const [menuData, setMenuData] = useState<MenuItem[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
   const [phoneDialogOpen, setPhoneDialogOpen] = useState(false);
   const [pendingCheckout, setPendingCheckout] = useState(false);
   const [processingPhone, setProcessingPhone] = useState(false);
+
+  // Use shared menu data hook
+  const { menuItems: menuData, categories, categorySettings, loading } = useMenuData();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -134,51 +119,6 @@ const Order = () => {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
-
-  useEffect(() => {
-    fetchMenuItems();
-
-    const channel = supabase
-      .channel("menu_order_changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "menu_items",
-        },
-        () => {
-          fetchMenuItems();
-        },
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
-
-  const fetchMenuItems = async () => {
-    try {
-      const { data, error } = await supabase.from("menu_items").select("*").order("category", { ascending: true });
-
-      if (error) throw error;
-
-      setMenuData(data || []);
-
-      const uniqueCategories = Array.from(new Set(data?.map((item) => item.category) || [])).sort();
-      setCategories(uniqueCategories);
-    } catch (error) {
-      console.error("Error fetching menu items:", error);
-      toast({
-        title: "Error loading menu",
-        description: "Please refresh the page",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const filteredMenu =
     selectedCategory === "all" ? menuData : menuData.filter((item) => item.category === selectedCategory);
@@ -585,74 +525,161 @@ const Order = () => {
               ) : filteredMenu.length === 0 ? (
                 <p className="text-center text-muted-foreground py-12">{t("menu.noItems")}</p>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {filteredMenu.map((item) => {
-                    const hasVariants = typeof item.price === "object" && item.price && Object.keys(item.price).length > 1;
-                    const variants = hasVariants ? Object.keys(item.price as Record<string, any>) : [];
-                    
-                    return (
-                      <Card key={item.id} className="p-4 overflow-hidden">
-                        <div className="flex gap-4">
-                          <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                            <img
-                              src={item.image_url || menuPlaceholder}
-                              alt={language === "de" ? item.name_de : item.name_en}
-                              className="w-full h-full object-cover transition-transform duration-200"
-                              style={{
-                                transform: `scale(${item.image_scale || 1})`,
-                                transformOrigin: "center",
-                              }}
-                            />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold truncate">{language === "de" ? item.name_de : item.name_en}</h3>
-                            <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                              {language === "de" ? item.description_de : item.description_en}
-                            </p>
-                            
+                (() => {
+                  const showImages = shouldShowImages(selectedCategory, filteredMenu, categorySettings);
+
+                  return showImages ? (
+                    // Card layout with images (when category has showImage=true)
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {filteredMenu.map((item) => {
+                        const hasVariants = typeof item.price === "object" && item.price && Object.keys(item.price).length > 1;
+                        const variants = hasVariants ? Object.keys(item.price as Record<string, any>) : [];
+                        const shouldShowImage = categorySettings[item.category] !== false;
+                        const imageSrc = shouldShowImage ? getItemImageSrc(item) : undefined;
+                        
+                        return (
+                          <Card key={item.id} className="p-4 overflow-hidden">
+                            <div className="flex gap-4">
+                              {imageSrc && (
+                                <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                                  <img
+                                    src={imageSrc}
+                                    alt={language === "de" ? item.name_de : item.name_en}
+                                    className="w-full h-full object-cover transition-transform duration-200"
+                                    style={{
+                                      transform: `scale(${item.image_scale || 1})`,
+                                      transformOrigin: "center",
+                                    }}
+                                    onError={(e) => {
+                                      e.currentTarget.style.display = "none";
+                                    }}
+                                  />
+                                </div>
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-semibold truncate">{language === "de" ? item.name_de : item.name_en}</h3>
+                                <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                                  {language === "de" ? item.description_de : item.description_en}
+                                </p>
+                                
+                                {hasVariants ? (
+                                  <div className="space-y-2">
+                                    {variants.map((variant) => {
+                                      const variantPrice = getUnitPrice(item.price, variant);
+                                      return (
+                                        <div key={variant} className="flex justify-between items-center gap-2">
+                                          <div className="flex items-center gap-2">
+                                            <span className="text-xs text-muted-foreground">{variant}</span>
+                                            <span className="font-bold text-sm text-accent">{formatEUR(variantPrice)}</span>
+                                          </div>
+                                          <Button 
+                                            size="sm" 
+                                            onClick={() => addToCart(item, variant)} 
+                                            disabled={addingToCart === item.name_de}
+                                          >
+                                            {addingToCart === item.name_de ? (
+                                              <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                            ) : (
+                                              <Plus className="h-4 w-4" />
+                                            )}
+                                          </Button>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                ) : (
+                                  <div className="flex justify-between items-center">
+                                    <span className="font-bold text-accent">{formatEUR(getUnitPrice(item.price))}</span>
+                                    <Button size="sm" onClick={() => addToCart(item)} disabled={addingToCart === item.name_de}>
+                                      {addingToCart === item.name_de ? (
+                                        <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                      ) : (
+                                        <Plus className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </Card>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    // Clean list layout without images (when category has showImage=false)
+                    <div className="max-w-4xl mx-auto space-y-4 mt-6">
+                      {filteredMenu.map((item) => {
+                        const hasVariants = typeof item.price === "object" && item.price && Object.keys(item.price).length > 1;
+                        const variants = hasVariants ? Object.keys(item.price as Record<string, any>) : [];
+                        
+                        return (
+                          <div 
+                            key={item.id} 
+                            className="group py-4 border-b border-border/50 hover:border-accent/50 transition-colors duration-300"
+                          >
                             {hasVariants ? (
-                              <div className="space-y-2">
+                              // Multiple sizes
+                              <div className="space-y-3">
+                                <div className="flex items-start justify-between gap-4">
+                                  <div className="flex-1">
+                                    <h4 className="text-foreground font-medium mb-1">{language === "de" ? item.name_de : item.name_en}</h4>
+                                    {(language === "de" ? item.description_de : item.description_en) && (
+                                      <p className="text-body text-sm">{language === "de" ? item.description_de : item.description_en}</p>
+                                    )}
+                                  </div>
+                                </div>
                                 {variants.map((variant) => {
                                   const variantPrice = getUnitPrice(item.price, variant);
                                   return (
-                                    <div key={variant} className="flex justify-between items-center gap-2">
-                                      <div className="flex items-center gap-2">
-                                        <span className="text-xs text-muted-foreground">{variant}</span>
-                                        <span className="font-bold text-sm text-accent">{formatEUR(variantPrice)}</span>
+                                    <div key={variant} className="flex items-center justify-between gap-4 pl-4">
+                                      <span className="text-sm text-body">{variant}</span>
+                                      <div className="flex items-center gap-4">
+                                        <div className="w-12 h-px bg-accent/60"></div>
+                                        <span className="text-accent font-bold whitespace-nowrap">{formatEUR(variantPrice)}</span>
+                                        <Button 
+                                          size="sm" 
+                                          onClick={() => addToCart(item, variant)} 
+                                          disabled={addingToCart === item.name_de}
+                                        >
+                                          {addingToCart === item.name_de ? (
+                                            <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                          ) : (
+                                            <Plus className="h-4 w-4" />
+                                          )}
+                                        </Button>
                                       </div>
-                                      <Button 
-                                        size="sm" 
-                                        onClick={() => addToCart(item, variant)} 
-                                        disabled={addingToCart === item.name_de}
-                                      >
-                                        {addingToCart === item.name_de ? (
-                                          <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                                        ) : (
-                                          <Plus className="h-4 w-4" />
-                                        )}
-                                      </Button>
                                     </div>
                                   );
                                 })}
                               </div>
                             ) : (
-                              <div className="flex justify-between items-center">
-                                <span className="font-bold text-accent">{formatEUR(getUnitPrice(item.price))}</span>
-                                <Button size="sm" onClick={() => addToCart(item)} disabled={addingToCart === item.name_de}>
-                                  {addingToCart === item.name_de ? (
-                                    <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                                  ) : (
-                                    <Plus className="h-4 w-4" />
+                              // Single price
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex-1">
+                                  <h4 className="text-foreground font-medium mb-1">{language === "de" ? item.name_de : item.name_en}</h4>
+                                  {(language === "de" ? item.description_de : item.description_en) && (
+                                    <p className="text-body text-sm">{language === "de" ? item.description_de : item.description_en}</p>
                                   )}
-                                </Button>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                  <div className="w-16 h-px bg-accent/60"></div>
+                                  <span className="text-accent font-bold whitespace-nowrap">{formatEUR(getUnitPrice(item.price))}</span>
+                                  <Button size="sm" onClick={() => addToCart(item)} disabled={addingToCart === item.name_de}>
+                                    {addingToCart === item.name_de ? (
+                                      <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                    ) : (
+                                      <Plus className="h-4 w-4" />
+                                    )}
+                                  </Button>
+                                </div>
                               </div>
                             )}
                           </div>
-                        </div>
-                      </Card>
-                    );
-                  })}
-                </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()
               )}
             </Card>
           </div>
