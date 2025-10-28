@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -8,21 +8,23 @@ import { useMenuData, getItemImageSrc, formatPrice, getItemVariants, shouldShowI
 
 export function Menu() {
   const { language, t } = useLanguage();
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const { menuItems, categories, categorySettings, loading } = useMenuData();
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
 
-  const categoryOptions = [
-    { value: "all", label: t("menu.category.all") },
-    ...categories.map((cat) => ({
-      value: cat,
-      label: cat,
-    })),
-  ];
+  // Update selected category when categories change
+  useEffect(() => {
+    if (categories.length > 0 && (!selectedCategory || !categories.includes(selectedCategory))) {
+      setSelectedCategory(categories[0]);
+    }
+  }, [categories, selectedCategory]);
+
+  const categoryOptions = categories.map((cat) => ({
+    value: cat,
+    label: cat,
+  }));
 
   // Filter items based on selected category
-  const filteredItems = selectedCategory === "all" 
-    ? menuItems 
-    : menuItems.filter((item) => item.category === selectedCategory);
+  const filteredItems = selectedCategory ? menuItems.filter((item) => item.category === selectedCategory) : menuItems;
 
   // Helpers
   const getItemName = (item: typeof menuItems[0]) => (language === "de" ? item.name_de : item.name_en);

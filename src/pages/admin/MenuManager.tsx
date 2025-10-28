@@ -81,7 +81,7 @@ export default function MenuManager() {
   const [filteredItems, setFilteredItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -158,6 +158,10 @@ export default function MenuManager() {
       
       if (uniqueCategories.length > 0) {
         setCategories(uniqueCategories);
+        // Update selected category if it's not in the list or if it's empty
+        if (!selectedCategory || !uniqueCategories.includes(selectedCategory)) {
+          setSelectedCategory(uniqueCategories[0] || "");
+        }
       }
 
       // Fetch category settings
@@ -198,7 +202,7 @@ export default function MenuManager() {
     }
 
     // Apply category filter
-    if (selectedCategory !== "all") {
+    if (selectedCategory) {
       filtered = filtered.filter(item => item.category === selectedCategory);
     }
 
@@ -858,7 +862,6 @@ export default function MenuManager() {
                 <SelectValue placeholder="Filter by category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
                 {categories.map((cat) => (
                   <SelectItem key={cat} value={cat}>
                     {cat}

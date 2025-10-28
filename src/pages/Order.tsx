@@ -18,6 +18,8 @@ import { z } from "zod";
 import { PhoneInputDialog } from "@/components/ui/phone-input-dialog";
 import { useMenuData, getItemImageSrc, formatPrice as formatMenuPrice, getItemVariants, shouldShowImages, type MenuItem as MenuItemType } from "@/hooks/useMenuData";
 import { getBookedTables, checkTableAvailability } from "@/lib/tableAvailability";
+import { FloatingMobileCart } from "@/components/order/FloatingMobileCart";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const checkoutSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
@@ -85,7 +87,7 @@ const Order = () => {
     return (rounded === 60 ? 0 : rounded).toString().padStart(2, "0");
   });
   const [selectedTable, setSelectedTable] = useState<number | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [addingToCart, setAddingToCart] = useState<string | null>(null);
@@ -93,9 +95,17 @@ const Order = () => {
   const [pendingCheckout, setPendingCheckout] = useState(false);
   const [processingPhone, setProcessingPhone] = useState(false);
   const [bookedTables, setBookedTables] = useState<Array<{ tableNumber: number; bookedUntil: string }>>([]);
+  const isMobile = useIsMobile();
 
   // Use shared menu data hook
   const { menuItems: menuData, categories, categorySettings, loading } = useMenuData();
+
+  // Update selected category when categories change
+  useEffect(() => {
+    if (categories.length > 0 && (!selectedCategory || !categories.includes(selectedCategory))) {
+      setSelectedCategory(categories[0]);
+    }
+  }, [categories, selectedCategory]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -138,8 +148,7 @@ const Order = () => {
     }
   }, [diningType, date, hour, minute]);
 
-  const filteredMenu =
-    selectedCategory === "all" ? menuData : menuData.filter((item) => item.category === selectedCategory);
+  const filteredMenu = selectedCategory ? menuData.filter((item) => item.category === selectedCategory) : menuData;
 
   const addToCart = (item: any, variant?: string) => {
     setAddingToCart(item.name_de);
@@ -539,14 +548,6 @@ const Order = () => {
 
             <Card className="p-6">
               <div className="grid gap-3 grid-cols-2 sm:grid-cols-[repeat(auto-fit,minmax(160px,1fr))]">
-                <Button
-                  className="w-full text-center whitespace-normal break-words leading-snug px-4 py-2"
-                  variant={selectedCategory === "all" ? "default" : "outline"}
-                  onClick={() => setSelectedCategory("all")}
-                >
-                  {t("menu.category.all")}
-                </Button>
-
                 {categories.map((cat) => {
                   return (
                     <Button
@@ -793,6 +794,19 @@ const Order = () => {
         onSubmit={handlePhoneSubmit}
         disabled={processingPhone}
       />
+
+      {/* Floating Mobile Cart */}
+      {isMobile && (
+        <FloatingMobileCart
+          cart={cart}
+          subtotal={subtotal}
+          formatEUR={formatEUR}
+          onCheckout={handleCheckout}
+          onUpdateQuantity={updateQuantity}
+          onRemoveItem={removeItem}
+          disabled={!date || (diningType === "dine-in" && !selectedTable)}
+        />
+      )}
     </div>
   );
 };
