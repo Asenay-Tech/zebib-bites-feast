@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { sendEmail } from "../_shared/sendEmail.ts";
+import { escapeHtml } from "../_shared/htmlEscape.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -36,14 +37,14 @@ serve(async (req) => {
                   <tr>
                     <td style="padding: 40px;">
                       <h2 style="margin: 0 0 20px; color: #333333; font-size: 24px;">Reservation Reminder</h2>
-                      <p style="margin: 0 0 15px; color: #666666; font-size: 16px; line-height: 1.6;">Hello ${name},</p>
+                      <p style="margin: 0 0 15px; color: #666666; font-size: 16px; line-height: 1.6;">Hello ${escapeHtml(name)},</p>
                       <p style="margin: 0 0 20px; color: #666666; font-size: 16px; line-height: 1.6;">This is a friendly reminder about your upcoming reservation:</p>
                       
                       <div style="background-color: #f8f8f8; padding: 25px; border-radius: 6px; border-left: 4px solid #8B0000;">
-                        <p style="margin: 8px 0; color: #666666; font-size: 15px;"><strong>Date:</strong> ${date}</p>
-                        <p style="margin: 8px 0; color: #666666; font-size: 15px;"><strong>Time:</strong> ${time}</p>
-                        <p style="margin: 8px 0; color: #666666; font-size: 15px;"><strong>Party Size:</strong> ${people} ${people === 1 ? 'person' : 'people'}</p>
-                        ${tableNumber ? `<p style="margin: 8px 0; color: #666666; font-size: 15px;"><strong>Table Number:</strong> ${tableNumber}</p>` : ''}
+                        <p style="margin: 8px 0; color: #666666; font-size: 15px;"><strong>Date:</strong> ${escapeHtml(date)}</p>
+                        <p style="margin: 8px 0; color: #666666; font-size: 15px;"><strong>Time:</strong> ${escapeHtml(time)}</p>
+                        <p style="margin: 8px 0; color: #666666; font-size: 15px;"><strong>Party Size:</strong> ${escapeHtml(String(people))} ${people === 1 ? 'person' : 'people'}</p>
+                        ${tableNumber ? `<p style="margin: 8px 0; color: #666666; font-size: 15px;"><strong>Table Number:</strong> ${escapeHtml(String(tableNumber))}</p>` : ''}
                       </div>
 
                       <p style="margin: 30px 0 0; color: #666666; font-size: 16px; line-height: 1.6;">We look forward to seeing you soon!</p>

@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { sendEmail } from "../_shared/sendEmail.ts";
+import { escapeHtml } from "../_shared/htmlEscape.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -36,7 +37,7 @@ serve(async (req) => {
                   <tr>
                     <td style="padding: 40px;">
                       <h2 style="margin: 0 0 20px; color: #333333; font-size: 24px;">Welcome to ZEBIB!</h2>
-                      <p style="margin: 0 0 15px; color: #666666; font-size: 16px; line-height: 1.6;">Hello ${name},</p>
+                      <p style="margin: 0 0 15px; color: #666666; font-size: 16px; line-height: 1.6;">Hello ${escapeHtml(name)},</p>
                       <p style="margin: 0 0 15px; color: #666666; font-size: 16px; line-height: 1.6;">Thank you for joining ZEBIB Restaurant. We're excited to have you with us!</p>
                       <p style="margin: 0 0 15px; color: #666666; font-size: 16px; line-height: 1.6;">You can now make reservations and place orders online through our platform.</p>
                       <p style="margin: 30px 0 0; color: #666666; font-size: 16px; line-height: 1.6;">Best regards,<br><strong>The ZEBIB Team</strong></p>

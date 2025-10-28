@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { sendEmail } from "../_shared/sendEmail.ts";
+import { escapeHtml } from "../_shared/htmlEscape.ts";
 
 const MAILERSEND_ADMIN = Deno.env.get("MAILERSEND_ADMIN") || "ale@zebibfood.de";
 
@@ -54,25 +55,25 @@ serve(async (req) => {
                   <tr>
                     <td style="padding: 40px;">
                       <h2 style="margin: 0 0 20px; color: #333333; font-size: 24px;">Order Confirmation</h2>
-                      <p style="margin: 0 0 15px; color: #666666; font-size: 16px; line-height: 1.6;">Hello ${name},</p>
+                      <p style="margin: 0 0 15px; color: #666666; font-size: 16px; line-height: 1.6;">Hello ${escapeHtml(name)},</p>
                       <p style="margin: 0 0 20px; color: #666666; font-size: 16px; line-height: 1.6;">Thank you for your order! We're preparing it now.</p>
                       
                       <div style="background-color: #f8f8f8; padding: 25px; border-radius: 6px; border-left: 4px solid #8B0000;">
                         <h3 style="margin: 0 0 15px; color: #333333; font-size: 18px;">Order Details</h3>
-                        <p style="margin: 5px 0; color: #666666; font-size: 15px;"><strong>Order ID:</strong> ${orderId.slice(0, 8).toUpperCase()}</p>
-                        <p style="margin: 5px 0; color: #666666; font-size: 15px;"><strong>Type:</strong> ${diningType === 'dine-in' ? 'Dine-in' : 'Pickup'}</p>
-                        <p style="margin: 5px 0; color: #666666; font-size: 15px;"><strong>Date:</strong> ${date}</p>
-                        <p style="margin: 5px 0 15px; color: #666666; font-size: 15px;"><strong>Time:</strong> ${time}</p>
-                        ${tableNumber ? `<p style="margin: 5px 0; color: #666666; font-size: 15px;"><strong>Table:</strong> ${tableNumber}</p>` : ''}
-                        ${phone ? `<p style="margin: 5px 0; color: #666666; font-size: 15px;"><strong>Phone:</strong> ${phone}</p>` : ''}
+                        <p style="margin: 5px 0; color: #666666; font-size: 15px;"><strong>Order ID:</strong> ${escapeHtml(orderId.slice(0, 8).toUpperCase())}</p>
+                        <p style="margin: 5px 0; color: #666666; font-size: 15px;"><strong>Type:</strong> ${escapeHtml(diningType === 'dine-in' ? 'Dine-in' : 'Pickup')}</p>
+                        <p style="margin: 5px 0; color: #666666; font-size: 15px;"><strong>Date:</strong> ${escapeHtml(date)}</p>
+                        <p style="margin: 5px 0 15px; color: #666666; font-size: 15px;"><strong>Time:</strong> ${escapeHtml(time)}</p>
+                        ${tableNumber ? `<p style="margin: 5px 0; color: #666666; font-size: 15px;"><strong>Table:</strong> ${escapeHtml(String(tableNumber))}</p>` : ''}
+                        ${phone ? `<p style="margin: 5px 0; color: #666666; font-size: 15px;"><strong>Phone:</strong> ${escapeHtml(phone)}</p>` : ''}
                         
                         <h4 style="margin: 20px 0 10px; color: #333333; font-size: 16px;">Items:</h4>
                         <table width="100%" cellpadding="8" cellspacing="0" style="border-top: 1px solid #ddd;">
                           ${items.map((item: any) => 
                             `<tr style="border-bottom: 1px solid #ddd;">
-                              <td style="color: #666666; font-size: 14px;">${item.name}${item.variant ? ` (${item.variant})` : ''}</td>
-                              <td style="color: #666666; font-size: 14px; text-align: center;">${item.quantity}x</td>
-                              <td style="color: #666666; font-size: 14px; text-align: right;">€${((item.price / 100) * item.quantity).toFixed(2)}</td>
+                              <td style="color: #666666; font-size: 14px;">${escapeHtml(item.name)}${item.variant ? ` (${escapeHtml(item.variant)})` : ''}</td>
+                              <td style="color: #666666; font-size: 14px; text-align: center;">${escapeHtml(String(item.quantity))}x</td>
+                              <td style="color: #666666; font-size: 14px; text-align: right;">€${escapeHtml(((item.price / 100) * item.quantity).toFixed(2))}</td>
                             </tr>`
                           ).join('')}
                           <tr>
@@ -115,8 +116,8 @@ serve(async (req) => {
 
     // Send admin notification
     const adminHtml = html.replace(
-      `Hello ${name},`,
-      `New paid order received from ${name} (${email}):`
+      `Hello ${escapeHtml(name)},`,
+      `New paid order received from ${escapeHtml(name)} (${escapeHtml(email)}):`
     ).replace(
       "Order Confirmation",
       "🔔 NEW PAID ORDER"
