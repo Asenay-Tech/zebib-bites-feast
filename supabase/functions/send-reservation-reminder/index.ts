@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+import { sendEmail } from "../_shared/sendEmail.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -64,31 +63,21 @@ serve(async (req) => {
       </html>
     `;
 
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: "Zebib Foods <ale@mail.zebibfood.de>",
-        to: [email],
-        subject: `Reservation Reminder - Today at ${time}`,
-        html,
-      }),
+    const result = await sendEmail({
+      to: { email, name },
+      subject: `Reservation Reminder - Today at ${time}`,
+      html,
+      idempotencyKey: `reservation-reminder-${email}-${date}-${time}`,
     });
 
-    const data = await response.json();
-    const error = !response.ok ? data : null;
-
-    if (error) {
-      console.error("Error sending email:", error);
-      throw error;
+    if (!result.success) {
+      console.error("Error sending email:", result.error);
+      throw new Error(result.error);
     }
 
-    console.log("Email sent successfully:", data);
+    console.log("Email sent successfully:", result.messageId);
 
-    return new Response(JSON.stringify({ success: true, data }), {
+    return new Response(JSON.stringify({ success: true, data: result }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

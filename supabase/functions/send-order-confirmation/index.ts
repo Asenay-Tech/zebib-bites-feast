@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { sendEmail } from "../_shared/sendEmail.ts";
 
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const MAILERSEND_ADMIN = Deno.env.get("MAILERSEND_ADMIN") || "ale@zebibfood.de";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -98,34 +99,18 @@ serve(async (req) => {
       </html>
     `;
 
-    // In test mode, Resend only allows sending to verified email
-    // So we'll send customer copy to admin email for testing
-    const adminEmail = Deno.env.get("ADMIN_EMAIL") || "ale@zebibfood.de";
-    const testMode = !RESEND_API_KEY?.startsWith("re_");
-    
-    console.log(`Sending emails in ${testMode ? "TEST" : "LIVE"} mode`);
-
-    // Send to customer (or admin in test mode)
-    const customerResponse = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: "Zebib Foods <ale@mail.zebibfood.de>",
-        to: [email],
-        subject: `Order Confirmation #${orderId.slice(0, 8).toUpperCase()} - Zebib Foods`,
-        html,
-      }),
+    // Send customer confirmation
+    const customerResult = await sendEmail({
+      to: email,
+      subject: `Order Confirmation #${orderId.slice(0, 8).toUpperCase()} - Zebib Foods`,
+      html,
+      idempotencyKey: `order-customer-${orderId}`,
     });
 
-    const customerData = await customerResponse.json();
-    
-    if (!customerResponse.ok) {
-      console.error("Error sending customer email:", customerData);
+    if (!customerResult.success) {
+      console.error("Failed to send customer email:", customerResult.error);
     } else {
-      console.log("Customer email sent successfully:", customerData);
+      console.log("Customer email sent successfully:", customerResult.messageId);
     }
 
     // Send admin notification
@@ -137,29 +122,24 @@ serve(async (req) => {
       "🔔 NEW PAID ORDER"
     );
     
-    const adminResponse = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: "Zebib Foods <ale@mail.zebibfood.de>",
-        to: [adminEmail],
-        subject: `🔔 New Order #${orderId.slice(0, 8).toUpperCase()} - €${(totalAmount / 100).toFixed(2)}`,
-        html: adminHtml,
-      }),
+    const adminResult = await sendEmail({
+      to: MAILERSEND_ADMIN,
+      subject: `🔔 New Order #${orderId.slice(0, 8).toUpperCase()} - €${(totalAmount / 100).toFixed(2)}`,
+      html: adminHtml,
+      idempotencyKey: `order-admin-${orderId}`,
     });
 
-    const adminData = await adminResponse.json();
-    
-    if (!adminResponse.ok) {
-      console.error("Error sending admin email:", adminData);
+    if (!adminResult.success) {
+      console.error("Failed to send admin email:", adminResult.error);
     } else {
-      console.log("Admin email sent successfully:", adminData);
+      console.log("Admin email sent successfully:", adminResult.messageId);
     }
 
-    return new Response(JSON.stringify({ success: true, customerData, adminData }), {
+    return new Response(JSON.stringify({ 
+      success: true, 
+      customer: customerResult,
+      admin: adminResult 
+    }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

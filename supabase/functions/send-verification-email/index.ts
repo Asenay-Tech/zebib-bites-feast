@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { sendEmail } from "../_shared/sendEmail.ts";
 
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
@@ -56,7 +56,7 @@ serve(async (req) => {
       throw insertError;
     }
 
-    const verificationLink = `${appUrl || window.location.origin}/verify-email?token=${tokenHash}`;
+    const verificationLink = `${appUrl || 'https://zebibfood.de'}/verify-email?token=${tokenHash}`;
 
     const html = `
       <!DOCTYPE html>
@@ -125,31 +125,21 @@ serve(async (req) => {
       </html>
     `;
 
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: "Zebib Foods <ale@mail.zebibfood.de>",
-        to: [email],
-        subject: "Verify Your Email - Zebib Foods",
-        html,
-      }),
+    const result = await sendEmail({
+      to: { email, name: name || undefined },
+      subject: "Verify Your Email - Zebib Foods",
+      html,
+      idempotencyKey: `verification-${userId}`,
     });
 
-    const data = await response.json();
-    const error = !response.ok ? data : null;
-
-    if (error) {
-      console.error("Error sending email:", error);
-      throw error;
+    if (!result.success) {
+      console.error("Error sending email:", result.error);
+      throw new Error(result.error);
     }
 
-    console.log("Verification email sent successfully:", data);
+    console.log("Verification email sent successfully:", result.messageId);
 
-    return new Response(JSON.stringify({ success: true, data }), {
+    return new Response(JSON.stringify({ success: true, data: result }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
