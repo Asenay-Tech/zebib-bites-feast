@@ -98,7 +98,14 @@ serve(async (req) => {
       </html>
     `;
 
-    // Send to customer
+    // In test mode, Resend only allows sending to verified email
+    // So we'll send customer copy to admin email for testing
+    const adminEmail = Deno.env.get("ADMIN_EMAIL") || "admin@zebibfood.de";
+    const testMode = !RESEND_API_KEY?.startsWith("re_");
+    
+    console.log(`Sending emails in ${testMode ? "TEST" : "LIVE"} mode`);
+
+    // Send to customer (or admin in test mode)
     const customerResponse = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -107,7 +114,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         from: "Zebib Foods <onboarding@resend.dev>",
-        to: [email],
+        to: testMode ? [adminEmail] : [email],
         subject: `Order Confirmation #${orderId.slice(0, 8).toUpperCase()} - Zebib Foods`,
         html,
       }),
@@ -121,11 +128,13 @@ serve(async (req) => {
       console.log("Customer email sent successfully:", customerData);
     }
 
-    // Send to admin
-    const adminEmail = Deno.env.get("ADMIN_EMAIL") || "admin@zebibfood.de";
+    // Send admin notification
     const adminHtml = html.replace(
       `Hello ${name},`,
       `New paid order received from ${name} (${email}):`
+    ).replace(
+      "Order Confirmation",
+      "🔔 NEW PAID ORDER"
     );
     
     const adminResponse = await fetch("https://api.resend.com/emails", {
