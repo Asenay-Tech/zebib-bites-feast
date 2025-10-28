@@ -106,7 +106,7 @@ serve(async (req) => {
         "Authorization": `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Zebib Foods <noreply@zebibfood.de>",
+        from: "Zebib Foods <onboarding@resend.dev>",
         to: [email],
         subject: `Order Confirmation #${orderId.slice(0, 8).toUpperCase()} - Zebib Foods`,
         html,
@@ -135,7 +135,7 @@ serve(async (req) => {
         "Authorization": `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Zebib Foods <noreply@zebibfood.de>",
+        from: "Zebib Foods <onboarding@resend.dev>",
         to: [adminEmail],
         subject: `🔔 New Order #${orderId.slice(0, 8).toUpperCase()} - €${(totalAmount / 100).toFixed(2)}`,
         html: adminHtml,

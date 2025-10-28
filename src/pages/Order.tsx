@@ -369,11 +369,8 @@ const Order = () => {
       const orderDate = format(date, "yyyy-MM-dd");
       const orderTime = `${hour}:${minute}`;
 
-      // Determine base URL based on environment
-      const BASE_URL =
-        window.location.hostname === "localhost"
-          ? "http://localhost:5173"
-          : "https://zebib-bites-feast.lovable.app";
+      // Determine base URL dynamically for any environment (local, preview, prod)
+      const BASE_URL = window.location.origin;
 
       const { data, error } = await supabase.functions.invoke("stripe-checkout", {
         body: {
