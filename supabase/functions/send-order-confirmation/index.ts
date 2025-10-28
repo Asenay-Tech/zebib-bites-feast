@@ -98,7 +98,8 @@ serve(async (req) => {
       </html>
     `;
 
-    const response = await fetch("https://api.resend.com/emails", {
+    // Send to customer
+    const customerResponse = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -112,17 +113,44 @@ serve(async (req) => {
       }),
     });
 
-    const data = await response.json();
-    const error = !response.ok ? data : null;
-
-    if (error) {
-      console.error("Error sending email:", error);
-      throw error;
+    const customerData = await customerResponse.json();
+    
+    if (!customerResponse.ok) {
+      console.error("Error sending customer email:", customerData);
+    } else {
+      console.log("Customer email sent successfully:", customerData);
     }
 
-    console.log("Email sent successfully:", data);
+    // Send to admin
+    const adminEmail = Deno.env.get("ADMIN_EMAIL") || "admin@zebibfood.de";
+    const adminHtml = html.replace(
+      `Hello ${name},`,
+      `New paid order received from ${name} (${email}):`
+    );
+    
+    const adminResponse = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${RESEND_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: "Zebib Foods <noreply@zebibfood.de>",
+        to: [adminEmail],
+        subject: `🔔 New Order #${orderId.slice(0, 8).toUpperCase()} - €${(totalAmount / 100).toFixed(2)}`,
+        html: adminHtml,
+      }),
+    });
 
-    return new Response(JSON.stringify({ success: true, data }), {
+    const adminData = await adminResponse.json();
+    
+    if (!adminResponse.ok) {
+      console.error("Error sending admin email:", adminData);
+    } else {
+      console.log("Admin email sent successfully:", adminData);
+    }
+
+    return new Response(JSON.stringify({ success: true, customerData, adminData }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
