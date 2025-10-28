@@ -104,7 +104,7 @@ export function Footer() {
             {/* <span>{t("footer.developed")}</span> */}
             <span className="text-sm text-body">
               <Trans i18nKey="footer.developed">
-                Developed by <a href="https://asenaytech.com" target="_blank" rel="noopener noreferrer" className="hover:text-accent font-semibold">Asenay Tech</a>
+                Developed by <a href="https://asenaytech.com" target="_blank" rel="noopener noreferrer" className="text-yellow-400 hover:text-yellow-300 hover:drop-shadow-[0_0_4px_rgba(255,215,0,0.8)] font-semibold transition-colors">Asenay Tech</a>
               </Trans>
             </span>
           </div>
