@@ -16,6 +16,7 @@ import menuPlaceholder from "@/assets/menu-placeholder.jpg";
 import { z } from "zod";
 import { PhoneInputDialog } from "@/components/ui/phone-input-dialog";
 import { useMenuData, getItemImageSrc, formatPrice as formatMenuPrice, getItemVariants, shouldShowImages, type MenuItem as MenuItemType } from "@/hooks/useMenuData";
+import { getBookedTables, checkTableAvailability } from "@/lib/tableAvailability";
 
 const checkoutSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
@@ -90,6 +91,7 @@ const Order = () => {
   const [phoneDialogOpen, setPhoneDialogOpen] = useState(false);
   const [pendingCheckout, setPendingCheckout] = useState(false);
   const [processingPhone, setProcessingPhone] = useState(false);
+  const [bookedTables, setBookedTables] = useState<Array<{ tableNumber: number; bookedUntil: string }>>([]);
 
   // Use shared menu data hook
   const { menuItems: menuData, categories, categorySettings, loading } = useMenuData();
@@ -119,6 +121,21 @@ const Order = () => {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  // Fetch booked tables when date/time or diningType changes
+  useEffect(() => {
+    if (diningType === "dine-in" && date) {
+      const fetchBookedTables = async () => {
+        const timeString = `${hour}:${minute}`;
+        const dateString = format(date, "yyyy-MM-dd");
+        const booked = await getBookedTables(dateString, timeString);
+        setBookedTables(booked);
+      };
+      fetchBookedTables();
+    } else {
+      setBookedTables([]);
+    }
+  }, [diningType, date, hour, minute]);
 
   const filteredMenu =
     selectedCategory === "all" ? menuData : menuData.filter((item) => item.category === selectedCategory);
@@ -187,6 +204,21 @@ const Order = () => {
     if (diningType === "dine-in" && !selectedTable) {
       toast({ title: "Please select a table", variant: "destructive" });
       return;
+    }
+    
+    // Check table availability for dine-in orders
+    if (diningType === "dine-in" && selectedTable) {
+      const timeString = `${hour}:${minute}`;
+      const dateString = format(date, "yyyy-MM-dd");
+      const availability = await checkTableAvailability(selectedTable, dateString, timeString);
+      
+      if (!availability.available) {
+        const message = availability.bookedUntil
+          ? `Table ${selectedTable} is already reserved until ${availability.bookedUntil}. Please choose another table or time.`
+          : `Table ${selectedTable} is already reserved. Please choose another table or time.`;
+        toast({ title: message, variant: "destructive" });
+        return;
+      }
     }
     if (!date) {
       toast({ title: "Please select a date", variant: "destructive" });
@@ -478,16 +510,26 @@ const Order = () => {
                   <div className="space-y-2">
                     <label className="text-sm font-medium">{t("reserve.table")}</label>
                     <div className="grid grid-cols-5 gap-2">
-                      {Array.from({ length: 15 }, (_, i) => i + 1).map((table) => (
-                        <Button
-                          key={table}
-                          variant={selectedTable === table ? "default" : "outline"}
-                          onClick={() => setSelectedTable(table)}
-                          className="aspect-square"
-                        >
-                          {table}
-                        </Button>
-                      ))}
+                      {Array.from({ length: 15 }, (_, i) => i + 1).map((table) => {
+                        const booking = bookedTables.find(b => b.tableNumber === table);
+                        const isBooked = !!booking;
+                        
+                        return (
+                          <Button
+                            key={table}
+                            variant={selectedTable === table ? "default" : "outline"}
+                            onClick={() => !isBooked && setSelectedTable(table)}
+                            disabled={isBooked}
+                            className={cn(
+                              "aspect-square relative",
+                              isBooked && "opacity-40 cursor-not-allowed"
+                            )}
+                            title={isBooked ? `Booked until ${booking.bookedUntil}` : undefined}
+                          >
+                            {table}
+                          </Button>
+                        );
+                      })}
                     </div>
                   </div>
                 )}

@@ -81,11 +81,21 @@ serve(async (req) => {
       </html>
     `;
 
+    // Send to customer
     const result = await sendEmail({
       to: { email, name },
       subject: `Reservation Confirmed - ${date} at ${time}`,
       html,
       idempotencyKey: `reservation-${reservationId}`,
+    });
+
+    // Send copy to admin
+    const adminEmail = Deno.env.get("ADMIN_EMAIL") || "ale@zebibfood.de";
+    await sendEmail({
+      to: { email: adminEmail, name: "Zebib Admin" },
+      subject: `New Reservation - ${name} - ${date} at ${time}`,
+      html,
+      idempotencyKey: `reservation-admin-${reservationId}`,
     });
 
     if (!result.success) {

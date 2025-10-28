@@ -15,6 +15,7 @@ import { format } from "date-fns";
 import { de, enUS } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { z } from "zod";
+import { getBookedTables, checkTableAvailability } from "@/lib/tableAvailability";
 
 const reservationSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
@@ -58,7 +59,7 @@ const Reserve = () => {
   const [eventType, setEventType] = useState("");
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [notes, setNotes] = useState("");
-  const [reservedTables, setReservedTables] = useState<number[]>([]);
+  const [bookedTables, setBookedTables] = useState<Array<{ tableNumber: number; bookedUntil: string }>>([]);
 
   useEffect(() => {
     // Check auth
@@ -87,27 +88,19 @@ const Reserve = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  // Check for reserved tables when date/time changes
+  // Check for reserved tables when date/time changes (2-hour window)
   useEffect(() => {
-    const checkReservedTables = async () => {
+    const fetchBookedTables = async () => {
       if (!date) return;
       
       const timeString = `${hour}:${minute}`;
       const dateString = format(date, "yyyy-MM-dd");
       
-      const { data, error } = await supabase
-        .from("reservations")
-        .select("table_number")
-        .eq("date", dateString)
-        .eq("time", timeString);
-      
-      if (!error && data) {
-        const reserved = data.map(r => r.table_number).filter(Boolean) as number[];
-        setReservedTables(reserved);
-      }
+      const booked = await getBookedTables(dateString, timeString);
+      setBookedTables(booked);
     };
     
-    checkReservedTables();
+    fetchBookedTables();
   }, [date, hour, minute]);
 
   const toggleService = (service: string) => {
@@ -130,9 +123,13 @@ const Reserve = () => {
       const dateString = format(date, "yyyy-MM-dd");
       const selectedTableNum = parseInt(tableNumber);
       
-      // Check if table is already reserved
-      if (reservedTables.includes(selectedTableNum)) {
-        setError(t("reserve.tableAlreadyReserved"));
+      // Check if table is available using 2-hour slot logic
+      const availability = await checkTableAvailability(selectedTableNum, dateString, timeString);
+      if (!availability.available) {
+        const message = availability.bookedUntil
+          ? `This table is already reserved until ${availability.bookedUntil}. Please choose another table or time.`
+          : "This table is already reserved for that time slot. Please choose another table or time.";
+        setError(message);
         setLoading(false);
         return;
       }
@@ -155,7 +152,7 @@ const Reserve = () => {
         return;
       }
       
-      const { error: reservationError } = await supabase
+      const { data: reservationData, error: reservationError } = await supabase
         .from("reservations")
         .insert({
           user_id: user.id,
@@ -169,9 +166,33 @@ const Reserve = () => {
           event_type: result.data.eventType || null,
           services: result.data.services.length > 0 ? result.data.services : null,
           notes: result.data.notes || null,
-        });
+        })
+        .select()
+        .single();
 
       if (reservationError) throw reservationError;
+
+      // Send confirmation email automatically
+      try {
+        await supabase.functions.invoke("send-reservation-confirmation", {
+          body: {
+            name: result.data.name,
+            email: result.data.email,
+            phone: result.data.phone,
+            reservationId: reservationData.id,
+            date: format(date, "PPP", { locale: language === "de" ? de : enUS }),
+            time: timeString,
+            people: result.data.people,
+            tableNumber: result.data.tableNumber,
+            eventType: result.data.eventType || null,
+            services: result.data.services.length > 0 ? result.data.services : null,
+            notes: result.data.notes || null,
+          },
+        });
+      } catch (emailError) {
+        console.error("Failed to send confirmation email:", emailError);
+        // Don't fail the reservation if email fails
+      }
 
       setSuccess(true);
     } catch (err: any) {
@@ -369,15 +390,17 @@ const Reserve = () => {
                     </SelectTrigger>
                     <SelectContent>
                       {Array.from({ length: 15 }, (_, i) => i + 1).map(t => {
-                        const isReserved = reservedTables.includes(t);
+                        const booking = bookedTables.find(b => b.tableNumber === t);
+                        const isBooked = !!booking;
                         return (
                           <SelectItem 
                             key={t} 
                             value={t.toString()}
-                            disabled={isReserved}
+                            disabled={isBooked}
+                            className={isBooked ? "opacity-50" : ""}
                           >
                             {language === "de" ? `Tisch ${t}` : `Table ${t}`}
-                            {isReserved && " (reserviert / reserved)"}
+                            {isBooked && ` (booked until ${booking.bookedUntil})`}
                           </SelectItem>
                         );
                       })}
