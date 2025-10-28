@@ -10,7 +10,11 @@ interface LanguageSwitcherProps {
   className?: string;
 }
 
-export function LanguageSwitcher({ currentLanguage, onLanguageChange, className }: LanguageSwitcherProps) {
+export function LanguageSwitcher({
+  currentLanguage,
+  onLanguageChange,
+  className,
+}: LanguageSwitcherProps) {
   const languages = [
     { code: "de" as Language, label: "DE", flag: "🇩🇪" },
     { code: "en" as Language, label: "EN", flag: "🇬🇧" },
@@ -48,7 +52,9 @@ interface LanguageContextType {
   t: (key: string) => string;
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+const LanguageContext = createContext<LanguageContextType | undefined>(
+  undefined
+);
 
 interface LanguageProviderProps {
   children: ReactNode;
@@ -111,8 +117,10 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "auth.password": "Passwort",
         "auth.confirmPassword": "Passwort bestätigen",
         "auth.name": "Name",
-        "auth.loginDescription": "Melden Sie sich an, um Reservierungen vorzunehmen und Bestellungen aufzugeben",
-        "auth.registerDescription": "Erstellen Sie ein Konto, um unsere Services zu nutzen",
+        "auth.loginDescription":
+          "Melden Sie sich an, um Reservierungen vorzunehmen und Bestellungen aufzugeben",
+        "auth.registerDescription":
+          "Erstellen Sie ein Konto, um unsere Services zu nutzen",
         "auth.emailPlaceholder": "ihre@email.de",
         "auth.passwordPlaceholder": "Ihr Passwort",
         "auth.confirmPasswordPlaceholder": "Passwort wiederholen",
@@ -127,18 +135,23 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "auth.reservations": "Reservierungen",
         "auth.forgotPassword": "Passwort vergessen?",
         "auth.sendResetLink": "Link zum Zurücksetzen senden",
-        "auth.resetLinkSent": "Passwort-Zurücksetzungslink gesendet. Bitte prüfen Sie Ihre E-Mails.",
+        "auth.resetLinkSent":
+          "Passwort-Zurücksetzungslink gesendet. Bitte prüfen Sie Ihre E-Mails.",
         "auth.resetPassword": "Passwort zurücksetzen",
-        "auth.resetPasswordDescription": "Legen Sie ein neues Passwort für Ihr Konto fest.",
-        "auth.resetPasswordHelp": "Geben Sie Ihre Konto-E-Mail ein; wir senden Ihnen einen Link zum Zurücksetzen.",
+        "auth.resetPasswordDescription":
+          "Legen Sie ein neues Passwort für Ihr Konto fest.",
+        "auth.resetPasswordHelp":
+          "Geben Sie Ihre Konto-E-Mail ein; wir senden Ihnen einen Link zum Zurücksetzen.",
         "auth.newPassword": "Neues Passwort",
         "auth.updatePassword": "Passwort aktualisieren",
         "auth.backToLogin": "Zurück zur Anmeldung",
         "auth.continueWithGoogle": "Weiter mit Google",
+        "auth.or": "oder",
 
         // Reserve
         "reserve.title": "Reservieren",
-        "reserve.description": "Reservieren Sie Ihren Tisch im Zebib Restaurant",
+        "reserve.description":
+          "Reservieren Sie Ihren Tisch im Zebib Restaurant",
         "reserve.name": "Name",
         "reserve.email": "E-Mail",
         "reserve.phone": "Telefon",
@@ -157,7 +170,8 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "reserve.notesPlaceholder": "Besondere Wünsche oder Allergien...",
         "reserve.submit": "Reservieren",
         "reserve.success": "Reservierung erfolgreich!",
-        "reserve.successMessage": "Ihre Reservierung wurde erfolgreich erstellt. Wir freuen uns auf Ihren Besuch!",
+        "reserve.successMessage":
+          "Ihre Reservierung wurde erfolgreich erstellt. Wir freuen uns auf Ihren Besuch!",
         "reserve.backToHome": "Zurück zur Startseite",
         "reserve.tableAlreadyReserved":
           "Dieser Tisch ist zu dieser Zeit bereits reserviert. Bitte wählen Sie einen anderen Tisch oder eine andere Zeit.",
@@ -225,7 +239,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "common.total": "Gesamt",
 
         // Footer
-        "footer.developed": "Entwickelt von Asenay Tech",
+        "footer.developed": "Entwickelt von ",
         "footer.followUs": "Folgen Sie uns",
         "footer.rights": "Alle Rechte vorbehalten.",
         "footer.privacy": "Datenschutz",
@@ -238,19 +252,26 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "privacy.title": "Datenschutzerklärung",
         "privacy.pageLabel": "Datenschutzerklärung / Privacy Policy",
         "privacy.intro.title": "Datenschutz im Überblick",
-        "privacy.intro.content": "Der Schutz Ihrer persönlichen Daten ist uns ein besonderes Anliegen. Wir verarbeiten Ihre Daten ausschließlich auf Grundlage der gesetzlichen Bestimmungen (DSGVO, TKG 2003). In dieser Datenschutzerklärung informieren wir Sie über die wichtigsten Aspekte der Datenverarbeitung.",
+        "privacy.intro.content":
+          "Der Schutz Ihrer persönlichen Daten ist uns ein besonderes Anliegen. Wir verarbeiten Ihre Daten ausschließlich auf Grundlage der gesetzlichen Bestimmungen (DSGVO, TKG 2003). In dieser Datenschutzerklärung informieren wir Sie über die wichtigsten Aspekte der Datenverarbeitung.",
         "privacy.collected.title": "Welche Daten sammeln wir?",
-        "privacy.collected.content": "Wir erfassen folgende personenbezogene Daten: Name, E-Mail-Adresse, Telefonnummer, Bestelldetails und Zahlungsstatus. Optional erfassen wir Analysedaten und Cookies zur Verbesserung unserer Dienste.",
+        "privacy.collected.content":
+          "Wir erfassen folgende personenbezogene Daten: Name, E-Mail-Adresse, Telefonnummer, Bestelldetails und Zahlungsstatus. Optional erfassen wir Analysedaten und Cookies zur Verbesserung unserer Dienste.",
         "privacy.purpose.title": "Zweck der Datenverarbeitung",
-        "privacy.purpose.content": "Ihre Daten werden ausschließlich zur Bestellabwicklung, zum Versand von Bestellbestätigungen und zur Kundenbetreuung verwendet. Wir verkaufen Ihre Daten nicht an Dritte. Eine Weitergabe erfolgt nur an Zahlungs- und Lieferdienstleister, soweit dies für die Auftragsabwicklung erforderlich ist.",
+        "privacy.purpose.content":
+          "Ihre Daten werden ausschließlich zur Bestellabwicklung, zum Versand von Bestellbestätigungen und zur Kundenbetreuung verwendet. Wir verkaufen Ihre Daten nicht an Dritte. Eine Weitergabe erfolgt nur an Zahlungs- und Lieferdienstleister, soweit dies für die Auftragsabwicklung erforderlich ist.",
         "privacy.legal.title": "Rechtsgrundlage",
-        "privacy.legal.content": "Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung) und Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse), soweit anwendbar.",
+        "privacy.legal.content":
+          "Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung) und Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse), soweit anwendbar.",
         "privacy.retention.title": "Speicherdauer",
-        "privacy.retention.content": "Ihre Daten werden nur so lange gespeichert, wie dies für die Erfüllung rechtlicher und buchhalterischer Verpflichtungen erforderlich ist.",
+        "privacy.retention.content":
+          "Ihre Daten werden nur so lange gespeichert, wie dies für die Erfüllung rechtlicher und buchhalterischer Verpflichtungen erforderlich ist.",
         "privacy.rights.title": "Ihre Rechte",
-        "privacy.rights.content": "Sie haben das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch. Zudem haben Sie das Recht, sich bei einer Aufsichtsbehörde zu beschweren.",
+        "privacy.rights.content":
+          "Sie haben das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch. Zudem haben Sie das Recht, sich bei einer Aufsichtsbehörde zu beschweren.",
         "privacy.cookies.title": "Cookies und Analyse",
-        "privacy.cookies.content": "Wir verwenden Cookies, um die Funktionalität unserer Website zu gewährleisten. Sofern Analysetools eingesetzt werden, informieren wir Sie gesondert.",
+        "privacy.cookies.content":
+          "Wir verwenden Cookies, um die Funktionalität unserer Website zu gewährleisten. Sofern Analysetools eingesetzt werden, informieren wir Sie gesondert.",
         "privacy.controller.title": "Verantwortliche Stelle",
         "privacy.controller.name": "Zebib Foods",
         "privacy.controller.address": "Salzstraße 14, 63450 Hanau, Germany",
@@ -268,8 +289,10 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "imprint.vat": "USt-ID Nr.",
         "imprint.vatNumber": "DE450260438",
         "imprint.disclaimer.title": "Haftungsausschluss",
-        "imprint.disclaimer.content": "Die Inhalte dieser Website wurden mit größter Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte können wir jedoch keine Gewähr übernehmen. Trotz sorgfältiger Kontrolle übernehmen wir keine Haftung für die Inhalte externer Links. Für den Inhalt der verlinkten Seiten sind ausschließlich deren Betreiber verantwortlich.",
-        "imprint.externalLinks.content": "Unser Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter verantwortlich.",
+        "imprint.disclaimer.content":
+          "Die Inhalte dieser Website wurden mit größter Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte können wir jedoch keine Gewähr übernehmen. Trotz sorgfältiger Kontrolle übernehmen wir keine Haftung für die Inhalte externer Links. Für den Inhalt der verlinkten Seiten sind ausschließlich deren Betreiber verantwortlich.",
+        "imprint.externalLinks.content":
+          "Unser Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter verantwortlich.",
       },
 
       en: {
@@ -308,7 +331,8 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "auth.password": "Password",
         "auth.confirmPassword": "Confirm password",
         "auth.name": "Name",
-        "auth.loginDescription": "Sign in to make reservations and place orders",
+        "auth.loginDescription":
+          "Sign in to make reservations and place orders",
         "auth.registerDescription": "Create an account to use our services",
         "auth.emailPlaceholder": "your@email.com",
         "auth.passwordPlaceholder": "Your password",
@@ -324,14 +348,17 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "auth.reservations": "Reservations",
         "auth.forgotPassword": "Forgot password?",
         "auth.sendResetLink": "Send reset link",
-        "auth.resetLinkSent": "Password reset link sent. Please check your email.",
+        "auth.resetLinkSent":
+          "Password reset link sent. Please check your email.",
         "auth.resetPassword": "Reset password",
         "auth.resetPasswordDescription": "Set a new password for your account.",
-        "auth.resetPasswordHelp": "Enter your account email and we’ll email you a reset link.",
+        "auth.resetPasswordHelp":
+          "Enter your account email and we’ll email you a reset link.",
         "auth.newPassword": "New password",
         "auth.updatePassword": "Update password",
         "auth.backToLogin": "Back to login",
         "auth.continueWithGoogle": "Continue with Google",
+        "auth.or": "or",
 
         // Reserve
         "reserve.title": "Make a Reservation",
@@ -354,7 +381,8 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "reserve.notesPlaceholder": "Special requests or allergies...",
         "reserve.submit": "Reserve",
         "reserve.success": "Reservation successful!",
-        "reserve.successMessage": "Your reservation has been created successfully. We look forward to your visit!",
+        "reserve.successMessage":
+          "Your reservation has been created successfully. We look forward to your visit!",
         "reserve.backToHome": "Back to Home",
         "reserve.tableAlreadyReserved":
           "This table is already reserved at this time. Please choose another table or time.",
@@ -422,7 +450,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "common.total": "Total",
 
         // Footer
-        "footer.developed": "Developed by Asenay Tech",
+        "footer.developed": "Developed by ",
         "footer.followUs": "Follow us",
         "footer.rights": "All rights reserved.",
         "footer.privacy": "Privacy Policy",
@@ -435,19 +463,26 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "privacy.title": "Privacy Policy",
         "privacy.pageLabel": "Privacy Policy / Datenschutzerklärung",
         "privacy.intro.title": "Privacy Overview",
-        "privacy.intro.content": "The protection of your personal data is of special concern to us. We process your data exclusively on the basis of legal regulations (GDPR, TKG 2003). In this privacy policy, we inform you about the most important aspects of data processing.",
+        "privacy.intro.content":
+          "The protection of your personal data is of special concern to us. We process your data exclusively on the basis of legal regulations (GDPR, TKG 2003). In this privacy policy, we inform you about the most important aspects of data processing.",
         "privacy.collected.title": "What Data Do We Collect?",
-        "privacy.collected.content": "We collect the following personal data: name, email address, phone number, order details, and payment status. Optionally, we collect analytics data and cookies to improve our services.",
+        "privacy.collected.content":
+          "We collect the following personal data: name, email address, phone number, order details, and payment status. Optionally, we collect analytics data and cookies to improve our services.",
         "privacy.purpose.title": "Purpose of Data Processing",
-        "privacy.purpose.content": "Your data is used exclusively for order processing, sending order confirmations, and customer support. We do not sell your data to third parties. Data is shared only with payment and delivery service providers as required for order fulfillment.",
+        "privacy.purpose.content":
+          "Your data is used exclusively for order processing, sending order confirmations, and customer support. We do not sell your data to third parties. Data is shared only with payment and delivery service providers as required for order fulfillment.",
         "privacy.legal.title": "Legal Basis",
-        "privacy.legal.content": "Processing is based on Art. 6 (1) lit. b GDPR (contract performance) and Art. 6 (1) lit. f GDPR (legitimate interest), where applicable.",
+        "privacy.legal.content":
+          "Processing is based on Art. 6 (1) lit. b GDPR (contract performance) and Art. 6 (1) lit. f GDPR (legitimate interest), where applicable.",
         "privacy.retention.title": "Data Retention",
-        "privacy.retention.content": "Your data is stored only as long as necessary to fulfill legal and accounting obligations.",
+        "privacy.retention.content":
+          "Your data is stored only as long as necessary to fulfill legal and accounting obligations.",
         "privacy.rights.title": "Your Rights",
-        "privacy.rights.content": "You have the right to access, rectification, deletion, restriction of processing, data portability, and objection. You also have the right to lodge a complaint with a supervisory authority.",
+        "privacy.rights.content":
+          "You have the right to access, rectification, deletion, restriction of processing, data portability, and objection. You also have the right to lodge a complaint with a supervisory authority.",
         "privacy.cookies.title": "Cookies and Analytics",
-        "privacy.cookies.content": "We use cookies to ensure the functionality of our website. If analytics tools are used, we inform you separately.",
+        "privacy.cookies.content":
+          "We use cookies to ensure the functionality of our website. If analytics tools are used, we inform you separately.",
         "privacy.controller.title": "Data Controller",
         "privacy.controller.name": "Zebib Foods",
         "privacy.controller.address": "Salzstraße 14, 63450 Hanau, Germany",
@@ -465,15 +500,21 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "imprint.vat": "VAT ID",
         "imprint.vatNumber": "DE450260438",
         "imprint.disclaimer.title": "Disclaimer",
-        "imprint.disclaimer.content": "The contents of this website were created with great care. However, we cannot guarantee the accuracy, completeness, or timeliness of the content. Despite careful control of external links, we assume no liability for the content of external websites. The operators of linked pages are solely responsible for their content.",
-        "imprint.externalLinks.content": "Our website contains links to external third-party websites over whose content we have no control. The respective provider is always responsible for the content of the linked pages.",
+        "imprint.disclaimer.content":
+          "The contents of this website were created with great care. However, we cannot guarantee the accuracy, completeness, or timeliness of the content. Despite careful control of external links, we assume no liability for the content of external websites. The operators of linked pages are solely responsible for their content.",
+        "imprint.externalLinks.content":
+          "Our website contains links to external third-party websites over whose content we have no control. The respective provider is always responsible for the content of the linked pages.",
       },
     };
 
     return translations[language][key] || key;
   };
 
-  return <LanguageContext.Provider value={{ language, setLanguage, t }}>{children}</LanguageContext.Provider>;
+  return (
+    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+      {children}
+    </LanguageContext.Provider>
+  );
 }
 
 export function useLanguage() {

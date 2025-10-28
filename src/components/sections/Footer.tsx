@@ -1,6 +1,6 @@
 import { useLanguage } from "@/components/ui/language-switcher";
 import { Facebook, Instagram, Twitter } from "lucide-react";
-import { Trans } from "react-i18next";
+// import { Trans } from "react-i18next";
 
 export function Footer() {
   const { t } = useLanguage();
@@ -8,7 +8,11 @@ export function Footer() {
 
   const socialLinks = [
     // { icon: Facebook, href: "#", label: "Facebook" },
-    { icon: Instagram, href: "https://www.instagram.com/zebib.official?igsh=YTRvYzRqdDRwN3py", label: "Instagram" },
+    {
+      icon: Instagram,
+      href: "https://www.instagram.com/zebib.official?igsh=YTRvYzRqdDRwN3py",
+      label: "Instagram",
+    },
     // { icon: Twitter, href: "#", label: "Twitter" },
     // {
     //   icon: () => (
@@ -102,10 +106,21 @@ export function Footer() {
               {t("footer.imprint")}
             </a>
             {/* <span>{t("footer.developed")}</span> */}
-            <span className="text-sm text-body">
+            {/* <span className="text-sm text-body">
               <Trans i18nKey="footer.developed">
                 Developed by <a href="https://asenaytech.com" target="_blank" rel="noopener noreferrer" className="text-yellow-400 hover:text-yellow-300 hover:drop-shadow-[0_0_4px_rgba(255,215,0,0.8)] font-semibold transition-colors">Asenay Tech</a>
               </Trans>
+            </span> */}
+            <span>
+              {t("footer.developed")}{" "}
+              <a
+                href="https://asenaytech.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-yellow-400 hover:text-yellow-300 hover:drop-shadow-[0_0_4px_rgba(255,215,0,0.8)] font-semibold transition-colors"
+              >
+                Asenay Tech
+              </a>
             </span>
           </div>
         </div>
