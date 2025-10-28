@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -9,13 +10,32 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const inputSchema = z.object({
+  tokenHash: z.string().regex(/^[a-f0-9]{64}$/, "Invalid token format"),
+});
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { tokenHash } = await req.json();
+    const body = await req.json();
+    
+    // Validate input
+    const validationResult = inputSchema.safeParse(body);
+    if (!validationResult.success) {
+      console.error("Validation error");
+      return new Response(
+        JSON.stringify({ error: "Invalid token" }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+    
+    const { tokenHash } = validationResult.data;
 
     console.log("Verifying email token:", tokenHash);
 
