@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { sendEmail } from "../_shared/sendEmail.ts";
 
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
@@ -140,31 +140,21 @@ serve(async (req) => {
       </html>
     `;
 
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: "Zebib Foods <noreply@zebibfood.de>",
-        to: [email],
-        subject: "Reset Your Password - Zebib Foods",
-        html,
-      }),
+    const emailResult = await sendEmail({
+      to: email,
+      subject: "Reset Your Password - Zebib Foods",
+      html,
+      idempotencyKey: `password-reset-${tokenHash}`,
     });
 
-    const data = await response.json();
-    const error = !response.ok ? data : null;
-
-    if (error) {
-      console.error("Error sending email:", error);
-      throw error;
+    if (!emailResult.success) {
+      console.error("Error sending email:", emailResult.error);
+      throw new Error(emailResult.error || "Failed to send email");
     }
 
-    console.log("Email sent successfully:", data);
+    console.log("Email sent successfully:", emailResult.messageId);
 
-    return new Response(JSON.stringify({ success: true, data }), {
+    return new Response(JSON.stringify({ success: true, messageId: emailResult.messageId }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
