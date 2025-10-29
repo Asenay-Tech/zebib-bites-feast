@@ -13,12 +13,13 @@ export function WhyChooseUs() {
       title: language === "de" ? "Frische Zutaten" : "Fresh Ingredients",
       description:
         language === "de"
-          ? "Wir verwenden nur die frischesten, authentischen Zutaten direkt aus Eritrea und lokale Bio-Produkte."
-          : "We use only the freshest, authentic ingredients directly from Eritrea and local organic produce.",
+          ? "Wir verwenden nur die frischesten Zutaten und authentische Habesha-Gewürze."
+          : "We use only the freshest ingredients and authentic Habesha spices.",
     },
     {
       icon: Users,
-      title: language === "de" ? "Einladende Atmosphäre" : "Welcoming Environment",
+      title:
+        language === "de" ? "Einladende Atmosphäre" : "Welcoming Environment",
       description:
         language === "de"
           ? "Unser Restaurant bietet eine warme, familienfreundliche Atmosphäre mit traditioneller eritreischer Gastfreundschaft."
@@ -26,7 +27,10 @@ export function WhyChooseUs() {
     },
     {
       icon: Calendar,
-      title: language === "de" ? "Veranstaltungen & Feiern" : "Events & Party Hosting",
+      title:
+        language === "de"
+          ? "Veranstaltungen & Feiern"
+          : "Events & Party Hosting",
       description:
         language === "de"
           ? "Wir organisieren unvergessliche Feiern und Veranstaltungen mit traditioneller Küche und Service."
@@ -67,10 +71,14 @@ export function WhyChooseUs() {
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-xl font-semibold text-foreground mb-4">{feature.title}</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-4">
+                    {feature.title}
+                  </h3>
 
                   {/* Description */}
-                  <p className="text-body leading-relaxed">{feature.description}</p>
+                  <p className="text-body leading-relaxed">
+                    {feature.description}
+                  </p>
                 </CardContent>
               </Card>
             );
@@ -82,7 +90,9 @@ export function WhyChooseUs() {
           {/* Text Block */}
           <div className="bg-gradient-to-br from-surface via-surface-elevated to-surface rounded-2xl p-10 flex flex-col justify-center text-center lg:text-left shadow-elegant border border-border/50">
             <h3 className="text-3xl font-bold text-foreground mb-6 tracking-wide">
-              {language === "de" ? "TRADITIONELL & MODERN" : "TRADITIONAL & MODERN"}
+              {language === "de"
+                ? "TRADITIONELL & MODERN"
+                : "TRADITIONAL & MODERN"}
             </h3>
             <p className="text-body leading-relaxed text-lg">
               {language === "de"
@@ -100,7 +110,9 @@ export function WhyChooseUs() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/30 to-transparent flex items-end">
               <p className="text-foreground font-semibold text-lg p-8">
-                {language === "de" ? "Traditionelle Zubereitung" : "Traditional Preparation"}
+                {language === "de"
+                  ? "Traditionelle Zubereitung"
+                  : "Traditional Preparation"}
               </p>
             </div>
           </div>

@@ -91,8 +91,8 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "nav.contact": "Kontakt",
 
         // Hero Section
-        "hero.title": "ZEBIB RESTAURANT",
-        "hero.subtitle": "Authentische eritreische Küche im Herzen von Hanau",
+        "hero.title": "ZEBIB DOOR OF AFRICA",
+        "hero.subtitle": "Authentische Habesha-Küche im Herzen von Hanau",
         "hero.cta.reserve": "Tisch Reservieren",
         "hero.cta.order": "Online Bestellen",
         "hero.scroll": "Zur Speisekarte",
@@ -150,8 +150,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
 
         // Reserve
         "reserve.title": "Reservieren",
-        "reserve.description":
-          "Reservieren Sie Ihren Tisch im Zebib Restaurant",
+        "reserve.description": "Reservieren Sie Ihren Tisch im Zebib",
         "reserve.name": "Name",
         "reserve.email": "E-Mail",
         "reserve.phone": "Telefon",
@@ -305,8 +304,8 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         "nav.contact": "Contact",
 
         // Hero Section
-        "hero.title": "ZEBIB RESTAURANT",
-        "hero.subtitle": "Authentic Eritrean cuisine in the heart of Hanau",
+        "hero.title": "ZEBIB DOOR OF AFRICA",
+        "hero.subtitle": "Authentic Habesha cuisine in the heart of Hanau",
         "hero.cta.reserve": "Make Reservation",
         "hero.cta.order": "Order Online",
         "hero.scroll": "View Menu",
