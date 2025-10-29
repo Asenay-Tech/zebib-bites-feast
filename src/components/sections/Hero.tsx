@@ -89,28 +89,6 @@ export function Hero({ onScrollToMenu }: HeroProps) {
       {/* Decorative Elements */}
       <div className="absolute top-1/4 left-4 w-2 h-16 bg-accent/20 rounded-full hidden lg:block" />
       <div className="absolute top-1/3 right-4 w-2 h-24 bg-accent/20 rounded-full hidden lg:block" />
-
-      {/* ✅ Mobile + Tablet Fix */}
-      <style jsx>{`
-        @media (max-width: 1024px) {
-          img {
-            object-fit: contain !important;
-            object-position: top center !important;
-            height: auto !important;
-          }
-          section {
-            min-height: 100vh !important;
-            height: auto !important;
-          }
-          h1 {
-            font-size: 2.2rem !important;
-          }
-          p {
-            font-size: 1rem !important;
-            margin-bottom: 1.5rem;
-          }
-        }
-      `}</style>
     </section>
   );
 }
