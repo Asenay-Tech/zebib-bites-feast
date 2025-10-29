@@ -42,37 +42,33 @@ export function Footer() {
               <p>{t("info.address")}</p>
               {/* optional: show phone/email labels translated */}
               <p>{t("contact.phone")}: +49 177 4629585</p>
-              <p>{t("contact.email")}: info@zebib-restaurant.de</p>
+              <p>{t("contact.email")}: ale@zebib-restaurant.de</p>
             </div>
           </div>
 
           {/* Opening Hours (inline, zero gap) */}
           <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-foreground">
-              {t("info.hours")}
-            </h4>
+            <h4 className="text-lg font-semibold text-foreground">{t("info.hours")}</h4>
 
             <div className="space-y-2 text-body">
               <p>
                 <span>{t("footer.hours.monThu")}</span>
-                <span className="font-mono tabular-nums"> 11:00 – 22:00</span>
+                <span className="font-mono tabular-nums"> 10:00 – 22:00</span>
               </p>
               <p>
                 <span>{t("footer.hours.friSat")}</span>
-                <span className="font-mono tabular-nums"> 11:00 – 23:00</span>
+                <span className="font-mono tabular-nums"> 10:00 – 23:00</span>
               </p>
               <p>
                 <span>{t("footer.hours.sun")}</span>
-                <span className="font-mono tabular-nums"> 12:00 – 22:00</span>
+                <span className="font-mono tabular-nums"> 11:00 – 23:00</span>
               </p>
             </div>
           </div>
 
           {/* Social Media */}
           <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-foreground">
-              {t("footer.followUs")}
-            </h4>
+            <h4 className="text-lg font-semibold text-foreground">{t("footer.followUs")}</h4>
             <div className="flex space-x-4">
               {socialLinks.map((social, index) => {
                 const Icon = social.icon;
@@ -94,8 +90,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-body text-sm">
-            {/* dynamic year + translated rights text */}© {year} Zebib
-            Restaurant. {t("footer.rights")}
+            {/* dynamic year + translated rights text */}© {year} Zebib Restaurant. {t("footer.rights")}
           </p>
 
           <div className="flex items-center gap-6 text-sm text-body">
