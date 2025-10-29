@@ -16,15 +16,7 @@ export function Hero({ onScrollToMenu }: HeroProps) {
   return (
     <section
       id="home"
-      // 🧩 SECTION HEIGHT & SPACING
-      // ❌ Problem: min-h-screen (100vh) causes too much empty space below the hero on smaller content
-      // ✅ Option 1 (recommended): reduce overall height to make transition smoother
-      // className="relative flex items-center justify-center overflow-hidden bg-background min-h-[80vh] mt-[85px]"
-      // ✅ Option 2 (compact look): use padding instead of full height
-      // className="relative flex items-center justify-center overflow-hidden bg-background py-20 md:py-28 mt-[85px]"
-      // ✅ Option 3 (dynamic spacing): keep min-h-screen but reduce top/bottom padding
-      // className="relative flex items-center justify-center overflow-hidden bg-background min-h-screen pt-12 md:pt-20 mt-[70px]"
-      className="relative flex items-center justify-center overflow-hidden bg-background min-h-screen mt-[85px]"
+      className="relative flex items-center justify-center overflow-hidden bg-background min-h-[70vh] md:min-h-screen mt-[85px] pb-8 md:pb-0"
     >
       {/* 🖼️ Background Image */}
       <div className="absolute inset-0 flex items-center justify-center">
