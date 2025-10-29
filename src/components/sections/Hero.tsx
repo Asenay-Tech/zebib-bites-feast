@@ -91,7 +91,7 @@ export function Hero({ onScrollToMenu }: HeroProps) {
             className="
               flex flex-col sm:flex-row gap-3 md:gap-4 
               justify-center items-center 
-              mb-8 md:mb-10
+              mb-4 md:mb-6
             "
           >
             {/* 💡 Reduce spacing below buttons:
