@@ -80,7 +80,23 @@ export function Specialties() {
     }
   };
 
-  if (specialties.length === 0) return null;
+  const formatPrice = (price: any) => {
+    if (typeof price === 'number') {
+      return `€${price.toFixed(2)}`;
+    }
+    if (typeof price === 'string') {
+      const numPrice = parseFloat(price);
+      return isNaN(numPrice) ? price : `€${numPrice.toFixed(2)}`;
+    }
+    if (typeof price === 'object' && price !== null) {
+      if ('default' in price) {
+        return formatPrice(price.default);
+      }
+      const firstKey = Object.keys(price)[0];
+      return firstKey ? formatPrice(price[firstKey]) : '€0.00';
+    }
+    return '€0.00';
+  };
 
   return (
     <section className="py-20 bg-background">
@@ -97,42 +113,57 @@ export function Specialties() {
           </p>
         </div>
 
-        {/* Specialties Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {specialties.map((specialty) => {
-            const item = specialty.menu_items;
-            
-            return (
-              <Card
-                key={specialty.id}
-                className="overflow-hidden bg-card border-border/50 hover:shadow-elegant transition-all duration-500 group rounded-2xl"
-              >
-                {item.image_url && (
-                  <div className="relative h-64 overflow-hidden">
-                    <img
-                      src={item.image_url}
-                      alt={language === "de" ? item.name_de : item.name_en}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent" />
-                  </div>
-                )}
+        {specialties.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-xl text-body">
+              {language === "de"
+                ? "Unsere Spezialitäten werden gerade aktualisiert – schauen Sie bald wieder vorbei!"
+                : "Our specialties are being updated — check back soon!"}
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
+            {/* Specialties List */}
+            <div className="space-y-6">
+              {specialties.map((specialty) => {
+                const item = specialty.menu_items;
+                const itemName = language === "de" ? item.name_de : item.name_en;
+                const itemPrice = formatPrice(item.price);
                 
-                <CardContent className="p-6">
-                  <h3 className="text-2xl font-bold text-foreground mb-3">
-                    {language === "de" ? item.name_de : item.name_en}
-                  </h3>
-                  
-                  {(language === "de" ? item.description_de : item.description_en) && (
-                    <p className="text-body leading-relaxed">
-                      {language === "de" ? item.description_de : item.description_en}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+                return (
+                  <div
+                    key={specialty.id}
+                    className="group hover:transform hover:translate-x-2 transition-all duration-300"
+                  >
+                    <div className="flex items-center gap-4">
+                      <h3 className="text-xl font-semibold text-foreground whitespace-nowrap">
+                        {itemName}
+                      </h3>
+                      <div className="flex-1 h-px bg-gradient-to-r from-[hsl(var(--primary))] to-transparent opacity-50" />
+                      <span className="text-lg font-bold text-primary whitespace-nowrap">
+                        {itemPrice}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Decorative Image */}
+            {specialties.length > 0 && specialties[0].menu_items.image_url && (
+              <div className="relative hidden lg:block">
+                <div className="relative w-full h-[500px] rounded-2xl overflow-hidden shadow-elegant">
+                  <img
+                    src={specialties[0].menu_items.image_url}
+                    alt={language === "de" ? "Spezialitäten" : "Specialties"}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </section>
   );
