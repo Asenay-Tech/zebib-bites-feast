@@ -14,14 +14,20 @@ export function Hero({ onScrollToMenu }: HeroProps) {
   const navigate = useNavigate();
 
   return (
-    <section id="home" className="relative min-h-screen h-screen flex items-center justify-center overflow-hidden">
+    <section
+      id="home"
+      className="relative flex items-center justify-center overflow-hidden bg-background"
+      style={{ minHeight: "100vh" }}
+    >
       {/* Background Image with Overlay */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 flex items-center justify-center">
         <img
           src={heroImage}
           alt="Zebib Restaurant Interior"
-          className="w-full h-full object-cover object-center md:object-cover"
-          style={{ objectPosition: "center 40%" }}
+          className="w-full h-full object-cover md:object-cover"
+          style={{
+            objectPosition: "center 40%",
+          }}
           onError={(e) => {
             logger.error("Failed to load hero image:", heroImage, e.currentTarget?.src);
           }}
@@ -84,12 +90,17 @@ export function Hero({ onScrollToMenu }: HeroProps) {
       <div className="absolute top-1/4 left-4 w-2 h-16 bg-accent/20 rounded-full hidden lg:block" />
       <div className="absolute top-1/3 right-4 w-2 h-24 bg-accent/20 rounded-full hidden lg:block" />
 
-      {/* ✅ Mobile-specific fixes */}
+      {/* ✅ Mobile + Tablet Fix */}
       <style jsx>{`
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
           img {
             object-fit: contain !important;
             object-position: top center !important;
+            height: auto !important;
+          }
+          section {
+            min-height: 100vh !important;
+            height: auto !important;
           }
           h1 {
             font-size: 2.2rem !important;
@@ -97,10 +108,6 @@ export function Hero({ onScrollToMenu }: HeroProps) {
           p {
             font-size: 1rem !important;
             margin-bottom: 1.5rem;
-          }
-          section {
-            height: auto !important;
-            min-height: 100vh;
           }
         }
       `}</style>
