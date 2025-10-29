@@ -16,18 +16,14 @@ export function Hero({ onScrollToMenu }: HeroProps) {
   return (
     <section
       id="home"
-      className="relative flex items-center justify-center overflow-hidden bg-background"
-      style={{ minHeight: "100vh" }}
+      className="relative flex items-center justify-center overflow-hidden bg-background min-h-screen"
     >
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 flex items-center justify-center">
         <img
           src={heroImage}
           alt="Zebib Restaurant Interior"
-          className="w-full h-full object-cover md:object-cover"
-          style={{
-            objectPosition: "center 40%",
-          }}
+          className="w-full h-full object-contain object-top md:object-cover md:object-center"
           onError={(e) => {
             logger.error("Failed to load hero image:", heroImage, e.currentTarget?.src);
           }}
