@@ -100,7 +100,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         // Info Bar
         "info.address": "Salzstraße 14, 63450 Hanau",
         "info.directions": "Route Anzeigen",
-        "info.hours": "Täglich 11:00 - 23:00",
+        "info.hours": " Öffnungszeiten ",
         "info.phone": "+49 177 4629585",
 
         // Menu Section
@@ -313,7 +313,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         // Info Bar
         "info.address": "Salzstraße 14, 63450 Hanau",
         "info.directions": "Get Directions",
-        "info.hours": "Daily 11:00 AM - 11:00 PM",
+        "info.hours": " Opening Hours ",
         "info.phone": "+49 177 4629585",
 
         // Menu Section

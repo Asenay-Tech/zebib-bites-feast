@@ -48,7 +48,9 @@ export function Footer() {
 
           {/* Opening Hours (inline, zero gap) */}
           <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-foreground">{t("info.hours")}</h4>
+            <h4 className="text-lg font-semibold text-foreground">
+              {t("info.hours")}
+            </h4>
 
             <div className="space-y-2 text-body">
               <p>
@@ -68,7 +70,9 @@ export function Footer() {
 
           {/* Social Media */}
           <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-foreground">{t("footer.followUs")}</h4>
+            <h4 className="text-lg font-semibold text-foreground">
+              {t("footer.followUs")}
+            </h4>
             <div className="flex space-x-4">
               {socialLinks.map((social, index) => {
                 const Icon = social.icon;
@@ -90,7 +94,8 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-body text-sm">
-            {/* dynamic year + translated rights text */}© {year} Zebib Restaurant. {t("footer.rights")}
+            {/* dynamic year + translated rights text */}© {year} Zebib
+            Restaurant. {t("footer.rights")}
           </p>
 
           <div className="flex items-center gap-6 text-sm text-body">
