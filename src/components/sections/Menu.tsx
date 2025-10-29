@@ -50,7 +50,7 @@ export function Menu() {
   const getItemDescription = (item: (typeof menuItems)[0]) =>
     (language === "de" ? item.description_de : item.description_en) || "";
   return (
-    <section id="menu" className="py-20 bg-background">
+    <section id="menu" className="pt-8 pb-20 sm:pt-12 md:pt-20 bg-background">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
