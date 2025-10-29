@@ -16,20 +16,14 @@ export function Hero({ onScrollToMenu }: HeroProps) {
   return (
     <section
       id="home"
-      // 🔧 adjust hero vertical position here:
-      // Change these padding values to control how far down the hero content appears.
-      // pt-12 → small gap
-      // pt-16 → medium gap
-      // pt-24 → large gap (recommended if navbar is tall)
-      // You can also use custom like: pt-[120px]
-      className="relative flex items-center justify-center overflow-hidden bg-background min-h-screen pt-44 md:pt-32"
+      // Added top padding to pull image down slightly
+      className="relative flex items-center justify-center overflow-hidden bg-background min-h-screen pt-66 md:pt-20"
     >
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 flex items-center justify-center">
         <img
           src={heroImage}
           alt="Zebib Restaurant Interior"
-          // 👇 On mobile, image fits naturally; on desktop, covers full height
           className="w-full h-full object-contain object-top md:object-cover md:object-center"
           onError={(e) => {
             logger.error("Failed to load hero image:", heroImage, e.currentTarget?.src);
@@ -39,24 +33,21 @@ export function Hero({ onScrollToMenu }: HeroProps) {
           }}
         />
 
-        {/* Gradient Overlay for readability */}
+        {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background/80" />
       </div>
 
-      {/* Hero Content */}
+      {/* Content */}
       <div className="relative z-10 text-center px-4 py-8 md:py-0 max-w-4xl mx-auto">
         <div className="animate-fade-in">
-          {/* Restaurant Title */}
           <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-foreground mb-4 md:mb-6 tracking-wider">
             {t("hero.title")}
           </h1>
 
-          {/* Subtitle */}
           <p className="text-lg sm:text-xl md:text-2xl text-body mb-8 md:mb-12 max-w-2xl mx-auto leading-relaxed">
             {t("hero.subtitle")}
           </p>
 
-          {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center mb-12 md:mb-16">
             <Button
               onClick={() => navigate("/reserve")}
@@ -78,7 +69,7 @@ export function Hero({ onScrollToMenu }: HeroProps) {
         </div>
       </div>
 
-      {/* Scroll Down Indicator */}
+      {/* Scroll Down Button */}
       <button
         onClick={onScrollToMenu}
         className="absolute bottom-4 md:bottom-8 left-1/2 transform -translate-x-1/2 z-10 group"
@@ -92,7 +83,7 @@ export function Hero({ onScrollToMenu }: HeroProps) {
         </div>
       </button>
 
-      {/* Decorative Lines (Desktop only) */}
+      {/* Decorative Elements */}
       <div className="absolute top-1/4 left-4 w-2 h-16 bg-accent/20 rounded-full hidden lg:block" />
       <div className="absolute top-1/3 right-4 w-2 h-24 bg-accent/20 rounded-full hidden lg:block" />
     </section>
