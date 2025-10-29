@@ -28,6 +28,26 @@ export function Specialties() {
 
   useEffect(() => {
     fetchSpecialties();
+
+    // Set up realtime subscription for specialties changes
+    const channel = supabase
+      .channel('specialties-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'specialties'
+        },
+        () => {
+          fetchSpecialties();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchSpecialties = async () => {
@@ -52,9 +72,11 @@ export function Specialties() {
         .order('display_order', { ascending: true });
 
       if (error) throw error;
+      console.log('Fetched specialties:', data);
       setSpecialties(data || []);
     } catch (error) {
       logger.error('Error fetching specialties:', error);
+      console.error('Error fetching specialties:', error);
     }
   };
 
