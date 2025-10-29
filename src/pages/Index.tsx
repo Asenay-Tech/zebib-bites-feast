@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/navigation/Header";
 import { Hero } from "@/components/sections/Hero";
 import { Menu } from "@/components/sections/Menu";
+import { Specialties } from "@/components/sections/Specialties";
 import { WhyChooseUs } from "@/components/sections/WhyChooseUs";
 import { Reviews } from "@/components/sections/Reviews";
 import { Contact } from "@/components/sections/Contact";
@@ -78,6 +79,8 @@ const Index = () => {
       />
       
       <Menu />
+      
+      <Specialties />
       
       <WhyChooseUs />
       
