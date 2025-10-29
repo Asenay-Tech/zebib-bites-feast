@@ -16,21 +16,14 @@ export function Hero({ onScrollToMenu }: HeroProps) {
   return (
     <section
       id="home"
-      className="relative flex items-center justify-center overflow-hidden bg-background min-h-[70vh] md:min-h-screen mt-[85px] pb-8 md:pb-0"
+      className="relative flex flex-col md:items-center md:justify-center overflow-hidden bg-background mt-[85px] pb-4 md:min-h-screen md:pb-0"
     >
-      {/* 🖼️ Background Image */}
-      <div className="absolute inset-0 flex items-center justify-center">
+      {/* 🖼️ Background Image - Full width banner on mobile, overlay on desktop */}
+      <div className="relative md:absolute md:inset-0 w-full h-[40vh] md:h-full flex items-center justify-center">
         <img
           src={heroImage}
           alt="Zebib Restaurant Interior"
-          // 🧠 Image Sizing Tips:
-          // ✅ object-cover = fills the section, crops excess → professional, modern look
-          // ✅ object-contain = fits the whole image, may leave blank areas
-          // ✅ Try these for refinement:
-          // className="w-full h-full object-cover object-center"
-          // className="w-full h-full object-cover object-top"
-          // className="w-full h-full object-[50%_30%]" // fine-tune vertical crop manually
-          className="w-full h-full object-contain object-top md:object-cover md:object-center"
+          className="w-full h-full object-cover object-center"
           onError={(e) => {
             logger.error("Failed to load hero image:", heroImage, e.currentTarget?.src);
           }}
@@ -39,12 +32,12 @@ export function Hero({ onScrollToMenu }: HeroProps) {
           }}
         />
 
-        {/* 🔳 Overlay: gradient overlay improves text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background/80" />
+        {/* 🔳 Overlay: gradient overlay improves text readability - desktop only */}
+        <div className="hidden md:block absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background/80" />
       </div>
 
       {/* 📝 Content Block */}
-      <div className="relative z-10 text-center px-4 py-8 md:py-0 max-w-4xl mx-auto">
+      <div className="relative z-10 text-center px-4 py-6 md:py-0 max-w-4xl mx-auto">
         <div className="animate-fade-in">
           {/* 🏷️ Title */}
           <h1
@@ -83,7 +76,7 @@ export function Hero({ onScrollToMenu }: HeroProps) {
             className="
               flex flex-col sm:flex-row gap-3 md:gap-4 
               justify-center items-center 
-              mb-4 md:mb-10
+              mb-2 md:mb-10
             "
           >
             {/* 💡 Reduce spacing below buttons:
@@ -120,10 +113,10 @@ export function Hero({ onScrollToMenu }: HeroProps) {
         </div>
       </div>
 
-      {/* 🖱️ Scroll Down Button */}
+      {/* 🖱️ Scroll Down Button - hidden on mobile since text is below image */}
       <button
         onClick={onScrollToMenu}
-        className="absolute bottom-4 md:bottom-8 left-1/2 transform -translate-x-1/2 z-10 group"
+        className="hidden md:block absolute bottom-4 md:bottom-8 left-1/2 transform -translate-x-1/2 z-10 group"
         aria-label={t("hero.scroll")}
       >
         <div className="flex flex-col items-center gap-1 md:gap-2 text-body hover:text-accent transition-colors duration-300">
