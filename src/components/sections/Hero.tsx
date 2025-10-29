@@ -121,9 +121,9 @@ export function Hero({ onScrollToMenu }: HeroProps) {
           aria-label={t("hero.scroll")}
         >
           <div className="flex flex-col items-center gap-1 md:gap-2 text-body hover:text-accent transition-colors duration-300">
-            <span className="text-xs md:text-sm font-medium tracking-wide uppercase">{t("hero.scroll")}</span>
-            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-current flex items-center justify-center group-hover:border-accent transition-colors duration-300">
-              <ChevronDown className="w-4 h-4 md:w-5 md:h-5 animate-bounce" />
+            <span className="hidden md:block text-xs md:text-sm font-medium tracking-wide uppercase">{t("hero.scroll")}</span>
+            <div className="w-12 h-12 md:w-12 md:h-12 rounded-full border-2 border-current flex items-center justify-center group-hover:border-accent transition-colors duration-300 bg-background/80 backdrop-blur-sm">
+              <ChevronDown className="w-5 h-5 md:w-5 md:h-5 animate-bounce" />
             </div>
           </div>
         </button>
