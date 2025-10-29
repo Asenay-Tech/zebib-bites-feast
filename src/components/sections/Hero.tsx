@@ -76,7 +76,7 @@ export function Hero({ onScrollToMenu }: HeroProps) {
             className="
               flex flex-col sm:flex-row gap-3 md:gap-4 
               justify-center items-center 
-              mb-4 md:mb-10
+              mb-2 md:mb-10
             "
           >
             {/* 💡 Reduce spacing below buttons:
@@ -114,7 +114,7 @@ export function Hero({ onScrollToMenu }: HeroProps) {
       </div>
 
       {/* 🖱️ Scroll Down Button - in flow on mobile, absolute on desktop */}
-      <div className="relative mt-4 mb-0 md:absolute md:bottom-8 md:left-1/2 md:transform md:-translate-x-1/2 md:mt-0 z-20">
+      <div className="relative mt-2 mb-0 md:absolute md:bottom-8 md:left-1/2 md:transform md:-translate-x-1/2 md:mt-0 z-20">
         <button
           onClick={onScrollToMenu}
           className="group mx-auto block"

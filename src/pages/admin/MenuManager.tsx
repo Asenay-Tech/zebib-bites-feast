@@ -101,6 +101,7 @@ export default function MenuManager() {
   const [imageOffsetY, setImageOffsetY] = useState(0);
   const [isDraggingImage, setIsDraggingImage] = useState(false);
   const [dragStartPos, setDragStartPos] = useState({ x: 0, y: 0 });
+  const [specialtyItems, setSpecialtyItems] = useState<Set<string>>(new Set());
   const [formData, setFormData] = useState({
     name_de: "",
     name_en: "",
@@ -174,6 +175,14 @@ export default function MenuManager() {
         settingsMap[s.category] = s.show_image;
       });
       setCategorySettings(settingsMap);
+
+      // Fetch specialties
+      const { data: specialtiesData } = await supabase
+        .from("specialties")
+        .select("menu_item_id");
+      
+      const specialtySet = new Set(specialtiesData?.map(s => s.menu_item_id) || []);
+      setSpecialtyItems(specialtySet);
     } catch (error) {
       logger.error('Error fetching menu items:', error);
       toast({
@@ -739,6 +748,85 @@ export default function MenuManager() {
     }
   };
 
+  const handleToggleSpecialty = async (itemId: string) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const isCurrentlySpecialty = specialtyItems.has(itemId);
+
+      if (isCurrentlySpecialty) {
+        // Remove from specialties
+        const { error } = await supabase
+          .from("specialties")
+          .delete()
+          .eq("menu_item_id", itemId);
+
+        if (error) throw error;
+
+        setSpecialtyItems(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(itemId);
+          return newSet;
+        });
+
+        toast({
+          title: "Success",
+          description: "Removed from specialties",
+        });
+      } else {
+        // Check if we already have 6 specialties
+        if (specialtyItems.size >= 6) {
+          toast({
+            title: "Limit Reached",
+            description: "You can only select up to 6 specialties.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Get the current max display_order
+        const { data: existingSpecialties } = await supabase
+          .from("specialties")
+          .select("display_order")
+          .order("display_order", { ascending: false })
+          .limit(1);
+
+        const nextOrder = existingSpecialties && existingSpecialties.length > 0 
+          ? existingSpecialties[0].display_order + 1 
+          : 0;
+
+        // Add to specialties
+        const { error } = await supabase
+          .from("specialties")
+          .insert({
+            menu_item_id: itemId,
+            display_order: nextOrder,
+            created_by: user.id,
+            updated_by: user.id,
+          });
+
+        if (error) throw error;
+
+        setSpecialtyItems(prev => new Set([...prev, itemId]));
+
+        toast({
+          title: "Success",
+          description: "Added to specialties",
+        });
+      }
+
+      await logActivity(`Toggled specialty for menu item`, 'menu_item', itemId);
+    } catch (error) {
+      logger.error('Error toggling specialty:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update specialty status",
+        variant: "destructive",
+      });
+    }
+  };
+
   const renderPrice = (price: any) => {
     if (typeof price === 'object') {
       return Object.entries(price)
@@ -916,13 +1004,18 @@ export default function MenuManager() {
                   <div className="flex-1">
                     <div className="flex items-start justify-between">
                       <div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <h3 className="font-semibold text-foreground">
                             {item.name_en} / {item.name_de}
                           </h3>
                           <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded">
                             {item.category}
                           </span>
+                          {specialtyItems.has(item.id) && (
+                            <span className="text-xs px-2 py-1 bg-accent/20 text-accent rounded">
+                              ⭐ Specialty
+                            </span>
+                          )}
                         </div>
                         {item.description_en && (
                           <p className="text-sm text-muted-foreground mt-1">
@@ -936,6 +1029,20 @@ export default function MenuManager() {
                       {!previewMode && (
                         <TooltipProvider>
                           <div className="flex gap-2">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant={specialtyItems.has(item.id) ? "default" : "ghost"}
+                                  size="sm"
+                                  onClick={() => handleToggleSpecialty(item.id)}
+                                >
+                                  ⭐
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{specialtyItems.has(item.id) ? "Remove from specialties" : "Add to specialties"}</p>
+                              </TooltipContent>
+                            </Tooltip>
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button
@@ -1283,7 +1390,7 @@ export default function MenuManager() {
 
       {/* Category Management Dialog */}
       <Dialog open={categoryDialogOpen} onOpenChange={setCategoryDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>Manage Categories</DialogTitle>
             <DialogDescription>
@@ -1291,7 +1398,7 @@ export default function MenuManager() {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="space-y-4">
+          <div className="space-y-4 overflow-y-auto flex-1 pr-2">
             <div className="flex gap-2">
               <Input
                 placeholder="New category name"
