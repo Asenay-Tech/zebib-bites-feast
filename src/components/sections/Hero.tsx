@@ -16,7 +16,8 @@ export function Hero({ onScrollToMenu }: HeroProps) {
   return (
     <section
       id="home"
-      className="relative flex items-center justify-center overflow-hidden bg-background min-h-screen"
+      // Added top padding to pull image down slightly
+      className="relative flex items-center justify-center overflow-hidden bg-background min-h-screen pt-16 md:pt-20"
     >
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 flex items-center justify-center">
