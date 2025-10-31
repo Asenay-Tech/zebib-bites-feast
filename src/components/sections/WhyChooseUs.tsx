@@ -22,8 +22,8 @@ export function WhyChooseUs() {
         language === "de" ? "Einladende Atmosphäre" : "Welcoming Environment",
       description:
         language === "de"
-          ? "Unser Restaurant bietet eine warme, familienfreundliche Atmosphäre mit traditioneller eritreischer Gastfreundschaft."
-          : "Our restaurant offers a warm, family-friendly atmosphere with traditional Eritrean hospitality.",
+          ? "Unser Restaurant bietet eine warme, familienfreundliche Atmosphäre mit traditioneller eritreischer und äthiopischer Gastfreundschaft."
+          : "Our restaurant offers a warm, family-friendly atmosphere with traditional Eritrean and Ethiopian hospitality.",
     },
     {
       icon: Calendar,
