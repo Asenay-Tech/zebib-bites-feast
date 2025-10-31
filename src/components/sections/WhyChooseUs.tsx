@@ -13,8 +13,8 @@ export function WhyChooseUs() {
       title: language === "de" ? "Frische Zutaten" : "Fresh Ingredients",
       description:
         language === "de"
-          ? "Wir verwenden nur die frischesten Zutaten und authentische Habesha-Gewürze."
-          : "We use only the freshest ingredients and authentic Habesha spices.",
+          ? "Wir verwenden nur die frischesten Zutaten und authentische eritreischer und äthiopischer Gewürze."
+          : "We use only the freshest ingredients and authentic Eritrean and Ethiopian spices.",
     },
     {
       icon: Users,
@@ -48,8 +48,8 @@ export function WhyChooseUs() {
           </h2>
           <p className="text-xl text-body max-w-2xl mx-auto">
             {language === "de"
-              ? "Entdecken Sie, was uns zu Ihrem bevorzugten eritreischen Restaurant macht."
-              : "Discover what makes us your preferred Eritrean restaurant."}
+              ? "Entdecken Sie, was uns zu Ihrem bevorzugten eritreischer und äthiopischer Restaurant macht."
+              : "Discover what makes us your preferred Eritrean and Ethiopian restaurant."}
           </p>
         </div>
 
