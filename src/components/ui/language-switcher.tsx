@@ -105,7 +105,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
 
         // Menu Section
         "menu.title": "UNSERE SPEISEKARTE",
-        "menu.subtitle": "Entdecken Sie die Aromen Eritreas",
+        "menu.subtitle": "Entdecken Sie die Aromen Eritreas und Äthiopiens",
         "menu.category.all": "Alle",
 
         // Auth
@@ -318,7 +318,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
 
         // Menu Section
         "menu.title": "OUR MENU",
-        "menu.subtitle": "Discover the Flavors of Eritrea",
+        "menu.subtitle": "Discover the Flavors of Eritrea and Ethiopia",
         "menu.category.all": "All",
 
         // Auth
