@@ -153,8 +153,8 @@ export function Specialties() {
                   src={traditionalPlatterImage}
                   alt={
                     language === "de"
-                      ? "Traditionelle Habesha-Platte"
-                      : "Traditional Habesha Platter"
+                      ? "Traditionelle Eritreisch-Äthiopische Platte"
+                      : "Traditional Eritrean and Ethiopian Platter"
                   }
                   className="w-full h-full object-cover rounded-2xl shadow-elegant"
                 />

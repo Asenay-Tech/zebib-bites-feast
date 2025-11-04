@@ -65,7 +65,7 @@ serve(async (req) => {
                         ${notes ? `<p style="margin: 8px 0; color: #666666; font-size: 15px;"><strong>Special Requests:</strong> ${escapeHtml(notes)}</p>` : ''}
                       </div>
 
-                      <p style="margin: 30px 0 0; color: #666666; font-size: 16px; line-height: 1.6;">We look forward to welcoming you and providing an authentic Eritrean dining experience!</p>
+                      <p style="margin: 30px 0 0; color: #666666; font-size: 16px; line-height: 1.6;">We look forward to welcoming you and providing an authentic Eritrean and Ethiopian dining experience!</p>
                       <p style="margin: 15px 0 0; color: #666666; font-size: 16px; line-height: 1.6;">Best regards,<br><strong>The ZEBIB Team</strong></p>
                     </td>
                   </tr>

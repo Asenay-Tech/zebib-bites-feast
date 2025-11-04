@@ -65,7 +65,7 @@
     { "name_de": "Kicha Fit Fit", "name_en": "Kicha Fit Fit", "description_de": "selbstgemachtes Brot in gewürzter Butter & Berbere getränkt, mit Joghurt serviert", "description_en": "homemade bread soaked in spiced butter & berbere, served with yogurt", "image": "Kicha Fit Fit.jpg" },
     { "name_de": "Ful Medames", "name_en": "Ful Medames", "description_de": "gekochte Bohnen mit roten Zwiebeln, Tomaten, Knoblauch; serviert mit Brot & Schafskäse", "description_en": "cooked beans with red onions, tomatoes, garlic; served with bread & feta", "image": "Ful Medames.jpg" },
     { "name_de": "Ga'at", "name_en": "Ga'at", "description_de": "Brei aus Gerstenmehl, mit gewürzter Butter & Berbere, serviert mit Joghurt", "description_en": "porridge of barley flour with spiced butter & berbere, served with yogurt", "image": "gaat.jpg" },
-    { "name_de": "Eritreische Frittata", "name_en": "Eritrean frittata", "description_de": "Rührei mit Gemüse", "description_en": "scrambled eggs with vegetables", "image": "frittata.jpg" }
+    { "name_de": "Eritreisch-Äthiopische Frittata", "name_en": "Eritrean and Ethiopian frittata", "description_de": "Rührei mit Gemüse", "description_en": "scrambled eggs with vegetables", "image": "frittata.jpg" }
   ],
 
   "Vorspeisen": [

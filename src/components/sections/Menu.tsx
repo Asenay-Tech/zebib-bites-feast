@@ -295,7 +295,7 @@ export function Menu() {
               <div className="relative">
                 <img
                   src={traditionalPlatterImage}
-                  alt="Traditional Eritrean Platter"
+                  alt="Traditional Eritrean and Ethiopian Platter"
                   className="w-full h-auto rounded-xl shadow-elegant"
                 />
               </div>

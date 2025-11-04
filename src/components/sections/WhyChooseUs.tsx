@@ -96,8 +96,8 @@ export function WhyChooseUs() {
             </h3>
             <p className="text-body leading-relaxed text-lg">
               {language === "de"
-                ? "Wir verbinden den authentischen Geschmack der Habesha-Hausmannskost mit einem modernen kulinarischen Erlebnis."
-                : "We combine the authentic taste of Habesha home cooking with a modern dining experience."}
+                ? "Wir verbinden den authentischen Geschmack der eritreisch-äthiopischen Hausmannskost mit einem modernen kulinarischen Erlebnis."
+                : "We combine the authentic taste of Eritrean and Ethiopian home cooking with a modern dining experience."}
             </p>
           </div>
 
