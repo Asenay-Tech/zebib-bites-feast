@@ -10,7 +10,7 @@ interface HeroProps {
 }
 
 export function Hero({ onScrollToMenu }: HeroProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
 
   return (
@@ -70,40 +70,25 @@ export function Hero({ onScrollToMenu }: HeroProps) {
             {t("hero.subtitle")}
           </p>
 
-          {/* CTA Buttons */}
+          {/* Permanently Closed Notice */}
           <div
             className="
-              flex flex-col sm:flex-row gap-2 md:gap-2
+              flex flex-col gap-2 md:gap-4
               justify-center items-center 
               mb-1 md:mb-4
             "
           >
-            <Button
-              onClick={() => navigate("/reserve")}
-              size="lg"
-              className="
-                bg-accent hover:bg-accent-hover text-accent-foreground 
-                font-semibold px-6 md:px-8 py-3 md:py-4 
-                text-base md:text-lg transition-all duration-300 
-                hover:shadow-glow min-w-[180px] md:min-w-[200px]
-              "
-            >
-              {t("hero.cta.reserve")}
-            </Button>
-
-            <Button
-              onClick={() => navigate("/order")}
-              variant="outline"
-              size="lg"
-              className="
-                border-accent text-accent hover:bg-accent hover:text-accent-foreground 
-                font-semibold px-6 md:px-8 py-3 md:py-4 
-                text-base md:text-lg transition-all duration-300 
-                min-w-[180px] md:min-w-[200px]
-              "
-            >
-              {t("hero.cta.order")}
-            </Button>
+            <div className="bg-destructive/90 text-destructive-foreground px-6 py-3 rounded-lg">
+              <p className="text-lg md:text-xl font-semibold">
+                {language === "de" ? "Dauerhaft Geschlossen" : "Permanently Closed"}
+              </p>
+            </div>
+            <p className="text-body text-sm md:text-base max-w-md">
+              {language === "de" 
+                ? "Vielen Dank für Ihre Unterstützung über die Jahre."
+                : "Thank you for your support over the years."
+              }
+            </p>
           </div>
         </div>
       </div>
