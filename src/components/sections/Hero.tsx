@@ -73,17 +73,30 @@ export function Hero({ onScrollToMenu }: HeroProps) {
           {/* Permanently Closed Notice */}
           <div
             className="
-              flex flex-col gap-2 md:gap-4
+              flex flex-col gap-3 md:gap-4
               justify-center items-center 
               mb-1 md:mb-4
             "
           >
             <div className="bg-destructive/90 text-destructive-foreground px-6 py-3 rounded-lg">
               <p className="text-lg md:text-xl font-semibold">
-                {language === "de" ? "Dauerhaft Geschlossen" : "Permanently Closed"}
+                {language === "de" ? "Dieses Geschäft ist dauerhaft geschlossen" : "This Business is Permanently Closed"}
               </p>
             </div>
-            <p className="text-body text-sm md:text-base max-w-md">
+            
+            <div className="bg-surface/80 backdrop-blur-sm border border-border rounded-lg px-6 py-4 text-center">
+              <p className="text-sm text-muted-foreground mb-2">
+                {language === "de" ? "Ehemalige Öffnungszeiten:" : "Former Opening Hours:"}
+              </p>
+              <p className="text-body font-medium">
+                {language === "de" ? "Di - So: 11:00 - 23:00 Uhr" : "Tue - Sun: 11:00 AM - 11:00 PM"}
+              </p>
+              <p className="text-body font-medium">
+                {language === "de" ? "Montag: Ruhetag" : "Monday: Closed"}
+              </p>
+            </div>
+            
+            <p className="text-muted-foreground text-sm md:text-base max-w-md">
               {language === "de" 
                 ? "Vielen Dank für Ihre Unterstützung über die Jahre."
                 : "Thank you for your support over the years."
